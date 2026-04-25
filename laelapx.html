@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laelapx — Know Why Before You Pitch</title>
+<meta property="og:title" content="Laelapx — Know Why Before You Pitch">
+<meta property="og:description" content="Upload your deck. Get your Fundability Snapshot — score, gaps, deck feedback, and matched investors — before your first cold email.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f7f5f0;
+  --surface: #edeae3;
+  --surface-2: #e2ded6;
+  --navy: #1c2b42;
+  --navy-2: #253d5c;
+  --blue: #2c5ba8;
+  --blue-lt: #4a78cc;
+  --blue-dim: rgba(44,91,168,0.07);
+  --blue-bd: rgba(44,91,168,0.18);
+  --text-1: #191714;
+  --text-2: #5a5650;
+  --text-3: #9a968e;
+  --border: rgba(25,23,20,0.1);
+  --white: #ffffff;
+  --red: #c44040;
+  --red-dim: rgba(196,64,64,0.07);
+  --red-bd: rgba(196,64,64,0.16);
+  --max: 1080px;
+  --pad: clamp(20px, 5vw, 80px);
+  --r: 4px;
+  --r-lg: 10px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeLeft {
+  from { opacity: 0; transform: translateX(44px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.hero-label   { animation: fadeUp  0.65s cubic-bezier(.16,1,.3,1) 0.08s both; }
+.hero-h1      { animation: fadeUp  0.8s  cubic-bezier(.16,1,.3,1) 0.24s both; }
+.hero-sub     { animation: fadeUp  0.65s cubic-bezier(.16,1,.3,1) 0.44s both; }
+.hero-actions { animation: fadeUp  0.65s cubic-bezier(.16,1,.3,1) 0.6s  both; }
+.hero-card-col { animation: fadeLeft 0.85s cubic-bezier(.16,1,.3,1) 0.42s both; }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s cubic-bezier(.16,1,.3,1),
+              transform 0.65s cubic-bezier(.16,1,.3,1);
+}
+.reveal.in { opacity: 1; transform: none; }
+.d1 { transition-delay: 0.07s; }
+.d2 { transition-delay: 0.15s; }
+.d3 { transition-delay: 0.23s; }
+.d4 { transition-delay: 0.31s; }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--pad); height: 62px;
+  background: var(--navy);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.nav-logo { font-size: 17px; font-weight: 900; letter-spacing: -0.5px; color: #fff; }
+.nav-logo span { color: var(--blue-lt); }
+.nav-right { display: flex; align-items: center; gap: 28px; }
+.nav-link { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); transition: color 0.2s; }
+.nav-link:hover { color: #fff; }
+.nav-cta {
+  font-size: 13px; font-weight: 600; color: #fff;
+  background: var(--blue); padding: 9px 18px; border-radius: var(--r);
+  transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--blue-lt); }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  background-color: var(--navy);
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  display: grid;
+  align-items: center;
+  padding: 130px var(--pad) 100px;
+  position: relative;
+}
+.hero-inner {
+  max-width: var(--max); margin: 0 auto; width: 100%;
+  display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 72px;
+  align-items: center;
+}
+.hero-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--blue-lt); margin-bottom: 22px; display: block;
+}
+.hero-h1 {
+  font-size: clamp(48px, 6.5vw, 84px); font-weight: 800; color: #fff;
+  line-height: 1.04; letter-spacing: -2.5px; margin-bottom: 28px;
+}
+.hero-sub {
+  font-size: 18px; font-weight: 400; color: rgba(255,255,255,0.65);
+  line-height: 1.68; max-width: 460px; margin-bottom: 40px;
+}
+.hero-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--blue); color: #fff;
+  font-size: 14px; font-weight: 600;
+  padding: 14px 26px; border-radius: var(--r);
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-primary:hover { background: var(--blue-lt); transform: translateY(-1px); }
+.btn-ghost { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.45); transition: color 0.2s; }
+.btn-ghost:hover { color: rgba(255,255,255,0.85); }
+
+/* ─── SNAPSHOT CARD ─── */
+.snapshot-card {
+  background: #fff;
+  border-radius: var(--r-lg);
+  padding: 30px;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  position: relative;
+}
+.sc-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px;
+}
+.sc-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--text-3);
+}
+.sc-badge {
+  font-size: 11px; font-weight: 600;
+  background: var(--blue-dim); color: var(--blue);
+  padding: 4px 10px; border-radius: 20px; border: 1px solid var(--blue-bd);
+}
+.sc-score-row { display: flex; align-items: center; gap: 22px; margin-bottom: 28px; }
+.sc-gauge {
+  width: 88px; height: 88px; flex-shrink: 0;
+  background: conic-gradient(var(--blue) 0deg 259deg, var(--surface-2) 259deg 360deg);
+  border-radius: 50%; position: relative;
+}
+.sc-gauge::after {
+  content: '72';
+  position: absolute; inset: 11px;
+  background: #ffffff; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px;
+}
+.sc-score-info { flex: 1; }
+.sc-score-label { font-size: 20px; font-weight: 800; color: var(--text-1); margin-bottom: 6px; }
+.sc-score-sub { font-size: 12px; color: var(--text-2); line-height: 1.55; }
+.sc-bars { display: flex; flex-direction: column; gap: 11px; margin-bottom: 26px; }
+.sc-bar-row { display: flex; align-items: center; gap: 10px; }
+.sc-bar-label { font-size: 11px; font-weight: 600; color: var(--text-2); width: 68px; flex-shrink: 0; }
+.sc-bar-track { flex: 1; height: 5px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+.sc-bar-fill { height: 100%; border-radius: 3px; background: var(--blue); width: 0; transition: width 1.1s cubic-bezier(.16,1,.3,1); }
+.sc-bar-fill.low { background: var(--red); }
+.sc-bar-val { font-size: 11px; font-weight: 700; color: var(--text-3); width: 26px; text-align: right; }
+.sc-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 18px; border-top: 1px solid var(--border);
+}
+.sc-investors { font-size: 13px; font-weight: 700; color: var(--text-1); }
+.sc-investors span { color: var(--blue); }
+.sc-gap-tag {
+  font-size: 11px; font-weight: 600;
+  background: var(--red-dim); color: var(--red);
+  padding: 4px 10px; border-radius: 20px; border: 1px solid var(--red-bd);
+}
+
+/* ─── SHARED ─── */
+.section-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--blue); margin-bottom: 18px; display: block;
+}
+.section-h2 {
+  font-size: clamp(32px, 4vw, 52px); font-weight: 800;
+  letter-spacing: -1.5px; line-height: 1.1; color: var(--text-1); margin-bottom: 18px;
+}
+.section-sub {
+  font-size: 17px; font-weight: 400; color: var(--text-2); line-height: 1.72; max-width: 560px;
+}
+
+/* ─── STAT ─── */
+.stat-section { padding: 110px var(--pad); background: var(--bg); overflow: hidden; }
+.stat-inner {
+  max-width: var(--max); margin: 0 auto; position: relative;
+  display: grid; grid-template-columns: 1fr 1.3fr; gap: 80px; align-items: center;
+}
+.stat-deco {
+  position: absolute; right: -32px; top: 50%; transform: translateY(-50%);
+  font-size: 240px; font-weight: 900; color: rgba(25,23,20,0.045);
+  letter-spacing: -10px; line-height: 1; pointer-events: none; user-select: none; white-space: nowrap;
+}
+.stat-inner > div { position: relative; z-index: 1; }
+.stat-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 18px; display: block; }
+.stat-number {
+  font-size: clamp(64px, 10vw, 108px); font-weight: 800;
+  color: var(--text-1); letter-spacing: -4px; line-height: 1; margin-bottom: 10px;
+}
+.stat-unit { font-size: 17px; font-weight: 500; color: var(--text-2); margin-bottom: 10px; line-height: 1.5; }
+.stat-source { font-size: 11px; color: var(--text-3); letter-spacing: 0.3px; }
+.stat-body h2 {
+  font-size: clamp(26px, 3.2vw, 40px); font-weight: 800;
+  letter-spacing: -1px; line-height: 1.22; color: var(--text-1); margin-bottom: 22px;
+}
+.stat-body p { font-size: 17px; color: var(--text-2); line-height: 1.72; }
+
+/* ─── PROBLEM ─── */
+.problem-section { padding: 110px var(--pad); background: var(--surface); }
+.problem-inner { max-width: var(--max); margin: 0 auto; }
+.pain-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 56px; }
+.pain-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 28px 24px;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.pain-card:hover { border-color: var(--red-bd); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+.pain-icon {
+  width: 38px; height: 38px; border-radius: var(--r);
+  background: var(--red-dim); border: 1px solid var(--red-bd);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+}
+.pain-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--red); }
+.pain-card h3 { font-size: 15px; font-weight: 800; color: var(--text-1); margin-bottom: 10px; }
+.pain-card p { font-size: 14px; color: var(--text-2); line-height: 1.68; }
+
+/* ─── FEATURES ─── */
+.features-section { padding: 120px var(--pad); background: var(--bg); }
+.features-inner { max-width: var(--max); margin: 0 auto; }
+.features-header { margin-bottom: 72px; }
+.features-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 2px; background: var(--border);
+  border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden;
+}
+.feature-card { background: var(--bg); padding: 48px 44px; transition: background 0.2s; }
+.feature-card:hover { background: var(--surface); }
+
+/* Feature icons */
+.fi {
+  width: 44px; height: 44px; margin-bottom: 22px;
+  position: relative;
+  background: var(--blue-dim); border: 1px solid var(--blue-bd);
+  border-radius: var(--r); flex-shrink: 0;
+}
+.fi-score { border-radius: 50%; }
+.fi-score::before {
+  content: ''; position: absolute; inset: 9px;
+  border-radius: 50%; border: 2px solid var(--blue);
+}
+.fi-score::after {
+  content: ''; position: absolute; bottom: 11px; left: 50%; transform: translateX(-50%);
+  width: 5px; height: 5px; background: var(--blue); border-radius: 50%;
+}
+.fi-bars { display: flex; align-items: flex-end; gap: 3px; padding: 10px 10px 11px; }
+.fi-bars span { flex: 1; background: var(--blue); border-radius: 1px; display: block; }
+.fi-lines { display: flex; flex-direction: column; gap: 5px; padding: 12px 11px; justify-content: center; }
+.fi-lines span { height: 2px; border-radius: 1px; display: block; }
+.fi-target { border-radius: 50%; }
+.fi-target::before {
+  content: ''; position: absolute; inset: 9px;
+  border: 2px solid var(--blue); border-radius: 50%; opacity: 0.45;
+}
+.fi-target::after {
+  content: ''; position: absolute; inset: 17px;
+  background: var(--blue); border-radius: 50%;
+}
+
+.feature-num {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--blue); margin-bottom: 14px; display: block;
+}
+.feature-card h3 { font-size: 22px; font-weight: 800; color: var(--text-1); letter-spacing: -0.4px; margin-bottom: 14px; }
+.feature-card p { font-size: 16px; color: var(--text-2); line-height: 1.72; }
+
+/* ─── HOW IT WORKS ─── */
+.hiw-section { padding: 120px var(--pad); background: var(--navy); }
+.hiw-inner { max-width: var(--max); margin: 0 auto; }
+.hiw-header { text-align: center; margin-bottom: 72px; }
+.hiw-header .section-eyebrow { color: var(--blue-lt); }
+.hiw-header .section-h2 { color: #fff; }
+.hiw-header .section-sub { color: rgba(255,255,255,0.55); margin: 0 auto; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; position: relative; }
+.steps::before {
+  content: '';
+  position: absolute; top: 48px;
+  left: calc(33.33% + 9px); right: calc(33.33% + 9px);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.16) 50%, rgba(255,255,255,0.06) 100%);
+  pointer-events: none;
+}
+.step {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--r); padding: 44px 32px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.step:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.16); }
+.step-num {
+  font-size: 52px; font-weight: 900; color: rgba(255,255,255,0.07);
+  letter-spacing: -2px; line-height: 1; margin-bottom: 20px;
+}
+.step h3 { font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 12px; }
+.step p { font-size: 15px; color: rgba(255,255,255,0.62); line-height: 1.72; }
+
+/* ─── BEFORE / AFTER ─── */
+.ba-section { padding: 120px var(--pad); background: var(--bg); }
+.ba-inner { max-width: var(--max); margin: 0 auto; }
+.ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 64px; position: relative; }
+.ba-arrow {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 34px; height: 34px; z-index: 2;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: var(--text-3);
+}
+.ba-col { border-radius: var(--r-lg); padding: 44px; }
+.ba-before { background: var(--surface); border: 1px solid var(--border); }
+.ba-after { background: var(--navy-2); border: 1px solid rgba(255,255,255,0.08); }
+.ba-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 28px; display: block;
+}
+.ba-before .ba-label { color: var(--text-3); }
+.ba-after .ba-label { color: var(--blue-lt); }
+.ba-items { display: flex; flex-direction: column; gap: 15px; }
+.ba-item { display: flex; align-items: flex-start; gap: 13px; }
+.ba-bullet { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+.ba-before .ba-bullet { background: var(--red); }
+.ba-after .ba-bullet { background: var(--blue-lt); }
+.ba-before .ba-item p { font-size: 15px; color: var(--text-2); line-height: 1.6; }
+.ba-after .ba-item p { font-size: 15px; color: rgba(255,255,255,0.78); line-height: 1.6; }
+
+/* ─── CONTRAST ─── */
+.contrast-section { padding: 110px var(--pad); background: var(--surface); }
+.contrast-inner { max-width: var(--max); margin: 0 auto; }
+.contrast-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 56px; }
+.contrast-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 32px 28px;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.contrast-card:hover { border-color: var(--blue-bd); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+.contrast-not {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-3); text-decoration: line-through; margin-bottom: 10px; display: block;
+}
+.contrast-is { font-size: 19px; font-weight: 800; color: var(--text-1); margin-bottom: 12px; display: block; }
+.contrast-card p { font-size: 14px; color: var(--text-2); line-height: 1.68; }
+
+/* ─── QUOTES ─── */
+.quote-section { padding: 100px var(--pad); background: var(--navy); }
+.quote-inner { max-width: var(--max); margin: 0 auto; }
+.quote-header { text-align: center; margin-bottom: 60px; }
+.quote-header .section-eyebrow { color: var(--blue-lt); }
+.quote-header .section-h2 { color: #fff; }
+.quote-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.quote-card {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--r); padding: 32px 28px;
+}
+.quote-mark { font-size: 36px; font-weight: 800; color: var(--blue-lt); opacity: 0.45; line-height: 1; margin-bottom: 16px; }
+.quote-card p { font-size: 15px; color: rgba(255,255,255,0.78); line-height: 1.7; font-style: italic; margin-bottom: 20px; }
+.quote-attr {
+  font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ─── CTA ─── */
+.cta-section { padding: 130px var(--pad); background: var(--blue); }
+.cta-inner { max-width: var(--max); margin: 0 auto; text-align: center; }
+.cta-rule { width: 40px; height: 2px; background: rgba(255,255,255,0.28); margin: 0 auto 32px; }
+.cta-inner h2 {
+  font-size: clamp(40px, 5.5vw, 72px); font-weight: 800;
+  color: #fff; letter-spacing: -2.5px; line-height: 1.06; margin-bottom: 20px;
+}
+.cta-inner p {
+  font-size: 18px; color: rgba(255,255,255,0.72);
+  line-height: 1.65; margin-bottom: 44px;
+  max-width: 560px; margin-left: auto; margin-right: auto;
+}
+.btn-white {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; color: var(--blue); font-size: 15px; font-weight: 700;
+  padding: 16px 32px; border-radius: var(--r);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-white:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(0,0,0,0.2); }
+
+/* ─── FOOTER ─── */
+footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px solid rgba(255,255,255,0.06); }
+.footer-inner { max-width: var(--max); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+.footer-logo { font-size: 16px; font-weight: 900; color: #fff; }
+.footer-logo span { color: var(--blue-lt); }
+.footer-links { display: flex; gap: 28px; }
+.footer-link { font-size: 13px; color: rgba(255,255,255,0.38); transition: color 0.2s; }
+.footer-link:hover { color: rgba(255,255,255,0.76); }
+.footer-copy { font-size: 12px; color: rgba(255,255,255,0.22); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 860px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 56px; }
+  .stat-inner { grid-template-columns: 1fr; gap: 44px; }
+  .stat-deco { display: none; }
+  .pain-grid { grid-template-columns: 1fr 1fr; }
+  .features-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  .steps::before { display: none; }
+  .ba-grid { grid-template-columns: 1fr; }
+  .ba-arrow { display: none; }
+  .contrast-grid { grid-template-columns: 1fr 1fr; }
+  .quote-grid { grid-template-columns: 1fr; }
+  .footer-inner { flex-direction: column; gap: 24px; text-align: center; }
+  .footer-links { flex-wrap: wrap; justify-content: center; }
+}
+@media (max-width: 540px) {
+  .pain-grid { grid-template-columns: 1fr; }
+  .contrast-grid { grid-template-columns: 1fr; }
+  .nav-right .nav-link { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Laelapx<span>.</span></div>
+  <div class="nav-right">
+    <a href="laelapx-investors.html" class="nav-link">For Investors</a>
+    <a href="#access" class="nav-cta">Get Early Access →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="hero-label">Fundability Intelligence</span>
+      <h1 class="hero-h1">Know why<br>before<br>you pitch.</h1>
+      <p class="hero-sub">Upload your deck. Get a Fundability Snapshot — score, gap analysis, deck feedback, and matched investors — before your first cold email.</p>
+      <div class="hero-actions">
+        <a href="#access" class="btn-primary">Get Early Access →</a>
+        <a href="#how" class="btn-ghost">How it works ↓</a>
+      </div>
+    </div>
+    <div class="hero-card-col">
+      <div class="snapshot-card">
+        <div class="sc-header">
+          <span class="sc-title">Fundability Snapshot</span>
+          <span class="sc-badge">Pre-Pitch</span>
+        </div>
+        <div class="sc-score-row">
+          <div class="sc-gauge"></div>
+          <div class="sc-score-info">
+            <div class="sc-score-label">72 / 100</div>
+            <div class="sc-score-sub">Above average. Two gaps to close before outreach.</div>
+          </div>
+        </div>
+        <div class="sc-bars">
+          <div class="sc-bar-row">
+            <span class="sc-bar-label">Market</span>
+            <div class="sc-bar-track"><div class="sc-bar-fill" data-w="84%"></div></div>
+            <span class="sc-bar-val">84</span>
+          </div>
+          <div class="sc-bar-row">
+            <span class="sc-bar-label">Team</span>
+            <div class="sc-bar-track"><div class="sc-bar-fill" data-w="76%"></div></div>
+            <span class="sc-bar-val">76</span>
+          </div>
+          <div class="sc-bar-row">
+            <span class="sc-bar-label">Traction</span>
+            <div class="sc-bar-track"><div class="sc-bar-fill low" data-w="48%"></div></div>
+            <span class="sc-bar-val">48</span>
+          </div>
+          <div class="sc-bar-row">
+            <span class="sc-bar-label">Financials</span>
+            <div class="sc-bar-track"><div class="sc-bar-fill" data-w="61%"></div></div>
+            <span class="sc-bar-val">61</span>
+          </div>
+        </div>
+        <div class="sc-footer">
+          <div class="sc-investors"><span>14</span> matching investors</div>
+          <div class="sc-gap-tag">2 gaps flagged</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STAT -->
+<section class="stat-section">
+  <div class="stat-inner">
+    <div class="stat-deco" aria-hidden="true">3:44</div>
+    <div class="reveal">
+      <span class="stat-eyebrow">The Reality</span>
+      <div class="stat-number">3:44</div>
+      <div class="stat-unit">Average time investors spend reviewing a pitch deck.</div>
+      <div class="stat-source">DocSend &amp; Harvard Business School, 2021</div>
+    </div>
+    <div class="stat-body reveal d1">
+      <h2>You have less than four minutes to make a case that took months to build.</h2>
+      <p>Most decks fail not because the company is weak — but because the signal doesn't land. Investors aren't wrong to pass. They're reading a document that wasn't designed for how they decide. Laelapx tells you exactly where your signal breaks down, before it costs you a meeting.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem-section">
+  <div class="problem-inner">
+    <span class="section-eyebrow reveal">The Pattern</span>
+    <h2 class="section-h2 reveal d1">The silence after<br>the send.</h2>
+    <p class="section-sub reveal d2">Most founders receive no useful feedback after a pass. They optimize the wrong things, repeat the same mistakes, and lose runway they can't recover.</p>
+    <div class="pain-grid">
+      <div class="pain-card reveal d1">
+        <div class="pain-icon"><div class="pain-dot"></div></div>
+        <h3>No feedback loop</h3>
+        <p>Investors rarely explain why they passed. Without that signal, every next pitch is a guess dressed as strategy.</p>
+      </div>
+      <div class="pain-card reveal d2">
+        <div class="pain-icon"><div class="pain-dot"></div></div>
+        <h3>Thesis mismatch</h3>
+        <p>Outreach to investors who don't fund your stage, sector, or geography wastes months of relationship capital.</p>
+      </div>
+      <div class="pain-card reveal d3">
+        <div class="pain-icon"><div class="pain-dot"></div></div>
+        <h3>Deck blind spots</h3>
+        <p>Founders are too close to their story to see how it reads to someone spending three minutes and forty-four seconds on it.</p>
+      </div>
+      <div class="pain-card reveal d4">
+        <div class="pain-icon"><div class="pain-dot"></div></div>
+        <h3>Wrong timing</h3>
+        <p>Pitching before a company is fundable — even by a few months — can permanently close doors that shouldn't have been opened yet.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="features-inner">
+    <div class="features-header reveal">
+      <span class="section-eyebrow">Your Fundability Snapshot</span>
+      <h2 class="section-h2">Four things investors screen for.<br>Before they open your deck.</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="fi fi-score"></div>
+        <span class="feature-num">01 — Score</span>
+        <h3>Fundability Score</h3>
+        <p>A composite score across market, team, traction, and financial signals. Not an opinion — a structured read of where your company stands relative to what investors fund at your stage.</p>
+      </div>
+      <div class="feature-card reveal d1">
+        <div class="fi fi-bars">
+          <span style="height:55%"></span>
+          <span style="height:100%"></span>
+          <span style="height:38%;opacity:0.35"></span>
+        </div>
+        <span class="feature-num">02 — Analysis</span>
+        <h3>Gap Analysis</h3>
+        <p>Specific gaps that are likely to cause a pass, ranked by impact. Each gap includes what's missing, why it matters to investors, and what closing it actually looks like.</p>
+      </div>
+      <div class="feature-card reveal d2">
+        <div class="fi fi-lines">
+          <span style="width:100%;background:var(--blue)"></span>
+          <span style="width:78%;background:var(--blue);opacity:0.65"></span>
+          <span style="width:55%;background:var(--red);opacity:0.55"></span>
+          <span style="width:85%;background:var(--blue);opacity:0.55"></span>
+        </div>
+        <span class="feature-num">03 — Feedback</span>
+        <h3>Deck Review</h3>
+        <p>Slide-by-slide feedback on narrative, clarity, and signal density. We surface what an investor reads, what they skip, and where your story loses them.</p>
+      </div>
+      <div class="feature-card reveal d3">
+        <div class="fi fi-target"></div>
+        <span class="feature-num">04 — Match</span>
+        <h3>Investor Match List</h3>
+        <p>A curated list of investors whose thesis, stage focus, and portfolio align with your company right now — so outreach starts where fit already exists.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="hiw-section" id="how">
+  <div class="hiw-inner">
+    <div class="hiw-header reveal">
+      <span class="section-eyebrow">How It Works</span>
+      <h2 class="section-h2">Three steps.</h2>
+      <p class="section-sub">No meetings. No calls. Upload your deck and get your Snapshot.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <h3>Upload your deck</h3>
+        <p>Submit your current pitch deck — PDF or link. We don't ask for personal information or financials beyond what's already in the deck.</p>
+      </div>
+      <div class="step reveal d1">
+        <div class="step-num">02</div>
+        <h3>We analyze it</h3>
+        <p>Your deck is evaluated against the signals investors actually screen for — at your stage, in your sector, against current market conditions.</p>
+      </div>
+      <div class="step reveal d2">
+        <div class="step-num">03</div>
+        <h3>Get your Snapshot</h3>
+        <p>Receive your Fundability Score, gap analysis, deck feedback, and matched investor list — before your first outreach.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section class="ba-section">
+  <div class="ba-inner">
+    <span class="section-eyebrow reveal">The Difference</span>
+    <h2 class="section-h2 reveal d1">Before and after.</h2>
+    <div class="ba-grid">
+      <div class="ba-arrow" aria-hidden="true">→</div>
+      <div class="ba-col ba-before reveal">
+        <span class="ba-label">Without Laelapx</span>
+        <div class="ba-items">
+          <div class="ba-item"><div class="ba-bullet"></div><p>Cold outreach to investors with misaligned thesis</p></div>
+          <div class="ba-item"><div class="ba-bullet"></div><p>No feedback after a pass — just silence</p></div>
+          <div class="ba-item"><div class="ba-bullet"></div><p>Months spent fixing the wrong things</p></div>
+          <div class="ba-item"><div class="ba-bullet"></div><p>Pitching before you're ready — burning bridges</p></div>
+          <div class="ba-item"><div class="ba-bullet"></div><p>Deck optimized for what founders think investors want</p></div>
+        </div>
+      </div>
+      <div class="ba-col ba-after reveal d1">
+        <span class="ba-label">With Laelapx</span>
+        <div class="ba-items">
+          <div class="ba-item"><div class="ba-bullet"></div><p>Outreach to investors already aligned to your company</p></div>
+          <div class="ba-item"><div class="ba-bullet"></div><p>Know your gaps before they become a pass</p></div>
+          <div class="ba-item"><div class="ba-bullet"></div><p>Fix what matters — in the order it matters</p></div>
+          <div class="ba-item"><div class="ba-bullet"></div><p>Pitch when your Snapshot says you're ready</p></div>
+          <div class="ba-item"><div class="ba-bullet"></div><p>Deck built around how investors actually decide</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE ARE -->
+<section class="contrast-section">
+  <div class="contrast-inner">
+    <span class="section-eyebrow reveal">What We Are</span>
+    <h2 class="section-h2 reveal d1">Not access. Intelligence.</h2>
+    <div class="contrast-grid">
+      <div class="contrast-card reveal d1">
+        <span class="contrast-not">Pitch coach</span>
+        <span class="contrast-is">Objective analysis</span>
+        <p>We don't tell you what to say. We tell you what's working and what isn't — based on how your deck reads, not how it sounds in a room.</p>
+      </div>
+      <div class="contrast-card reveal d2">
+        <span class="contrast-not">Investor database</span>
+        <span class="contrast-is">Thesis-matched outreach</span>
+        <p>We don't give you a list of emails. We surface investors whose documented thesis, stage focus, and portfolio fit your company right now.</p>
+      </div>
+      <div class="contrast-card reveal d3">
+        <span class="contrast-not">A guarantee</span>
+        <span class="contrast-is">Honest intelligence</span>
+        <p>We don't promise funding. We give you an honest read of where you stand — so you can decide whether to pitch, fix, or wait.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTES -->
+<section class="quote-section">
+  <div class="quote-inner">
+    <div class="quote-header reveal">
+      <span class="section-eyebrow">Common Experiences</span>
+      <h2 class="section-h2">The feedback founders never got.</h2>
+      <p style="font-size:13px;color:rgba(255,255,255,0.32);margin-top:14px;font-style:italic;">Representative of patterns we hear from early-stage founders.</p>
+    </div>
+    <div class="quote-grid">
+      <div class="quote-card reveal d1">
+        <div class="quote-mark">"</div>
+        <p>We raised a seed from angels. When we went to VCs, we got twelve passes in sixty days and had no idea why. We kept tweaking the deck but had nothing to go on.</p>
+        <div class="quote-attr">Founder, B2B SaaS — Seed Stage</div>
+      </div>
+      <div class="quote-card reveal d2">
+        <div class="quote-mark">"</div>
+        <p>In hindsight, we were pitching investors whose fund thesis didn't fit us at all. We didn't know what we didn't know. Six months wasted on the wrong list.</p>
+        <div class="quote-attr">Founder, Climate Tech — Pre-Seed</div>
+      </div>
+      <div class="quote-card reveal d3">
+        <div class="quote-mark">"</div>
+        <p>The deck looked good to us. Our advisors said it was solid. But we had no way of knowing how it actually read to someone who had eight other decks open.</p>
+        <div class="quote-attr">Founder, Consumer — Series A</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="access">
+  <div class="cta-inner reveal">
+    <div class="cta-rule"></div>
+    <h2>Stop guessing.<br>Start knowing.</h2>
+    <p>Early access is open. Upload your deck, get your Fundability Snapshot, and walk into your next conversation with a clear picture of where you stand.</p>
+    <a href="mailto:hello@laelapx.com" class="btn-white">Get Early Access →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Laelapx<span>.</span></div>
+    <div class="footer-links">
+      <a href="laelapx-investors.html" class="footer-link">For Investors</a>
+      <a href="#features" class="footer-link">Features</a>
+      <a href="#how" class="footer-link">How It Works</a>
+      <a href="mailto:hello@laelapx.com" class="footer-link">Contact</a>
+    </div>
+    <div class="footer-copy">© 2026 Laelapx. Pre-launch.</div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// Bar animation — trigger when snapshot card scrolls into view
+const barIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.sc-bar-fill[data-w]').forEach(bar => {
+        setTimeout(() => { bar.style.width = bar.dataset.w; }, 300);
+      });
+    }
+  });
+}, { threshold: 0.4 });
+const card = document.querySelector('.snapshot-card');
+if (card) {
+  barIO.observe(card);
+  // Also trigger on load if card is in viewport (hero)
+  const rect = card.getBoundingClientRect();
+  if (rect.top < window.innerHeight) {
+    setTimeout(() => {
+      card.querySelectorAll('.sc-bar-fill[data-w]').forEach(bar => {
+        setTimeout(() => { bar.style.width = bar.dataset.w; }, 800);
+      });
+    }, 100);
+  }
+}
+</script>
+</body>
+</html>
