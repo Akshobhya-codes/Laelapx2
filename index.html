@@ -17,6 +17,26 @@
 <meta name="twitter:description" content="Know why before you pitch. Signal over noise for investors.">
 <meta name="twitter:image" content="https://laelapx.com/og.png">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Laelapx",
+  "alternateName": "Laelapx — Fundability Intelligence",
+  "url": "https://laelapx.com",
+  "logo": "https://laelapx.com/og.png",
+  "description": "Fundability intelligence — pre-analyzed deal flow for investors and fundability snapshots for founders.",
+  "email": "hello@laelapx.com"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Laelapx",
+  "url": "https://laelapx.com"
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1571,6 +1591,14 @@ document.querySelectorAll('.nav-toggle-btn, .mobile-toggle-btn').forEach(btn => 
 // Init from URL hash
 const hash = location.hash.replace('#', '');
 if (hash === 'investors' || hash === 'founders') setView(hash);
+
+// Auto-open modal from ?modal=founders|investors
+const modalParam = new URLSearchParams(location.search).get('modal');
+if (modalParam === 'founders' || modalParam === 'investors') {
+  setView(modalParam);
+  setTimeout(() => openModal(modalParam), 250);
+  history.replaceState(null, '', location.pathname + '#' + modalParam);
+}
 
 /* ─── SCROLL REVEAL ─── */
 const io = new IntersectionObserver(entries => {
