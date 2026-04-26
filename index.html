@@ -571,6 +571,123 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
   cursor: pointer; text-align: center; transition: background 0.2s, color 0.2s;
 }
 .mobile-toggle-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+/* ─── MODAL ─── */
+@keyframes overlayIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalSlide { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(15,20,30,0.72);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: overlayIn 0.2s ease both;
+}
+.modal-overlay.hidden { display: none; }
+
+.modal {
+  background: #fff;
+  border-radius: var(--r-lg);
+  width: 100%; max-width: 520px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.22);
+  animation: modalSlide 0.28s cubic-bezier(.16,1,.3,1) both;
+  max-height: 90vh; overflow-y: auto;
+}
+
+.modal-head {
+  background: var(--navy);
+  padding: 24px 28px 22px;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.modal-head-text {}
+.modal-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--blue-lt); margin-bottom: 6px; display: block;
+}
+.modal-title { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.4px; }
+.modal-close {
+  background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
+  width: 32px; height: 32px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: rgba(255,255,255,0.6); font-size: 16px;
+  transition: background 0.15s, color 0.15s; line-height: 1;
+}
+.modal-close:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+.modal-body { padding: 28px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+.form-field:last-of-type { margin-bottom: 0; }
+.form-label { font-size: 12px; font-weight: 700; color: var(--text-1); letter-spacing: 0.2px; }
+.form-label span { color: var(--red); margin-left: 2px; }
+
+.form-input, .form-select {
+  font-family: inherit; font-size: 14px; font-weight: 400; color: var(--text-1);
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 11px 14px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  width: 100%; outline: none; appearance: none; -webkit-appearance: none;
+}
+.form-input::placeholder { color: var(--text-3); }
+.form-input:focus, .form-select:focus {
+  border-color: var(--blue); box-shadow: 0 0 0 3px rgba(44,91,168,0.12);
+}
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a968e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  padding-right: 36px; cursor: pointer;
+}
+
+.form-checkbox-group { display: flex; flex-direction: column; gap: 9px; }
+.form-checkbox {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--text-2); cursor: pointer;
+}
+.form-checkbox input[type="checkbox"] {
+  width: 16px; height: 16px; border-radius: 3px;
+  border: 1.5px solid var(--border); background: var(--bg);
+  accent-color: var(--blue); cursor: pointer; flex-shrink: 0;
+}
+
+.form-divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+.form-submit {
+  width: 100%; margin-top: 22px;
+  font-family: inherit; font-size: 14px; font-weight: 700; color: #fff;
+  background: var(--blue); border: none; border-radius: var(--r);
+  padding: 14px 24px; cursor: pointer;
+  transition: background 0.18s, transform 0.12s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.form-submit:hover { background: var(--blue-lt); transform: translateY(-1px); }
+.form-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.form-note {
+  font-size: 11px; color: var(--text-3); text-align: center; margin-top: 14px; line-height: 1.6;
+}
+
+/* Success / Error states */
+.form-success, .form-error { display: none; text-align: center; padding: 40px 24px; }
+.form-success.show, .form-error.show { display: block; }
+.form-fields.hidden { display: none; }
+
+.success-icon {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--green-dim); border: 2px solid var(--green-bd);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px; font-size: 22px;
+}
+.form-success h3 { font-size: 20px; font-weight: 800; color: var(--text-1); margin-bottom: 10px; letter-spacing: -0.3px; }
+.form-success p { font-size: 15px; color: var(--text-2); line-height: 1.65; }
+.form-error p { font-size: 14px; color: var(--red); line-height: 1.6; }
+
+@media (max-width: 540px) {
+  .form-row { grid-template-columns: 1fr; }
+  .modal-body { padding: 20px; }
+}
 </style>
 </head>
 <body data-view="founders">
@@ -585,8 +702,8 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
   </div>
 
   <div class="nav-right">
-    <a href="#access" class="nav-cta founder-only">Get Early Access →</a>
-    <a href="#partner" class="nav-cta investor-only">Partner With Us →</a>
+    <a href="#" class="nav-cta founder-only" onclick="openModal('founders');return false;">Get Early Access →</a>
+    <a href="#" class="nav-cta investor-only" onclick="openModal('investors');return false;">Partner With Us →</a>
   </div>
 </nav>
 
@@ -608,7 +725,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
       <h1 class="hero-h1">Know why<br>before<br>you pitch.</h1>
       <p class="hero-sub">Upload your deck. Get a Fundability Snapshot — score, gap analysis, deck feedback, and matched investors — before your first cold email.</p>
       <div class="hero-actions">
-        <a href="#access" class="btn-primary">Get Early Access →</a>
+        <a href="#" class="btn-primary" onclick="openModal('founders');return false;">Get Early Access →</a>
         <a href="#how-founders" class="btn-ghost">How it works ↓</a>
       </div>
     </div>
@@ -867,7 +984,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
     <div class="cta-rule"></div>
     <h2>Stop guessing.<br>Start knowing.</h2>
     <p>Early access is open. Upload your deck, get your Fundability Snapshot, and walk into your next conversation with a clear picture of where you stand.</p>
-    <a href="mailto:hello@laelapx.com" class="btn-white">Get Early Access →</a>
+    <a href="#" class="btn-white" onclick="openModal('founders');return false;">Get Early Access →</a>
   </div>
 </section>
 
@@ -883,7 +1000,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
       <h1 class="hero-h1">Deal flow<br>that's already<br>been vetted.</h1>
       <p class="hero-sub">Laelapx pre-analyzes inbound before it reaches you. Thesis-aligned. Scored. Gaps already surfaced — so the work of a first screen is done before you open the deck.</p>
       <div class="hero-actions">
-        <a href="#partner" class="btn-primary">Partner With Us →</a>
+        <a href="#" class="btn-primary" onclick="openModal('investors');return false;">Partner With Us →</a>
         <a href="#how-investors" class="btn-ghost">How it works ↓</a>
       </div>
     </div>
@@ -1153,9 +1270,155 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
     <div class="cta-rule"></div>
     <h2>Less noise.<br>Better signal.</h2>
     <p>Partner with Laelapx during our pre-launch phase and help define what thesis-matched deal flow looks like for your fund.</p>
-    <a href="mailto:investors@laelapx.com" class="btn-white">Partner With Us →</a>
+    <a href="#" class="btn-white" onclick="openModal('investors');return false;">Partner With Us →</a>
   </div>
 </section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- MODALS                                 -->
+<!-- ═══════════════════════════════════════ -->
+
+<!-- FOUNDERS MODAL -->
+<div class="modal-overlay hidden" id="modal-founders" role="dialog" aria-modal="true" aria-label="Founder early access">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-text">
+        <span class="modal-eyebrow">Founders</span>
+        <div class="modal-title">Get Early Access</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('founders')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-founders" class="form-fields">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label" for="f-name">Full name <span>*</span></label>
+            <input class="form-input" type="text" id="f-name" name="name" placeholder="Jane Smith" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="f-email">Email <span>*</span></label>
+            <input class="form-input" type="email" id="f-email" name="email" placeholder="jane@company.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label" for="f-company">Company name <span>*</span></label>
+            <input class="form-input" type="text" id="f-company" name="company" placeholder="Acme Inc." required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="f-stage">Stage <span>*</span></label>
+            <select class="form-select" id="f-stage" name="stage" required>
+              <option value="" disabled selected>Select stage</option>
+              <option value="Pre-Idea">Pre-Idea</option>
+              <option value="Pre-Seed">Pre-Seed</option>
+              <option value="Seed">Seed</option>
+              <option value="Series A">Series A</option>
+              <option value="Series B+">Series B+</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="f-niche">Sector / Niche <span>*</span></label>
+          <input class="form-input" type="text" id="f-niche" name="sector" placeholder="e.g. B2B SaaS, Climate Tech, Consumer Health" required>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="f-deck">Pitch deck link <span style="color:var(--text-3);font-weight:500">(optional)</span></label>
+          <input class="form-input" type="url" id="f-deck" name="deck_link" placeholder="https://docsend.com/view/...">
+        </div>
+        <input type="hidden" name="_subject" value="New Founder — Laelapx Early Access">
+        <input type="hidden" name="audience" value="Founder">
+        <button type="submit" class="form-submit" id="f-submit">
+          <span>Request Early Access</span>
+          <span>→</span>
+        </button>
+        <p class="form-note">No spam. No pitch required. We'll reach out when access opens.</p>
+      </form>
+      <div class="form-success" id="success-founders">
+        <div class="success-icon">✓</div>
+        <h3>You're on the list.</h3>
+        <p>We'll be in touch when early access opens. In the meantime — if your deck is ready, we're already thinking about your Snapshot.</p>
+      </div>
+      <div class="form-error" id="error-founders">
+        <p>Something went wrong. Email us directly at <strong>hello@laelapx.com</strong> and we'll get you added.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INVESTORS MODAL -->
+<div class="modal-overlay hidden" id="modal-investors" role="dialog" aria-modal="true" aria-label="Investor partnership">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-text">
+        <span class="modal-eyebrow">Investors</span>
+        <div class="modal-title">Partner With Us</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('investors')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-investors" class="form-fields">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label" for="i-name">Full name <span>*</span></label>
+            <input class="form-input" type="text" id="i-name" name="name" placeholder="Alex Johnson" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="i-email">Email <span>*</span></label>
+            <input class="form-input" type="email" id="i-email" name="email" placeholder="alex@fund.vc" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label" for="i-fund">Fund name <span>*</span></label>
+            <input class="form-input" type="text" id="i-fund" name="fund" placeholder="Sequoia Capital" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="i-role">Your role</label>
+            <select class="form-select" id="i-role" name="role">
+              <option value="" disabled selected>Select role</option>
+              <option value="General Partner">General Partner</option>
+              <option value="Partner">Partner</option>
+              <option value="Principal">Principal</option>
+              <option value="Associate">Associate</option>
+              <option value="Analyst">Analyst</option>
+              <option value="Angel">Angel Investor</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Stage focus <span>*</span></label>
+          <div class="form-checkbox-group">
+            <label class="form-checkbox"><input type="checkbox" name="stage_focus" value="Pre-Seed"> Pre-Seed</label>
+            <label class="form-checkbox"><input type="checkbox" name="stage_focus" value="Seed"> Seed</label>
+            <label class="form-checkbox"><input type="checkbox" name="stage_focus" value="Series A"> Series A</label>
+            <label class="form-checkbox"><input type="checkbox" name="stage_focus" value="Series B+"> Series B+</label>
+            <label class="form-checkbox"><input type="checkbox" name="stage_focus" value="Multi-stage"> Multi-stage</label>
+          </div>
+        </div>
+        <div class="form-field" style="margin-top:16px">
+          <label class="form-label" for="i-thesis">Thesis / Sector niche <span>*</span></label>
+          <input class="form-input" type="text" id="i-thesis" name="thesis" placeholder="e.g. Enterprise SaaS, Deep Tech, Climate, Fintech" required>
+        </div>
+        <input type="hidden" name="_subject" value="New Investor Partner — Laelapx">
+        <input type="hidden" name="audience" value="Investor">
+        <button type="submit" class="form-submit" id="i-submit">
+          <span>Request Partnership</span>
+          <span>→</span>
+        </button>
+        <p class="form-note">Pre-launch partners shape what the platform looks like. No commitment required.</p>
+      </form>
+      <div class="form-success" id="success-investors">
+        <div class="success-icon">✓</div>
+        <h3>Request received.</h3>
+        <p>We'll reach out within 48 hours to learn more about your thesis and how Laelapx can fit your deal flow.</p>
+      </div>
+      <div class="form-error" id="error-investors">
+        <p>Something went wrong. Email us directly at <strong>investors@laelapx.com</strong> and we'll be in touch.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════ -->
 <!-- SHARED FOOTER                          -->
@@ -1178,6 +1441,73 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
 </footer>
 
 <script>
+/* ─── MODAL ─── */
+const FORMSPREE = {
+  founders:  'YOUR_FOUNDER_FORM_ID',   // replace with Formspree ID e.g. xpzgvwkr
+  investors: 'YOUR_INVESTOR_FORM_ID'   // replace with Formspree ID
+};
+
+function openModal(type) {
+  document.getElementById('modal-' + type).classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id.replace('modal-', ''));
+  });
+});
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['founders','investors'].forEach(t => {
+      if (!document.getElementById('modal-' + t).classList.contains('hidden')) closeModal(t);
+    });
+  }
+});
+
+// Form submission
+async function submitForm(type) {
+  const form = document.getElementById('form-' + type);
+  const btn  = document.getElementById(type[0] + '-submit');
+  const id   = FORMSPREE[type];
+
+  // Collect checkbox values (stage_focus)
+  const checkboxes = form.querySelectorAll('input[name="stage_focus"]:checked');
+  const stageFocus = Array.from(checkboxes).map(c => c.value).join(', ');
+
+  const data = new FormData(form);
+  if (stageFocus) data.set('stage_focus', stageFocus);
+
+  btn.disabled = true;
+  btn.querySelector('span').textContent = 'Sending…';
+
+  try {
+    const res = await fetch('https://formspree.io/f/' + id, {
+      method: 'POST', body: data, headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      form.classList.add('hidden');
+      document.getElementById('success-' + type).classList.add('show');
+    } else {
+      throw new Error('server error');
+    }
+  } catch {
+    document.getElementById('error-' + type).classList.add('show');
+    btn.disabled = false;
+    btn.querySelector('span').textContent = type === 'founders' ? 'Request Early Access' : 'Request Partnership';
+  }
+}
+
+document.getElementById('form-founders').addEventListener('submit', e => { e.preventDefault(); submitForm('founders'); });
+document.getElementById('form-investors').addEventListener('submit', e => { e.preventDefault(); submitForm('investors'); });
+
 /* ─── VIEW SWITCHING ─── */
 function setView(view) {
   const body = document.body;
