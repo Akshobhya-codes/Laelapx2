@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sample Fundability Snapshot — Laelapx</title>
+<meta name="description" content="A fictional sample Snapshot showing what Laelapx delivers: score, gap analysis, slide-by-slide review, and matched investors.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:title" content="Sample Fundability Snapshot — Laelapx">
+<meta property="og:description" content="See what Laelapx delivers: score, gaps, deck review, and matched investors.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://laelapx.com/snapshot">
+<meta property="og:image" content="https://laelapx.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laelapx.com/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f7f5f0;
+  --surface: #edeae3;
+  --surface-2: #e2ded6;
+  --navy: #1c2b42;
+  --navy-2: #253d5c;
+  --blue: #2c5ba8;
+  --blue-lt: #4a78cc;
+  --blue-dim: rgba(44,91,168,0.07);
+  --blue-bd: rgba(44,91,168,0.18);
+  --text-1: #191714;
+  --text-2: #5a5650;
+  --text-3: #9a968e;
+  --border: rgba(25,23,20,0.1);
+  --white: #ffffff;
+  --red: #c44040;
+  --red-dim: rgba(196,64,64,0.07);
+  --red-bd: rgba(196,64,64,0.16);
+  --green: #2a9c52;
+  --green-dim: rgba(42,156,82,0.08);
+  --green-bd: rgba(42,156,82,0.2);
+  --amber: #c8871a;
+  --amber-dim: rgba(200,135,26,0.08);
+  --amber-bd: rgba(200,135,26,0.22);
+  --max: 1080px;
+  --pad: clamp(20px, 5vw, 80px);
+  --r: 4px;
+  --r-lg: 10px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+a { color: inherit; text-decoration: none; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(.16,1,.3,1),
+              transform 0.6s cubic-bezier(.16,1,.3,1);
+}
+.reveal.in { opacity: 1; transform: none; }
+.d1 { transition-delay: 0.07s; }
+.d2 { transition-delay: 0.15s; }
+.d3 { transition-delay: 0.23s; }
+.d4 { transition-delay: 0.31s; }
+
+/* SAMPLE BANNER */
+.sample-banner {
+  background: var(--amber);
+  color: #fff;
+  text-align: center;
+  padding: 10px var(--pad);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* NAV */
+.ss-nav {
+  padding: 18px var(--pad);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+  position: sticky; top: 0; z-index: 50;
+}
+.ss-nav-logo {
+  font-size: 17px; font-weight: 900;
+  color: var(--navy); letter-spacing: -0.5px;
+}
+.ss-nav-logo span { color: var(--blue); }
+.ss-nav-back {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-2);
+}
+.ss-nav-back:hover { color: var(--navy); }
+
+/* HERO */
+.ss-hero {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 56px var(--pad) 24px;
+}
+.ss-label {
+  display: inline-block;
+  background: var(--navy);
+  color: #fff;
+  font-size: 10px; font-weight: 800;
+  padding: 5px 11px;
+  border-radius: var(--r);
+  letter-spacing: 2.5px;
+}
+.ss-company {
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 900;
+  color: var(--navy);
+  margin-top: 16px;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+}
+.ss-meta {
+  color: var(--text-2);
+  margin-top: 10px;
+  font-size: 16px;
+}
+.ss-meta strong { color: var(--text-1); font-weight: 600; }
+
+/* SECTIONS */
+.section {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 40px var(--pad);
+}
+.section-eyebrow {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-h2 {
+  font-size: clamp(26px, 3.5vw, 36px);
+  font-weight: 900;
+  color: var(--navy);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 28px;
+}
+
+/* SCORE */
+.score-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 36px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 36px;
+  align-items: center;
+}
+.score-num {
+  font-size: 96px;
+  font-weight: 900;
+  color: var(--blue);
+  letter-spacing: -4px;
+  line-height: 1;
+}
+.score-num span {
+  font-size: 28px;
+  color: var(--text-3);
+  font-weight: 600;
+  letter-spacing: -1px;
+}
+.score-headline {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 8px;
+  line-height: 1.25;
+  letter-spacing: -0.4px;
+}
+.score-body {
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.subscores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+.ss-bar {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+}
+.ss-bar-label {
+  font-size: 11px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  font-weight: 700;
+}
+.ss-bar-val {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--navy);
+  margin: 6px 0 8px;
+  letter-spacing: -1px;
+}
+.ss-bar-track {
+  height: 4px;
+  background: var(--surface);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ss-bar-fill {
+  height: 100%;
+  background: var(--blue-lt);
+  border-radius: 2px;
+}
+.ss-bar-fill.low { background: var(--red); }
+.ss-bar-fill.mid { background: var(--amber); }
+
+/* GAPS */
+.gap-card {
+  border-left: 4px solid var(--border);
+  background: var(--white);
+  padding: 22px 26px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.gap-card.sev-red {
+  border-left-color: var(--red);
+  background: var(--red-dim);
+}
+.gap-card.sev-amber {
+  border-left-color: var(--amber);
+  background: var(--amber-dim);
+}
+.gap-card.sev-green {
+  border-left-color: var(--green);
+  background: var(--green-dim);
+}
+.gap-sev {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.gap-sev.red { color: var(--red); }
+.gap-sev.amber { color: var(--amber); }
+.gap-sev.green { color: var(--green); }
+.gap-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 8px 0 10px;
+  color: var(--navy);
+  letter-spacing: -0.3px;
+}
+.gap-card p {
+  color: var(--text-2);
+  font-size: 14.5px;
+  margin-bottom: 6px;
+}
+.gap-card p strong { color: var(--text-1); font-weight: 700; }
+
+/* SLIDES */
+.slide-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 24px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.slide-num {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--blue-lt);
+  letter-spacing: -1px;
+  padding-top: 2px;
+}
+.slide-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 4px;
+}
+.slide-body {
+  color: var(--text-2);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+/* VC TABLE */
+.vc-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 14px;
+}
+.vc-table th, .vc-table td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.vc-table tr:last-child td { border-bottom: none; }
+.vc-table th {
+  background: var(--surface);
+  font-weight: 800;
+  color: var(--navy);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1.4px;
+}
+.vc-table td { color: var(--text-2); }
+.vc-table td.fund { color: var(--navy); font-weight: 700; }
+.vc-table td.stage {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+/* CTA */
+.ss-cta {
+  text-align: center;
+  padding: 64px var(--pad) 96px;
+  max-width: var(--max);
+  margin: 0 auto;
+}
+.ss-cta h2 {
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 900;
+  color: var(--navy);
+  letter-spacing: -1px;
+  margin-bottom: 14px;
+}
+.ss-cta p {
+  color: var(--text-2);
+  font-size: 16px;
+  margin-bottom: 28px;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--blue);
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: var(--r);
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: var(--navy); }
+
+/* FOOTER */
+footer.ss-footer {
+  background: var(--navy);
+  padding: 28px var(--pad);
+  text-align: center;
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+}
+footer.ss-footer a {
+  color: rgba(255,255,255,0.7);
+  margin: 0 10px;
+  font-weight: 500;
+}
+footer.ss-footer a:hover { color: #fff; }
+.ss-footer-copy { margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.4); }
+
+/* MOBILE */
+@media (max-width: 760px) {
+  .subscores { grid-template-columns: repeat(2, 1fr); }
+  .score-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 28px;
+    gap: 20px;
+  }
+  .score-num { font-size: 72px; }
+  .vc-table { font-size: 13px; }
+  .vc-table th, .vc-table td { padding: 12px 14px; }
+  .slide-card { grid-template-columns: 44px 1fr; gap: 12px; padding: 16px 18px; }
+}
+</style>
+</head>
+<body>
+
+<div class="sample-banner">Sample — Fictional company for illustration only</div>
+
+<nav class="ss-nav">
+  <a href="/" class="ss-nav-logo">Laelapx<span>.</span></a>
+  <a href="/" class="ss-nav-back">← Back to Laelapx</a>
+</nav>
+
+<section class="ss-hero">
+  <span class="ss-label reveal">SAMPLE SNAPSHOT</span>
+  <h1 class="ss-company reveal d1">Northwind Health</h1>
+  <p class="ss-meta reveal d2"><strong>Pre-Seed</strong> · Health Tech · Clinician workflow SaaS</p>
+</section>
+
+<!-- 01 SCORE -->
+<section class="section">
+  <span class="section-eyebrow reveal">01 · Fundability Score</span>
+  <div class="score-card reveal d1">
+    <div class="score-num">72<span>/100</span></div>
+    <div>
+      <div class="score-headline">Above average. Two gaps to close before outreach.</div>
+      <p class="score-body">Strong market and team signal for pre-seed health tech. Traction is the gating constraint — institutional investors will discount the round until pilot revenue is on the page.</p>
+    </div>
+  </div>
+  <div class="subscores reveal d2">
+    <div class="ss-bar">
+      <div class="ss-bar-label">Market</div>
+      <div class="ss-bar-val">84</div>
+      <div class="ss-bar-track"><div class="ss-bar-fill" style="width:84%"></div></div>
+    </div>
+    <div class="ss-bar">
+      <div class="ss-bar-label">Team</div>
+      <div class="ss-bar-val">76</div>
+      <div class="ss-bar-track"><div class="ss-bar-fill" style="width:76%"></div></div>
+    </div>
+    <div class="ss-bar">
+      <div class="ss-bar-label">Traction</div>
+      <div class="ss-bar-val">48</div>
+      <div class="ss-bar-track"><div class="ss-bar-fill low" style="width:48%"></div></div>
+    </div>
+    <div class="ss-bar">
+      <div class="ss-bar-label">Financials</div>
+      <div class="ss-bar-val">61</div>
+      <div class="ss-bar-track"><div class="ss-bar-fill mid" style="width:61%"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 GAPS -->
+<section class="section">
+  <span class="section-eyebrow reveal">02 · Gap Analysis</span>
+  <h2 class="section-h2 reveal">What's blocking the round.</h2>
+
+  <div class="gap-card sev-red reveal d1">
+    <span class="gap-sev red">Critical</span>
+    <h3 class="gap-title">Traction proof is missing</h3>
+    <p><strong>What's missing:</strong> no paid pilots, signed LOIs, or revenue figures appear in the deck. "Interest" is implied via design-partner logos, but the slide doesn't quantify commitment.</p>
+    <p><strong>How to close it:</strong> secure 2 paid pilots (even at $0–$2k MRR) and disclose them on slide 5. If revenue is genuinely zero, lead with named LOIs and dollar-weighted intent instead of logos.</p>
+  </div>
+
+  <div class="gap-card sev-amber reveal d2">
+    <span class="gap-sev amber">Important</span>
+    <h3 class="gap-title">Wedge is undefined</h3>
+    <p><strong>What's missing:</strong> the deck pitches "all hospital staff" as the user. Investors read this as inability to choose — and most pass on horizontal pitches at pre-seed.</p>
+    <p><strong>How to close it:</strong> name a single ICP (e.g., ED nurse managers in 200–500 bed urban hospitals) and rewrite slide 3 to anchor around that one persona. Land-and-expand is fine — but land first.</p>
+  </div>
+
+  <div class="gap-card sev-green reveal d3">
+    <span class="gap-sev green">Strength to surface</span>
+    <h3 class="gap-title">Founder–market fit is your strongest signal</h3>
+    <p><strong>What you have:</strong> a clinical co-founder with 8 years of hospital ops experience and a technical co-founder out of an EHR-adjacent unicorn. This is rare for the wedge you're attacking.</p>
+    <p><strong>How to leverage it:</strong> move the team slide from position 9 to position 2. In health tech at pre-seed, founder credibility is the lead, not the close.</p>
+  </div>
+</section>
+
+<!-- 03 SLIDES -->
+<section class="section">
+  <span class="section-eyebrow reveal">03 · Slide-by-Slide Review</span>
+  <h2 class="section-h2 reveal">7 slides. 7 reads.</h2>
+
+  <div class="slide-card reveal d1">
+    <div class="slide-num">01</div>
+    <div>
+      <div class="slide-name">Title</div>
+      <div class="slide-body">Tagline is feature-led ("AI-powered clinician workflow"), not outcome-led. Try: "Give nurses 90 minutes back per shift."</div>
+    </div>
+  </div>
+  <div class="slide-card reveal d1">
+    <div class="slide-num">02</div>
+    <div>
+      <div class="slide-name">Problem</div>
+      <div class="slide-body">Strong stat hook ("73% of nurses report burnout"). Cite the source under the figure — investors will check, and an uncited stat reads as soft.</div>
+    </div>
+  </div>
+  <div class="slide-card reveal d2">
+    <div class="slide-num">03</div>
+    <div>
+      <div class="slide-name">Solution</div>
+      <div class="slide-body">Three product pillars dilute the wedge. Lead with one (charting auto-summary), reference the other two in passing.</div>
+    </div>
+  </div>
+  <div class="slide-card reveal d2">
+    <div class="slide-num">04</div>
+    <div>
+      <div class="slide-name">Market</div>
+      <div class="slide-body">$48B TAM is credible and well-sourced. SAM and SOM are missing — add them. Investors discount any pitch that only shows TAM.</div>
+    </div>
+  </div>
+  <div class="slide-card reveal d3">
+    <div class="slide-num">05</div>
+    <div>
+      <div class="slide-name">Traction</div>
+      <div class="slide-body">Only LinkedIn followers and waitlist count are shown. Both are heavily discounted. Replace with paid pilots + LOIs (see Gap #1).</div>
+    </div>
+  </div>
+  <div class="slide-card reveal d3">
+    <div class="slide-num">06</div>
+    <div>
+      <div class="slide-name">Team</div>
+      <div class="slide-body">Strongest slide in the deck. Move to position 2 — investors read the team early in health tech.</div>
+    </div>
+  </div>
+  <div class="slide-card reveal d4">
+    <div class="slide-num">07</div>
+    <div>
+      <div class="slide-name">Ask</div>
+      <div class="slide-body">$1.5M ask without use-of-funds breakdown. Add a 4-bar "what 18 months buys" chart — investors want to model burn against milestones.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 INVESTORS -->
+<section class="section">
+  <span class="section-eyebrow reveal">04 · Investor Matches</span>
+  <h2 class="section-h2 reveal">14 funds aligned to your thesis. Top 5 shown.</h2>
+
+  <table class="vc-table reveal d1">
+    <thead>
+      <tr>
+        <th>Fund</th>
+        <th>Stage</th>
+        <th>Why it matches</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="fund">Meridian Health Ventures</td>
+        <td class="stage">Pre-Seed → Seed</td>
+        <td>Active in clinician workflow tools; portfolio includes 3 nurse-facing SaaS bets in last 18 months.</td>
+      </tr>
+      <tr>
+        <td class="fund">Bright Harbor Capital</td>
+        <td class="stage">Pre-Seed</td>
+        <td>Vertical SaaS thesis with a healthcare ops sub-focus. Lead checks $500k–$1.5M.</td>
+      </tr>
+      <tr>
+        <td class="fund">Northpoint Bio Fund</td>
+        <td class="stage">Seed</td>
+        <td>Backs health tech with clinical founders. Strong fit for your founder–market story.</td>
+      </tr>
+      <tr>
+        <td class="fund">Cascade Seed</td>
+        <td class="stage">Pre-Seed</td>
+        <td>Geo-aligned (US west coast), B2B SaaS focus, comfortable leading rounds at sub-$2M ask.</td>
+      </tr>
+      <tr>
+        <td class="fund">Lighthouse Angels</td>
+        <td class="stage">Pre-Seed</td>
+        <td>Solo GP, ex-clinician operator. Will move fast on a deck that lands the wedge clearly.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- CTA -->
+<section class="ss-cta">
+  <h2>Want yours?</h2>
+  <p>This is a fictional sample. Get your real Snapshot when early access opens.</p>
+  <a href="/#" class="btn-primary">Get Early Access <span>→</span></a>
+</section>
+
+<footer class="ss-footer">
+  <a href="/">Home</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
+  <div class="ss-footer-copy">© 2026 Laelapx. Pre-launch. Northwind Health is a fictional company; any resemblance to real entities is coincidental.</div>
+</footer>
+
+<script>
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

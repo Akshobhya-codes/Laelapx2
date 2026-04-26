@@ -8,6 +8,15 @@
 <meta property="og:title" content="Laelapx — Fundability Intelligence">
 <meta property="og:description" content="Know why before you pitch. Signal over noise for investors.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://laelapx.com/">
+<meta property="og:image" content="https://laelapx.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Laelapx — Fundability Intelligence">
+<meta name="twitter:description" content="Know why before you pitch. Signal over noise for investors.">
+<meta name="twitter:image" content="https://laelapx.com/og.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -724,6 +733,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
       <span class="hero-label">Fundability Intelligence</span>
       <h1 class="hero-h1">Know why<br>before<br>you pitch.</h1>
       <p class="hero-sub">Upload your deck. Get a Fundability Snapshot — score, gap analysis, deck feedback, and matched investors — before your first cold email.</p>
+      <p class="hero-sub" style="margin-top:14px;font-size:14px"><a href="/snapshot" style="color:var(--blue);font-weight:600;border-bottom:1px solid var(--blue-bd);padding-bottom:2px">See a sample Snapshot →</a></p>
       <div class="hero-actions">
         <a href="#" class="btn-primary" onclick="openModal('founders');return false;">Get Early Access →</a>
         <a href="#how-founders" class="btn-ghost">How it works ↓</a>
@@ -890,6 +900,9 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
         <h3>Get your Snapshot</h3>
         <p>Receive your Fundability Score, gap analysis, deck feedback, and matched investor list — before your first outreach.</p>
       </div>
+    </div>
+    <div class="reveal d3" style="text-align:center;margin-top:36px">
+      <a href="/snapshot" class="btn-ghost">See a sample Snapshot →</a>
     </div>
   </div>
 </section>
@@ -1332,6 +1345,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
           <span>→</span>
         </button>
         <p class="form-note">No spam. No pitch required. We'll reach out when access opens.</p>
+        <p class="form-note" style="margin-top:8px;font-size:11px;opacity:0.75">By requesting access you agree to our <a href="/privacy" style="color:var(--blue-lt);text-decoration:underline">Privacy Policy</a> and <a href="/terms" style="color:var(--blue-lt);text-decoration:underline">Terms</a>.</p>
       </form>
       <div class="form-success" id="success-founders">
         <div class="success-icon">✓</div>
@@ -1407,6 +1421,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
           <span>→</span>
         </button>
         <p class="form-note">Pre-launch partners shape what the platform looks like. No commitment required.</p>
+        <p class="form-note" style="margin-top:8px;font-size:11px;opacity:0.75">By requesting partnership you agree to our <a href="/privacy" style="color:var(--blue-lt);text-decoration:underline">Privacy Policy</a> and <a href="/terms" style="color:var(--blue-lt);text-decoration:underline">Terms</a>.</p>
       </form>
       <div class="form-success" id="success-investors">
         <div class="success-icon">✓</div>
@@ -1429,11 +1444,15 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
     <div class="footer-links founder-only">
       <a href="#features-founders" class="footer-link">Features</a>
       <a href="#how-founders" class="footer-link">How It Works</a>
+      <a href="/privacy" class="footer-link">Privacy</a>
+      <a href="/terms" class="footer-link">Terms</a>
       <a href="mailto:hello@laelapx.com" class="footer-link">Contact</a>
     </div>
     <div class="footer-links investor-only">
       <a href="#features-investors" class="footer-link">Features</a>
       <a href="#how-investors" class="footer-link">How It Works</a>
+      <a href="/privacy" class="footer-link">Privacy</a>
+      <a href="/terms" class="footer-link">Terms</a>
       <a href="mailto:investors@laelapx.com" class="footer-link">Contact</a>
     </div>
     <div class="footer-copy">© 2026 Laelapx. Pre-launch.</div>
@@ -1607,5 +1626,7 @@ setTimeout(() => {
   if (document.body.dataset.view === 'investors') staggerDeals();
 }, 200);
 </script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>
