@@ -462,7 +462,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
   <div class="nav-logo">Laelapx<span>.</span></div>
   <div class="nav-right">
     <a href="laelapx-investors.html" class="nav-link">For Investors</a>
-    <a href="https://app.laelapx.com/handler/sign-up" data-app-href="/handler/sign-up" class="nav-cta">Get started →</a>
+    <a href="/handler/sign-up" class="nav-cta">Get started →</a>
   </div>
 </nav>
 
@@ -475,7 +475,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
       <p class="hero-sub">Upload your deck. Get a Fundability Snapshot — score, gap analysis, deck feedback, and matched investors — before your first cold email.</p>
       <p class="hero-sub" style="margin-top:14px;font-size:14px"><a href="/snapshot" style="color:var(--blue);font-weight:600;border-bottom:1px solid var(--blue-bd);padding-bottom:2px">See a sample Snapshot →</a></p>
       <div class="hero-actions">
-        <a href="https://app.laelapx.com/handler/sign-up" data-app-href="/handler/sign-up" class="btn-primary">Get started →</a>
+        <a href="/handler/sign-up" class="btn-primary">Get started →</a>
         <a href="#how" class="btn-ghost">How it works ↓</a>
       </div>
     </div>
@@ -709,7 +709,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
     <div class="cta-rule"></div>
     <h2>Stop guessing.<br>Start knowing.</h2>
     <p>Submit your startup. Get your Fundability Snapshot — score, gap analysis, and matched investors — and walk into your next conversation with a clear picture of where you stand.</p>
-    <a href="https://app.laelapx.com/handler/sign-up" data-app-href="/handler/sign-up" class="btn-white">Get started →</a>
+    <a href="/handler/sign-up" class="btn-white">Get started →</a>
   </div>
 </section>
 
@@ -730,16 +730,6 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
 </footer>
 
 <script>
-// Auth-link rewriter: in local dev (vite at :5173) point at the local Next app.
-(function () {
-  const isLocal =
-    location.hostname === 'localhost' || location.hostname.startsWith('127.');
-  const APP_BASE = isLocal ? 'http://localhost:3000' : 'https://laelapx-app.vercel.app';
-  document.querySelectorAll('[data-app-href]').forEach((a) => {
-    a.href = APP_BASE + a.getAttribute('data-app-href');
-  });
-})();
-
 // Scroll reveal
 const io = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });

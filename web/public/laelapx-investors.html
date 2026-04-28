@@ -433,7 +433,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
   <div class="nav-logo">Laelapx<span>.</span></div>
   <div class="nav-right">
     <a href="laelapx.html" class="nav-link">For Founders</a>
-    <a href="https://app.laelapx.com/handler/sign-up" data-app-href="/handler/sign-up" class="nav-cta">Get started →</a>
+    <a href="/handler/sign-up" class="nav-cta">Get started →</a>
   </div>
 </nav>
 
@@ -445,7 +445,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
       <h1 class="hero-h1">Deal flow<br>that's already<br>been vetted.</h1>
       <p class="hero-sub">Laelapx pre-analyzes inbound before it reaches you. Thesis-aligned. Scored. Gaps already surfaced — so the work of a first screen is done before you open the deck.</p>
       <div class="hero-actions">
-        <a href="https://app.laelapx.com/handler/sign-up" data-app-href="/handler/sign-up" class="btn-primary">Get started →</a>
+        <a href="/handler/sign-up" class="btn-primary">Get started →</a>
         <a href="#how" class="btn-ghost">How it works ↓</a>
       </div>
     </div>
@@ -670,7 +670,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
     <div class="cta-rule"></div>
     <h2>Less noise.<br>Better signal.</h2>
     <p>Define your thesis once. Off-thesis startups never reach your inbox. Pre-analyzed inbound — for the rest of your fund's life.</p>
-    <a href="https://app.laelapx.com/handler/sign-up" data-app-href="/handler/sign-up" class="btn-white">Get started →</a>
+    <a href="/handler/sign-up" class="btn-white">Get started →</a>
   </div>
 </section>
 
@@ -691,16 +691,6 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
 </footer>
 
 <script>
-// Auth-link rewriter: in local dev (vite at :5173) point at the local Next app.
-(function () {
-  const isLocal =
-    location.hostname === 'localhost' || location.hostname.startsWith('127.');
-  const APP_BASE = isLocal ? 'http://localhost:3000' : 'https://laelapx-app.vercel.app';
-  document.querySelectorAll('[data-app-href]').forEach((a) => {
-    a.href = APP_BASE + a.getAttribute('data-app-href');
-  });
-})();
-
 // Scroll reveal
 const io = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });

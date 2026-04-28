@@ -1263,23 +1263,12 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
 
 <script>
 /* ─── AUTH REDIRECT ───
-   Every "Get started" CTA on this marketing page (originally an early-access
-   modal handler) now bounces straight to the app's sign-up flow. We detect
-   localhost so the same HTML works in both `npm run dev` (root, port 5173)
-   and production (laelapx.com → app.laelapx.com).
+   Marketing + app are served from the same Next.js project, so every CTA
+   navigates relatively to the auth handler. Both founder and investor land
+   on /welcome which forwards them based on their saved role.
 */
-const APP_BASE = (
-  location.hostname === 'localhost' || location.hostname.startsWith('127.')
-)
-  ? 'http://localhost:3000'
-  // Until DNS is pointed at app.laelapx.com, route to the bare Vercel alias.
-  // Flip back to https://app.laelapx.com once the CNAME is wired.
-  : 'https://laelapx-app.vercel.app';
-
 function openModal(/* type */) {
-  // Both founder and investor land on /welcome which routes them based on
-  // their saved role (or shows the role chooser on first sign-in).
-  window.location.href = APP_BASE + '/handler/sign-up';
+  window.location.href = '/handler/sign-up';
 }
 
 /* ─── VIEW SWITCHING ─── */
