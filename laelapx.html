@@ -453,7 +453,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
   <div class="nav-logo">Laelapx<span>.</span></div>
   <div class="nav-right">
     <a href="laelapx-investors.html" class="nav-link">For Investors</a>
-    <a href="#access" class="nav-cta">Get Early Access →</a>
+    <a href="https://app.laelapx.com/handler/sign-up" data-app-href="/handler/sign-up" class="nav-cta">Get started →</a>
   </div>
 </nav>
 
@@ -465,7 +465,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
       <h1 class="hero-h1">Know why<br>before<br>you pitch.</h1>
       <p class="hero-sub">Upload your deck. Get a Fundability Snapshot — score, gap analysis, deck feedback, and matched investors — before your first cold email.</p>
       <div class="hero-actions">
-        <a href="#access" class="btn-primary">Get Early Access →</a>
+        <a href="https://app.laelapx.com/handler/sign-up" data-app-href="/handler/sign-up" class="btn-primary">Get started →</a>
         <a href="#how" class="btn-ghost">How it works ↓</a>
       </div>
     </div>
@@ -723,8 +723,8 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
   <div class="cta-inner reveal">
     <div class="cta-rule"></div>
     <h2>Stop guessing.<br>Start knowing.</h2>
-    <p>Early access is open. Upload your deck, get your Fundability Snapshot, and walk into your next conversation with a clear picture of where you stand.</p>
-    <a href="mailto:hello@laelapx.com" class="btn-white">Get Early Access →</a>
+    <p>Submit your startup. Get your Fundability Snapshot — score, gap analysis, and matched investors — and walk into your next conversation with a clear picture of where you stand.</p>
+    <a href="https://app.laelapx.com/handler/sign-up" data-app-href="/handler/sign-up" class="btn-white">Get started →</a>
   </div>
 </section>
 
@@ -738,11 +738,21 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
       <a href="#how" class="footer-link">How It Works</a>
       <a href="mailto:hello@laelapx.com" class="footer-link">Contact</a>
     </div>
-    <div class="footer-copy">© 2026 Laelapx. Pre-launch.</div>
+    <div class="footer-copy">© 2026 Laelapx.</div>
   </div>
 </footer>
 
 <script>
+// Auth-link rewriter: in local dev (vite at :5173) point at the local Next app.
+(function () {
+  const isLocal =
+    location.hostname === 'localhost' || location.hostname.startsWith('127.');
+  const APP_BASE = isLocal ? 'http://localhost:3000' : 'https://app.laelapx.com';
+  document.querySelectorAll('[data-app-href]').forEach((a) => {
+    a.href = APP_BASE + a.getAttribute('data-app-href');
+  });
+})();
+
 // Scroll reveal
 const io = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });

@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* ─── BRAND TOKENS (mirrors the marketing site) ───────────────────────── */
+@theme {
+  /* Surfaces */
+  --color-paper: #f7f5f0;
+  --color-paper-2: #edeae3;
+  --color-paper-3: #e2ded6;
+  --color-navy: #1c2b42;
+  --color-navy-2: #253d5c;
+  --color-white: #ffffff;
+
+  /* Brand */
+  --color-blue: #2c5ba8;
+  --color-blue-light: #4a78cc;
+
+  /* Ink (typography) */
+  --color-ink: #191714;
+  --color-ink-soft: #5a5650;
+  --color-ink-faint: #9a968e;
+
+  /* Flag colors (gaps, scores) */
+  --color-flag-red: #c44040;
+  --color-flag-green: #2a9c52;
+  --color-flag-amber: #c8871a;
+
+  /* Type */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+}
+
+/* ─── BASE ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  font-feature-settings: "ss01", "cv11";
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: var(--color-blue);
+  color: var(--color-white);
+}
+
+/* Slightly tighter heading tracking — matches marketing aesthetic */
+h1, h2, h3, h4 { letter-spacing: -0.025em; }
+
+/* Native input reset for our style */
+input, textarea, select, button { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Prefer reduced motion respected by Framer Motion automatically; still
+   reduce CSS-only transitions for users who request it. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

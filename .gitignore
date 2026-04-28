@@ -9,3 +9,21 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Node / Vite
+node_modules/
+dist/
+.env
+.env.local
+.env*.local
+*.log
+
+# Next.js (in /web)
+.next/
+
+# Per-developer Claude Code state — contains permission allowlists with
+# hardcoded API keys; never commit.
+.claude/
+
+# Build artifacts
+*.tsbuildinfo
