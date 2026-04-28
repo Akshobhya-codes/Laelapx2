@@ -1272,7 +1272,9 @@ const APP_BASE = (
   location.hostname === 'localhost' || location.hostname.startsWith('127.')
 )
   ? 'http://localhost:3000'
-  : 'https://app.laelapx.com';
+  // Until DNS is pointed at app.laelapx.com, route to the bare Vercel alias.
+  // Flip back to https://app.laelapx.com once the CNAME is wired.
+  : 'https://laelapx-app.vercel.app';
 
 function openModal(/* type */) {
   // Both founder and investor land on /welcome which routes them based on

@@ -695,7 +695,7 @@ footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px soli
 (function () {
   const isLocal =
     location.hostname === 'localhost' || location.hostname.startsWith('127.');
-  const APP_BASE = isLocal ? 'http://localhost:3000' : 'https://app.laelapx.com';
+  const APP_BASE = isLocal ? 'http://localhost:3000' : 'https://laelapx-app.vercel.app';
   document.querySelectorAll('[data-app-href]').forEach((a) => {
     a.href = APP_BASE + a.getAttribute('data-app-href');
   });
