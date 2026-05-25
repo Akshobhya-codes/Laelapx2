@@ -1,6 +1,10 @@
 import { stackServerApp } from "@/stack";
 import { getInvestorByOwner, thesisFitScore } from "@/lib/insforge/investors";
 import { listAllSubmissions } from "@/lib/insforge/submissions";
+import {
+  listSavedForInvestor,
+  listConnectsForInvestor,
+} from "@/lib/insforge/audience";
 import { FunderHome } from "./funder-home";
 
 export const metadata = { title: "Investor workspace · Laelapx" };
@@ -9,9 +13,11 @@ export const dynamic = "force-dynamic";
 export default async function FunderHomePage() {
   const user = await stackServerApp.getUser({ or: "redirect" });
 
-  const [thesis, allSubs] = await Promise.all([
+  const [thesis, allSubs, saved, connects] = await Promise.all([
     getInvestorByOwner(user.id),
     listAllSubmissions({ limit: 200 }),
+    listSavedForInvestor(user.id),
+    listConnectsForInvestor(user.id),
   ]);
 
   let topMatches: {
@@ -62,6 +68,8 @@ export default async function FunderHomePage() {
       stats={{
         totalLive: allSubs.length,
         strongFit: strongFitCount,
+        savedCount: saved.length,
+        connectCount: connects.length,
       }}
       topMatches={topMatches}
     />

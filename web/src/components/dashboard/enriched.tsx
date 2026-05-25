@@ -37,6 +37,18 @@ function NarrativeCard({ narrative }: { narrative: string }) {
 }
 
 /* ─── GAPS BLOCK ──────────────────────────────────────────────────────── */
+/**
+ * Priority for the gaps shown to the founder:
+ *   1. snapshot.gaps from the LLM scorer (derived from per-sub-criterion
+ *      ratings ≤ 3, with the rubric tier above's "what good looks like"
+ *      becoming the closing). Always passed as `fallbackGaps`.
+ *   2. Legacy narrative-pass gaps (only used if the scorer wasn't run,
+ *      which only happens on the deterministic-fallback path).
+ *
+ * In practice the snapshot.gaps are now richer than the narrative ones,
+ * so we prefer them when present — the narrative pass is becoming a
+ * pure summary-paragraph generator.
+ */
 export function GapsBlock({
   promise,
   fallbackGaps,
@@ -45,12 +57,12 @@ export function GapsBlock({
   fallbackGaps: Gap[];
 }) {
   const enrichment = use(promise);
-  // If LLM failed/returned 0, fall back to deterministic rubric gaps so the
-  // dashboard always renders something useful.
   const gaps =
-    enrichment.gaps && enrichment.gaps.length > 0
+    fallbackGaps.length > 0
+      ? fallbackGaps
+      : enrichment.gaps && enrichment.gaps.length > 0
       ? enrichment.gaps
-      : fallbackGaps;
+      : [];
   return <GapsSection gaps={gaps} />;
 }
 

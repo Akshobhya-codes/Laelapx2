@@ -34,7 +34,12 @@ export function FunderHome({
   displayName: string | null;
   profileImageUrl: string | null;
   thesis: Thesis | null;
-  stats: { totalLive: number; strongFit: number };
+  stats: {
+    totalLive: number;
+    strongFit: number;
+    savedCount: number;
+    connectCount: number;
+  };
   topMatches: Match[];
 }) {
   const firstName = displayName?.split(" ")[0] || "you";
@@ -102,10 +107,10 @@ export function FunderHome({
                   highlight
                 />
                 <StatCard
-                  label="Saved + connect"
-                  value={0}
-                  helper="Coming soon"
-                  muted
+                  label="Saved + connects"
+                  value={stats.savedCount + stats.connectCount}
+                  helper={`${stats.savedCount} saved · ${stats.connectCount} connects sent`}
+                  href="/funder/saved"
                 />
               </div>
             </Reveal>
@@ -234,23 +239,27 @@ function StatCard({
   helper,
   highlight = false,
   muted = false,
+  href,
 }: {
   label: string;
   value: number;
   helper: string;
   highlight?: boolean;
   muted?: boolean;
+  href?: string;
 }) {
-  return (
-    <div
-      className={`rounded-2xl border p-7 ${
-        highlight
-          ? "border-blue/30 bg-gradient-to-br from-blue/[0.08] via-white to-white"
-          : muted
-          ? "border-ink/10 bg-paper-2 opacity-70"
-          : "border-ink/10 bg-white"
-      }`}
-    >
+  const baseClasses = `rounded-2xl border p-7 ${
+    highlight
+      ? "border-blue/30 bg-gradient-to-br from-blue/[0.08] via-white to-white"
+      : muted
+      ? "border-ink/10 bg-paper-2 opacity-70"
+      : "border-ink/10 bg-white"
+  }`;
+  const interactiveClasses = href
+    ? " group block transition-all hover:-translate-y-0.5 hover:border-blue/40 hover:shadow-[0_8px_24px_rgba(28,43,66,0.06)]"
+    : "";
+  const inner = (
+    <>
       <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-ink-faint">
         {label}
       </div>
@@ -262,8 +271,16 @@ function StatCard({
         <AnimatedNumber value={value} />
       </div>
       <div className="mt-3 text-[12px] text-ink-faint">{helper}</div>
-    </div>
+    </>
   );
+  if (href) {
+    return (
+      <Link href={href} className={baseClasses + interactiveClasses}>
+        {inner}
+      </Link>
+    );
+  }
+  return <div className={baseClasses}>{inner}</div>;
 }
 
 /* ─── MATCH CARD ──────────────────────────────────────────────────────── */

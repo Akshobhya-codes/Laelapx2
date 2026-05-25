@@ -181,8 +181,55 @@ export async function listInvestorsByOwners(
   return map;
 }
 
+/**
+ * Every investor on Laelapx (every row in the `investors` table). Used by the
+ * founder dashboard to match against real investor theses, not a mock list.
+ */
+export async function listAllInvestors(): Promise<StoredInvestor[]> {
+  const client = getInsforge();
+  const { data, error } = await client.database
+    .from("investors")
+    .select("*")
+    .order("updated_at", { ascending: false });
+  if (error) throw new Error(`listAllInvestors: ${error.message}`);
+  return ((data ?? []) as InvestorRow[]).map(rowToStored);
+}
+
 /* ─── MATCHING ────────────────────────────────────────────────────────── */
 import type { StoredSubmission } from "./submissions";
+
+export type InvestorMatch = {
+  investor: StoredInvestor;
+  fitScore: number;
+  reasons: string[];
+};
+
+/**
+ * Score a submission against every investor on Laelapx. Excludes the founder's
+ * own investor profile (operator-VCs), filters by minimum fit, and returns the
+ * top N.
+ */
+export async function matchInvestorsFromInsforge(
+  submission: StoredSubmission,
+  opts: {
+    excludeOwnerUserId?: string;
+    minScore?: number;
+    top?: number;
+  } = {}
+): Promise<InvestorMatch[]> {
+  const minScore = opts.minScore ?? 40;
+  const top = opts.top ?? 6;
+  const all = await listAllInvestors();
+  return all
+    .filter((inv) => inv.ownerUserId !== opts.excludeOwnerUserId)
+    .map((inv) => {
+      const { score, reasons } = thesisFitScore(inv.data, submission);
+      return { investor: inv, fitScore: score, reasons };
+    })
+    .filter((m) => m.fitScore >= minScore)
+    .sort((a, b) => b.fitScore - a.fitScore)
+    .slice(0, top);
+}
 
 export function thesisFitScore(
   thesis: InvestorThesis,

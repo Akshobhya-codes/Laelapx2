@@ -9,6 +9,8 @@
  * marketing site mock — which keeps the dashboard visually consistent.
  */
 import type { Submission } from "@/lib/submission/schema";
+import type { SectionScore, ScoredGap } from "./llm-scorer";
+import type { FrameworkStage } from "./frameworks";
 
 export type SubScore = {
   axis: "Market" | "Team" | "Traction" | "Financials";
@@ -21,6 +23,16 @@ export type Snapshot = {
   subscores: SubScore[];
   gaps: Gap[];
   rating: "Below threshold" | "Borderline" | "Above average" | "Strong";
+  /**
+   * Rich per-section scores from the stage-specific LLM rubric. Only present
+   * when buildSnapshotLlm() produced the snapshot (founder dashboard); absent
+   * for the legacy deterministic path used by list views.
+   */
+  sections?: SectionScore[];
+  /** Per-sub-criterion gaps with reasoning + improvement, from the LLM scorer. */
+  topGaps?: ScoredGap[];
+  /** The framework actually used (Pre-Seed if the submission's stage rubric is still a stub). */
+  frameworkStage?: FrameworkStage;
 };
 
 export type Gap = {

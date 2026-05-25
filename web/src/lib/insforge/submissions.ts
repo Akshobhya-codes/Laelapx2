@@ -1,10 +1,11 @@
 import "server-only";
 import { getInsforge } from "./client";
 import type { Submission, Founder } from "@/lib/submission/schema";
+import type { Snapshot } from "@/lib/scoring/rubric";
 import slugify from "slugify";
 import { nanoid } from "nanoid";
 
-/* ─── ROW SHAPE (mirrors db/0002-init-schema.sql) ─────────────────────── */
+/* ─── ROW SHAPE (mirrors db/0002-init-schema.sql + 0007-scored-snapshot.sql) ─ */
 type SubmissionRow = {
   id: string;
   owner_user_id: string;
@@ -48,6 +49,9 @@ type SubmissionRow = {
   open_to_investor_contact: boolean;
   created_at: string;
   updated_at: string;
+  // Added by migration 0007 — nullable until the migration is applied.
+  scored_snapshot: Snapshot | null;
+  scored_for_updated_at: string | null;
 };
 
 export type StoredSubmission = {
@@ -57,6 +61,11 @@ export type StoredSubmission = {
   data: Submission;
   createdAt: string;
   updatedAt: string;
+  /** Cached LLM-scored Snapshot (migration 0007). Null if not yet scored
+   *  or if the score is stale (founder edited the submission since scoring). */
+  scoredSnapshot: Snapshot | null;
+  /** The submission's updated_at at the time the cached score was computed. */
+  scoredForUpdatedAt: string | null;
 };
 
 /* ─── MAPPERS ─────────────────────────────────────────────────────────── */
@@ -107,7 +116,35 @@ function rowToStored(r: SubmissionRow): StoredSubmission {
     data,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
+    scoredSnapshot: r.scored_snapshot ?? null,
+    scoredForUpdatedAt: r.scored_for_updated_at ?? null,
   };
+}
+
+/**
+ * Persist a freshly-computed Snapshot back to the submission row so we never
+ * recompute it until the founder edits their submission again. Fails soft —
+ * if the migration hasn't been applied yet (no columns), this is a no-op
+ * and the caller will just keep computing on every read.
+ */
+export async function persistScoredSnapshot(
+  submissionId: string,
+  snapshot: Snapshot,
+  scoredForUpdatedAt: string
+): Promise<void> {
+  const client = getInsforge();
+  try {
+    await client.database
+      .from("submissions")
+      .update({
+        scored_snapshot: snapshot,
+        scored_for_updated_at: scoredForUpdatedAt,
+      })
+      .eq("id", submissionId);
+  } catch {
+    // No-op on failure (e.g. column doesn't exist because migration 0007
+    // hasn't been applied). The next dashboard load will just recompute.
+  }
 }
 
 function dataToRow(s: Submission, ownerUserId: string, slug: string) {
@@ -208,7 +245,15 @@ export async function updateSubmission(
   };
   void _o;
   void _s;
-  const updateRow = { ...rest, updated_at: new Date().toISOString() };
+  const updateRow = {
+    ...rest,
+    updated_at: new Date().toISOString(),
+    // Invalidate the cached LLM score — the submission just changed, so any
+    // previously-computed Snapshot is stale. Next dashboard load will lazily
+    // recompute and persist via persistScoredSnapshot().
+    scored_snapshot: null,
+    scored_for_updated_at: null,
+  };
   const result = await client.database
     .from("submissions")
     .update(updateRow)

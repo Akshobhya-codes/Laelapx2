@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Submission } from "@/lib/submission/schema";
 import type { Snapshot, SubScore, Gap } from "@/lib/scoring/rubric";
-import type { InvestorMatch } from "@/lib/investors/mock";
+import type { InvestorMatch } from "@/lib/insforge/investors";
 import { Reveal } from "@/components/motion/reveal";
 import { AnimatedNumber, formatUsdShort } from "@/components/motion/animated-number";
 import { NotificationsBell } from "@/components/notifications/bell";
@@ -257,6 +257,7 @@ function SummaryPill({
 
 /* ─── SCORE SECTION ──────────────────────────────────────────────────── */
 export function ScoreSection({ snapshot }: { snapshot: Snapshot }) {
+  const useRich = !!snapshot.sections && snapshot.sections.length > 0;
   return (
     <section className="mt-16">
       <Reveal>
@@ -275,32 +276,121 @@ export function ScoreSection({ snapshot }: { snapshot: Snapshot }) {
                 {snapshot.rating}
               </div>
             </div>
+            {snapshot.frameworkStage && (
+              <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-blue/25 bg-blue/8 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-blue">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue" />
+                {snapshot.frameworkStage} rubric
+              </div>
+            )}
           </div>
         </Reveal>
 
         <Reveal delay={0.2}>
-          <div className="rounded-2xl border border-ink/10 bg-white p-8">
-            <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-ink-faint">
-              Sub-scores
-            </div>
-            <div className="mt-5 space-y-5">
-              {snapshot.subscores.map((s, i) => (
-                <SubScoreBar key={s.axis} sub={s} delay={i * 0.08} />
-              ))}
-            </div>
-            <div className="mt-7 flex flex-col gap-1.5 border-t border-ink/8 pt-5 text-[12px] text-ink-faint">
-              <div>
-                Weighted: Market 30% · Team 25% · Traction 30% · Financials 15%.
+          {useRich ? (
+            <RichSectionsPanel sections={snapshot.sections!} />
+          ) : (
+            <div className="rounded-2xl border border-ink/10 bg-white p-8">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-ink-faint">
+                Sub-scores
               </div>
-              <div>
-                v1 rubric — narrative gap analysis & deeper read coming once
-                LLM scoring is wired.
+              <div className="mt-5 space-y-5">
+                {snapshot.subscores.map((s, i) => (
+                  <SubScoreBar key={s.axis} sub={s} delay={i * 0.08} />
+                ))}
+              </div>
+              <div className="mt-7 flex flex-col gap-1.5 border-t border-ink/8 pt-5 text-[12px] text-ink-faint">
+                <div>
+                  Weighted: Market 30% · Team 25% · Traction 30% · Financials 15%.
+                </div>
+                <div>v1 deterministic rubric (LLM scorer unavailable).</div>
               </div>
             </div>
-          </div>
+          )}
         </Reveal>
       </div>
     </section>
+  );
+}
+
+/* ─── RICH SECTIONS PANEL (new rubric) ──────────────────────────────── */
+function RichSectionsPanel({
+  sections,
+}: {
+  sections: NonNullable<Snapshot["sections"]>;
+}) {
+  return (
+    <div className="rounded-2xl border border-ink/10 bg-white p-7">
+      <div className="flex items-baseline justify-between">
+        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-ink-faint">
+          Section breakdown
+        </div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+          weight · score
+        </div>
+      </div>
+      <div className="mt-5 space-y-5">
+        {sections.map((sec, i) => (
+          <RichSectionRow key={sec.id} section={sec} delay={i * 0.06} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RichSectionRow({
+  section,
+  delay,
+}: {
+  section: NonNullable<Snapshot["sections"]>[number];
+  delay: number;
+}) {
+  const low = section.score < 50;
+  const mid = section.score >= 50 && section.score < 70;
+  const barColor = low ? "bg-flag-red" : mid ? "bg-flag-amber" : "bg-blue";
+  return (
+    <div>
+      <div className="mb-1.5 flex items-baseline justify-between gap-3">
+        <div className="flex items-baseline gap-2">
+          <span className="text-[13px] font-extrabold text-ink">
+            {section.name}
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-ink-faint">
+            {Math.round(section.weight * 100)}%
+          </span>
+        </div>
+        <span className="text-[15px] font-extrabold tabular-nums text-ink">
+          <AnimatedNumber value={section.score} />
+        </span>
+      </div>
+      <div className="h-2 w-full overflow-hidden rounded-full bg-ink/8">
+        <motion.div
+          initial={{ width: 0 }}
+          whileInView={{ width: `${section.score}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.0, delay, ease: [0.16, 1, 0.3, 1] }}
+          className={`h-full rounded-full ${barColor}`}
+        />
+      </div>
+      {/* Sub-criteria pill row */}
+      <div className="mt-2.5 flex flex-wrap gap-1.5">
+        {section.subCriteria.map((sc) => (
+          <div
+            key={sc.id}
+            title={sc.reasoning}
+            className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[10px] font-semibold ${
+              sc.rating >= 4
+                ? "border-blue/25 bg-blue/8 text-blue"
+                : sc.rating === 3
+                ? "border-ink/15 bg-paper text-ink"
+                : "border-flag-amber/30 bg-flag-amber/8 text-flag-amber"
+            }`}
+          >
+            <span className="font-bold tabular-nums">{sc.rating}</span>
+            <span className="opacity-80">{sc.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -440,15 +530,18 @@ function GapCard({ gap }: { gap: Gap }) {
 
 /* ─── MATCHED INVESTORS ──────────────────────────────────────────────── */
 export function MatchesSection({ matches }: { matches: InvestorMatch[] }) {
+  // Hide entirely when there are no in-house matches. Founders go straight
+  // to the external funds section instead of seeing an empty-state card.
+  // (Empty-state browse CTA stays available via the global nav.)
+  if (matches.length === 0) return null;
   return (
     <section className="mt-20">
       <Reveal>
         <SectionTitle
-          eyebrow="03 — Matched investors"
-          title="Investors whose thesis fits you right now."
+          eyebrow="03 — Investors on Laelapx"
+          title="Investors here whose thesis fits — connect in one click."
         />
       </Reveal>
-
       <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {matches.map((m, i) => (
           <Reveal key={m.investor.id} delay={i * 0.06}>
@@ -462,6 +555,10 @@ export function MatchesSection({ matches }: { matches: InvestorMatch[] }) {
 
 function InvestorCard({ match }: { match: InvestorMatch }) {
   const { investor, fitScore, reasons } = match;
+  const data = investor.data;
+  const partnerLine = [data.partnerName, data.partnerTitle]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <motion.div
       whileHover={{ y: -3 }}
@@ -471,17 +568,17 @@ function InvestorCard({ match }: { match: InvestorMatch }) {
       <div className="mb-3 flex items-start justify-between">
         <div>
           <div className="text-[16px] font-extrabold tracking-tight text-navy">
-            {investor.fundName}
+            {data.fundName}
           </div>
-          <div className="text-[12px] text-ink-faint">
-            {investor.partner} · {investor.partnerTitle}
-          </div>
+          {partnerLine && (
+            <div className="text-[12px] text-ink-faint">{partnerLine}</div>
+          )}
         </div>
         <FitBadge value={fitScore} />
       </div>
 
       <p className="mb-4 text-[13px] italic leading-[1.55] text-ink-soft">
-        “{investor.thesisOneLiner}”
+        “{data.thesisOneLiner}”
       </p>
 
       <ul className="mb-4 space-y-1.5">
@@ -497,23 +594,17 @@ function InvestorCard({ match }: { match: InvestorMatch }) {
       </ul>
 
       <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-ink/8 pt-4 text-[10px] uppercase tracking-[0.15em]">
-        <span className="text-ink-faint">{investor.hq}</span>
-        <span className="text-ink-faint">·</span>
-        <span className="text-ink-faint">
-          {investor.stages.join(" / ")}
-        </span>
+        {data.hq && <span className="text-ink-faint">{data.hq}</span>}
+        {data.hq && <span className="text-ink-faint">·</span>}
+        <span className="text-ink-faint">{data.stages.join(" / ")}</span>
       </div>
 
-      {investor.websiteUrl !== "#" && (
-        <a
-          href={investor.websiteUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 inline-block text-[12px] font-bold text-blue transition-colors hover:text-blue-light"
-        >
-          Visit site ↗
-        </a>
-      )}
+      <Link
+        href={`/v/${investor.slug}`}
+        className="mt-3 inline-block text-[12px] font-bold text-blue transition-colors hover:text-blue-light"
+      >
+        View profile →
+      </Link>
     </motion.div>
   );
 }

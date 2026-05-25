@@ -20,7 +20,7 @@ import {
   SECTORS,
   type Submission,
 } from "@/lib/submission/schema";
-import { DUMMY_SUBMISSION } from "@/lib/submission/dummy";
+import { DUMMY_SUBMISSION, EMPTY_SUBMISSION } from "@/lib/submission/dummy";
 import {
   submitFounderSubmission,
   updateFounderSubmission,
@@ -82,7 +82,7 @@ const STEP_FIELDS: Record<(typeof STEPS)[number]["id"], FieldPath<Submission>[]>
 
 export function SubmissionForm({
   mode = "create",
-  defaultValues = DUMMY_SUBMISSION,
+  defaultValues = EMPTY_SUBMISSION,
   editingSlug,
 }: {
   mode?: "create" | "edit";
@@ -150,8 +150,19 @@ export function SubmissionForm({
             <div className="text-[16px] font-black tracking-tight text-navy">
               Laelapx<span className="text-blue">.</span>
             </div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
-              Step {stepIdx + 1} / {STEPS.length} · {step.title}
+            <div className="flex items-center gap-4">
+              {mode === "create" && (
+                <button
+                  type="button"
+                  onClick={() => methods.reset(DUMMY_SUBMISSION)}
+                  className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-faint transition-colors hover:text-blue"
+                >
+                  Load sample
+                </button>
+              )}
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
+                Step {stepIdx + 1} / {STEPS.length} · {step.title}
+              </div>
             </div>
           </div>
           {/* Progress bar */}

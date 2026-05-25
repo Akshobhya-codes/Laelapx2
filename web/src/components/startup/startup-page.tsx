@@ -716,10 +716,28 @@ function Ask({
               Subscribed investors can request a connect. We pass the request
               to {data.companyName} with your thesis-fit context attached.
             </p>
-            <button className="mt-5 inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 text-[13px] font-bold text-navy transition-transform hover:-translate-y-0.5">
-              Request connect
-              <span className="text-base">→</span>
-            </button>
+            {canSeeContact ? (
+              <p className="mt-5 text-[13px] font-semibold text-white/80">
+                Use the action bar at the bottom of the page to save or request
+                a connect.
+              </p>
+            ) : viewerSignedIn ? (
+              <Link
+                href="/funder/thesis"
+                className="mt-5 inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 text-[13px] font-bold text-navy shadow-[0_8px_24px_rgba(0,0,0,0.25)] transition-transform hover:-translate-y-0.5"
+              >
+                Set up your investor profile
+                <span className="text-base">→</span>
+              </Link>
+            ) : (
+              <Link
+                href="/handler/sign-in"
+                className="mt-5 inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 text-[13px] font-bold text-navy shadow-[0_8px_24px_rgba(0,0,0,0.25)] transition-transform hover:-translate-y-0.5"
+              >
+                Sign in to request a connect
+                <span className="text-base">→</span>
+              </Link>
+            )}
           </div>
         </Reveal>
       )}
