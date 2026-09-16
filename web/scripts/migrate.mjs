@@ -21,7 +21,9 @@ function loadEnv() {
   for (const line of text.split(/\r?\n/)) {
     if (!line || line.startsWith("#")) continue;
     const m = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
-    if (m) env[m[1]] = m[2].trim();
+    // `vercel env pull` writes quoted values ("https://..."); strip the
+    // wrapping quotes so the URL is usable. Next's own dotenv does this too.
+    if (m) env[m[1]] = m[2].trim().replace(/^(['"])(.*)\1$/s, "$2");
   }
   return env;
 }
