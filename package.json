@@ -1,0 +1,12 @@
+{
+  "name": "laelapx",
+  "private": true,
+  "description": "Repo root. The Next.js app lives in web/ — these scripts forward to it so commands work from either directory.",
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "start": "npm --prefix web run start",
+    "lint": "npm --prefix web run lint",
+    "postinstall": "npm --prefix web install"
+  }
+}
