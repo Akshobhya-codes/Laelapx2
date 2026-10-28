@@ -7,7 +7,8 @@ import type { FounderEntitlement, InvestorEntitlement } from "./entitlements";
  *
  * "Paid" means an active plan someone pays for — a free investor pilot
  * doesn't count. Someone paying on both sides (an operator who invests)
- * keeps the toggle, since both sides are genuinely theirs.
+ * keeps the toggle, since both sides are genuinely theirs. The pages also
+ * skip the lock for the Laelapx team (ADMIN_EMAILS), who test both sides.
  */
 export function paidSide(
   founder: Pick<FounderEntitlement, "isPaid">,

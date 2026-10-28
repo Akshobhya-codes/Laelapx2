@@ -5,6 +5,7 @@ import {
 } from "@/lib/billing/entitlements";
 import { isStripeConfigured } from "@/lib/billing/stripe";
 import { paidSide } from "@/lib/billing/side";
+import { isAdminEmail } from "@/lib/billing/admin";
 import { PricingPage } from "./pricing-client";
 
 export const metadata = {
@@ -44,8 +45,9 @@ export default async function Pricing({
     currentFounderPlan = f.plan.id;
     currentInvestorPlan = i.active ? i.plan?.id ?? null : null;
     pilotAvailable = !i.pilotExhausted && !i.active;
-    // Paid on one side → only that side's plans, no toggle.
-    lockedSide = paidSide(f, i);
+    // Paid on one side → only that side's plans, no toggle. The Laelapx
+    // team (ADMIN_EMAILS) always keeps the toggle, to test both sides.
+    lockedSide = isAdminEmail(user.primaryEmail) ? null : paidSide(f, i);
   }
 
   return (

@@ -12,6 +12,7 @@ import { listSubmissionsByOwner } from "@/lib/insforge/submissions";
 import { isStripeConfigured, listPaymentHistory, type PaymentRecord } from "@/lib/billing/stripe";
 import { getStripeCustomerId } from "@/lib/insforge/billing";
 import { paidSide } from "@/lib/billing/side";
+import { isAdminEmail } from "@/lib/billing/admin";
 import { BillingPage } from "./billing-client";
 
 export const metadata = { title: "Billing · Laelapx" };
@@ -38,8 +39,9 @@ export default async function Billing({
     listReviewOrdersForUser(user.id),
   ]);
 
-  // Paid on one side → that side only, whatever ?side= says.
-  const lockedSide = paidSide(founder, investor);
+  // Paid on one side → that side only, whatever ?side= says. The Laelapx
+  // team (ADMIN_EMAILS) always keeps the toggle, to test both sides.
+  const lockedSide = isAdminEmail(user.primaryEmail) ? null : paidSide(founder, investor);
   const side: "founder" | "investor" =
     lockedSide ??
     (sp.side === "investor" || sp.side === "founder"
