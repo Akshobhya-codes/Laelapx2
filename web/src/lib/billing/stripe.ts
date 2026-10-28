@@ -185,6 +185,79 @@ export async function createStripeCustomer(input: {
   return customer.id;
 }
 
+/* ─── PAYMENT HISTORY ────────────────────────────────────────────────── */
+
+export type PaymentRecord = {
+  id: string;
+  date: string;
+  description: string;
+  /** e.g. "First payment", "Renewal", "Plan change (prorated)". */
+  reason: string | null;
+  amountCents: number;
+  status: "paid" | "open" | "refunded" | "failed" | "void";
+  /** Stripe-hosted receipt / invoice page. */
+  receiptUrl: string | null;
+  pdfUrl: string | null;
+};
+
+const REASON: Record<string, string> = {
+  subscription_create: "First payment",
+  subscription_cycle: "Renewal",
+  subscription_update: "Plan change (prorated)",
+  manual: "Manual",
+};
+
+/**
+ * Every charge on a customer, newest first: subscription invoices plus
+ * one-time Founder Review payments (which have no invoice). Read straight
+ * from Stripe, so it always matches what the card was actually charged.
+ */
+export async function listPaymentHistory(customerId: string): Promise<PaymentRecord[]> {
+  const stripe = getStripe();
+  const [invoices, intents] = await Promise.all([
+    stripe.invoices.list({ customer: customerId, limit: 24 }),
+    stripe.paymentIntents.list({ customer: customerId, limit: 24, expand: ["data.latest_charge"] }),
+  ]);
+
+  const fromInvoices: PaymentRecord[] = invoices.data
+    .filter((i) => i.status !== "draft")
+    .map((i) => {
+      const line = i.lines.data[0]?.description ?? "Subscription";
+      return {
+        id: i.id ?? i.number ?? String(i.created),
+        date: new Date(i.created * 1000).toISOString(),
+        // "1 × Laelapx Laelapx+ (at $30.00 / month)" → "Laelapx+ (at $30.00 / month)"
+        description: line.replace(/^\d+\s*×\s*/, "").replace(/^Laelapx\s+(?=\S)/, ""),
+        reason: i.billing_reason ? REASON[i.billing_reason] ?? null : null,
+        amountCents: i.status === "paid" ? i.amount_paid : i.amount_due,
+        status: i.status === "paid" ? "paid" : i.status === "void" || i.status === "uncollectible" ? "void" : "open",
+        receiptUrl: i.hosted_invoice_url ?? null,
+        pdfUrl: i.invoice_pdf ?? null,
+      };
+    });
+
+  // One-time payments (Founder Review). Subscription charges are already
+  // covered by their invoices above, so only our tagged checkouts are added.
+  const fromIntents: PaymentRecord[] = intents.data
+    .filter((p) => p.metadata?.kind === "founder_review" && p.status !== "canceled" && p.status !== "requires_payment_method")
+    .map((p) => {
+      const charge = typeof p.latest_charge === "object" ? p.latest_charge : null;
+      const refunded = !!charge?.refunded;
+      return {
+        id: p.id,
+        date: new Date(p.created * 1000).toISOString(),
+        description: "Founder Review",
+        reason: "One-time",
+        amountCents: p.amount,
+        status: refunded ? "refunded" : p.status === "succeeded" ? "paid" : "failed",
+        receiptUrl: charge?.receipt_url ?? null,
+        pdfUrl: null,
+      };
+    });
+
+  return [...fromInvoices, ...fromIntents].sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
 /* ─── WEBHOOK ────────────────────────────────────────────────────────── */
 
 export function constructWebhookEvent(

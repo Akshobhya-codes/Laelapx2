@@ -4,6 +4,7 @@ import {
   getInvestorEntitlement,
 } from "@/lib/billing/entitlements";
 import { isStripeConfigured } from "@/lib/billing/stripe";
+import { paidSide } from "@/lib/billing/side";
 import { PricingPage } from "./pricing-client";
 
 export const metadata = {
@@ -34,6 +35,7 @@ export default async function Pricing({
   let currentFounderPlan: string | null = null;
   let currentInvestorPlan: string | null = null;
   let pilotAvailable = true;
+  let lockedSide: "founder" | "investor" | null = null;
   if (user) {
     const [f, i] = await Promise.all([
       getFounderEntitlement(user.id),
@@ -42,11 +44,14 @@ export default async function Pricing({
     currentFounderPlan = f.plan.id;
     currentInvestorPlan = i.active ? i.plan?.id ?? null : null;
     pilotAvailable = !i.pilotExhausted && !i.active;
+    // Paid on one side → only that side's plans, no toggle.
+    lockedSide = paidSide(f, i);
   }
 
   return (
     <PricingPage
-      initialSide={side}
+      initialSide={lockedSide ?? side}
+      showSideToggle={lockedSide === null}
       signedIn={!!user}
       displayName={user?.displayName ?? null}
       currentFounderPlan={currentFounderPlan}

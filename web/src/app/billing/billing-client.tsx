@@ -13,6 +13,7 @@ import {
 } from "@/lib/billing/plans";
 import type { InvestorQuota } from "@/lib/billing/entitlements";
 import type { StoredTeamMember, ReviewOrderStatus } from "@/lib/insforge/billing";
+import type { PaymentRecord } from "@/lib/billing/stripe";
 import {
   openPortalAction,
   startPilotAction,
@@ -25,6 +26,11 @@ type Side = "founder" | "investor";
 
 type Props = {
   side: Side;
+  /** False once the user pays on exactly one side — see lib/billing/side.ts. */
+  showSideToggle: boolean;
+  /** Every charge on the account, from Stripe. Account-wide, not per side. */
+  payments: PaymentRecord[];
+  paymentsError: boolean;
   displayName: string | null;
   profileImageUrl: string | null;
   email: string | null;
@@ -74,7 +80,7 @@ const fmtDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
 
 export function BillingPage(props: Props) {
-  const { side, displayName, profileImageUrl, notice } = props;
+  const { side, showSideToggle, displayName, profileImageUrl, notice } = props;
   const firstName = displayName?.split(" ")[0] || "you";
 
   return (
@@ -120,26 +126,32 @@ export function BillingPage(props: Props) {
                 Plans &amp; billing
               </h1>
             </div>
-            <div className="inline-flex rounded-full border border-ink/10 bg-white p-1">
-              {(["founder", "investor"] as Side[]).map((s) => (
-                <Link
-                  key={s}
-                  href={`/billing?side=${s}`}
-                  className={clsx(
-                    "rounded-full px-4 py-1.5 text-[12px] font-bold transition-colors",
-                    side === s ? "bg-navy text-white" : "text-ink-soft hover:text-ink"
-                  )}
-                >
-                  {s === "founder" ? "Founder" : "Investor"}
-                </Link>
-              ))}
-            </div>
+            {showSideToggle && (
+              <div className="inline-flex rounded-full border border-ink/10 bg-white p-1">
+                {(["founder", "investor"] as Side[]).map((s) => (
+                  <Link
+                    key={s}
+                    href={`/billing?side=${s}`}
+                    className={clsx(
+                      "rounded-full px-4 py-1.5 text-[12px] font-bold transition-colors",
+                      side === s ? "bg-navy text-white" : "text-ink-soft hover:text-ink"
+                    )}
+                  >
+                    {s === "founder" ? "Founder" : "Investor"}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </Reveal>
 
         <Notices notice={notice} />
 
         {side === "founder" ? <FounderPanel {...props} /> : <InvestorPanel {...props} />}
+
+        <Reveal delay={0.12}>
+          <PaymentHistory payments={props.payments} error={props.paymentsError} />
+        </Reveal>
       </main>
     </div>
   );
@@ -176,6 +188,91 @@ function Notices({ notice }: { notice: Props["notice"] }) {
         </motion.div>
       ))}
     </div>
+  );
+}
+
+/* ─── PAYMENT HISTORY ────────────────────────────────────────────────── */
+
+const PAY_STATUS: Record<PaymentRecord["status"], { label: string; cls: string }> = {
+  paid: { label: "Paid", cls: "bg-flag-green/15 text-flag-green" },
+  open: { label: "Due", cls: "bg-flag-amber/15 text-flag-amber" },
+  refunded: { label: "Refunded", cls: "bg-paper-2 text-ink-soft" },
+  failed: { label: "Failed", cls: "bg-flag-red/10 text-flag-red" },
+  void: { label: "Void", cls: "bg-paper-2 text-ink-faint" },
+};
+
+function PaymentHistory({ payments, error }: { payments: PaymentRecord[]; error: boolean }) {
+  const total = payments.filter((p) => p.status === "paid").reduce((n, p) => n + p.amountCents, 0);
+  return (
+    <section className="mt-6 rounded-2xl border border-ink/10 bg-white p-7">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-[0.2em] text-ink-faint">Payment history</div>
+          <h3 className="text-[20px] font-extrabold tracking-tight text-navy">Every charge on your account</h3>
+        </div>
+        {payments.length > 0 && (
+          <div className="text-right">
+            <div className="text-[11px] font-semibold text-ink-faint">Total paid</div>
+            <div className="text-[20px] font-extrabold text-navy">{formatPrice(total)}</div>
+          </div>
+        )}
+      </div>
+
+      {error ? (
+        <p className="rounded-md border border-flag-amber/30 bg-flag-amber/10 px-4 py-3 text-[13px] text-ink">
+          We couldn&apos;t load your payment history from Stripe just now. Refresh in a moment — your plan isn&apos;t affected.
+        </p>
+      ) : payments.length === 0 ? (
+        <p className="py-6 text-center text-[13px] text-ink-faint">No payments yet.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-[13px]">
+            <thead>
+              <tr className="border-b border-ink/10 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-ink-faint">
+                <th className="py-2 pr-3">Date</th>
+                <th className="py-2 pr-3">Item</th>
+                <th className="py-2 pr-3 text-right">Amount</th>
+                <th className="py-2 pr-3">Status</th>
+                <th className="py-2 text-right">Receipt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {payments.map((p) => (
+                <tr key={p.id} className="border-b border-ink/5">
+                  <td className="whitespace-nowrap py-2.5 pr-3 tabular-nums text-ink-soft">{fmtDate(p.date)}</td>
+                  <td className="py-2.5 pr-3">
+                    <div className="font-semibold text-ink">{p.description}</div>
+                    {p.reason && <div className="text-[11px] text-ink-faint">{p.reason}</div>}
+                  </td>
+                  <td className="whitespace-nowrap py-2.5 pr-3 text-right font-semibold tabular-nums text-ink">
+                    {formatPrice(p.amountCents)}
+                  </td>
+                  <td className="py-2.5 pr-3">
+                    <span className={clsx("rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em]", PAY_STATUS[p.status].cls)}>
+                      {PAY_STATUS[p.status].label}
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap py-2.5 text-right">
+                    {p.receiptUrl ? (
+                      <a href={p.receiptUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue hover:underline">
+                        View
+                      </a>
+                    ) : (
+                      <span className="text-ink-faint">—</span>
+                    )}
+                    {p.pdfUrl && (
+                      <a href={p.pdfUrl} target="_blank" rel="noopener noreferrer" className="ml-3 font-semibold text-blue hover:underline">
+                        PDF
+                      </a>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }
 

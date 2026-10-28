@@ -36,6 +36,7 @@ const ANNUAL_SAVINGS_PCT = Math.floor(
 
 export function PricingPage({
   initialSide,
+  showSideToggle,
   signedIn,
   displayName,
   currentFounderPlan,
@@ -45,6 +46,8 @@ export function PricingPage({
   contactEmail,
 }: {
   initialSide: Side;
+  /** False once the user pays on exactly one side — see lib/billing/side.ts. */
+  showSideToggle: boolean;
   signedIn: boolean;
   displayName: string | null;
   currentFounderPlan: string | null;
@@ -119,7 +122,8 @@ export function PricingPage({
           </p>
         </Reveal>
 
-        {/* Side switch */}
+        {/* Side switch — hidden once they've paid on one side */}
+        {showSideToggle && (
         <Reveal delay={0.18}>
           <div className="mt-9 inline-flex rounded-full border border-ink/10 bg-white p-1">
             {(["founder", "investor"] as Side[]).map((s) => (
@@ -146,6 +150,7 @@ export function PricingPage({
             ))}
           </div>
         </Reveal>
+        )}
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-14">

@@ -1,4 +1,5 @@
 import type Stripe from "stripe";
+import { after } from "next/server";
 import {
   getStripe,
   constructWebhookEvent,
@@ -121,6 +122,16 @@ async function onReviewPaid(session: Stripe.Checkout.Session) {
     paidAt: new Date().toISOString(),
   });
 
+  // The payment is recorded; acknowledge Stripe now. Emails to the team and
+  // the founder take seconds over SMTP and run after the response, so the
+  // webhook never approaches Stripe's timeout.
+  after(() => notifyReviewPaid(order, session).catch((e) => console.error("[stripe] review notify failed:", e)));
+}
+
+async function notifyReviewPaid(
+  order: NonNullable<Awaited<ReturnType<typeof getReviewOrder>>>,
+  session: Stripe.Checkout.Session
+) {
   const founder = await stackServerApp.getUser(order.userId);
   const founderName = founder?.displayName ?? "A founder";
   const founderEmail = founder?.primaryEmail ?? session.customer_details?.email ?? null;
@@ -222,24 +233,35 @@ async function syncSubscription(sub: Stripe.Subscription, source: string) {
     seats: side === "investor" && "seats" in plan.features ? plan.features.seats : 1,
   });
 
-  // First activation (or plan change) → tell the user.
+  // checkout.session.completed and customer.subscription.created arrive
+  // together for every new subscription and both see the same "before"
+  // state; only the subscription events notify, so the user hears once.
+  if (source === "checkout.session.completed") return;
+
+  // First activation (or plan change) → tell the user, after the response.
   const becameActive = status === "active" && before?.status !== "active";
   const planChanged = !!before && before.plan !== plan.id && status === "active";
   if (becameActive || planChanged) {
-    const user = await stackServerApp.getUser(userId);
-    await createNotification({
-      userId,
-      kind: "subscription_changed",
-      payload: { message: `${plan.name} is active.` },
-      href: `/billing?side=${side}`,
+    after(async () => {
+      try {
+        const user = await stackServerApp.getUser(userId);
+        await createNotification({
+          userId,
+          kind: "subscription_changed",
+          payload: { message: `${plan.name} is active.` },
+          href: `/billing?side=${side}`,
+        });
+        if (becameActive && user?.primaryEmail) {
+          const tpl = subscriptionStartedEmail({
+            firstName: user.displayName?.split(" ")[0] || "there",
+            planName: plan.name,
+            side,
+          });
+          await sendEmail({ to: user.primaryEmail, subject: tpl.subject, html: tpl.html });
+        }
+      } catch (e) {
+        console.error("[stripe] subscription notify failed:", e);
+      }
     });
-    if (becameActive && user?.primaryEmail) {
-      const tpl = subscriptionStartedEmail({
-        firstName: user.displayName?.split(" ")[0] || "there",
-        planName: plan.name,
-        side,
-      });
-      await sendEmail({ to: user.primaryEmail, subject: tpl.subject, html: tpl.html });
-    }
   }
 }

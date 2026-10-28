@@ -9,7 +9,9 @@ import {
   listReviewOrdersForUser,
 } from "@/lib/insforge/billing";
 import { listSubmissionsByOwner } from "@/lib/insforge/submissions";
-import { isStripeConfigured } from "@/lib/billing/stripe";
+import { isStripeConfigured, listPaymentHistory, type PaymentRecord } from "@/lib/billing/stripe";
+import { getStripeCustomerId } from "@/lib/insforge/billing";
+import { paidSide } from "@/lib/billing/side";
 import { BillingPage } from "./billing-client";
 
 export const metadata = { title: "Billing · Laelapx" };
@@ -28,12 +30,6 @@ export default async function Billing({
   const user = await stackServerApp.getUser({ or: "redirect" });
   const sp = await searchParams;
   const role = (user.clientReadOnlyMetadata as { role?: string } | null)?.role;
-  const side: "founder" | "investor" =
-    sp.side === "investor" || sp.side === "founder"
-      ? sp.side
-      : role === "investor"
-      ? "investor"
-      : "founder";
 
   const [founder, investor, submissions, orders] = await Promise.all([
     getFounderEntitlement(user.id),
@@ -41,6 +37,30 @@ export default async function Billing({
     listSubmissionsByOwner(user.id),
     listReviewOrdersForUser(user.id),
   ]);
+
+  // Paid on one side → that side only, whatever ?side= says.
+  const lockedSide = paidSide(founder, investor);
+  const side: "founder" | "investor" =
+    lockedSide ??
+    (sp.side === "investor" || sp.side === "founder"
+      ? sp.side
+      : role === "investor"
+      ? "investor"
+      : "founder");
+
+  // Payment history comes straight from Stripe, so it always matches the
+  // card statement. A Stripe outage shouldn't take the billing page down.
+  let payments: PaymentRecord[] = [];
+  let paymentsError = false;
+  const customerId = isStripeConfigured() ? await getStripeCustomerId(user.id) : null;
+  if (customerId) {
+    try {
+      payments = await listPaymentHistory(customerId);
+    } catch (e) {
+      console.error("[billing] payment history failed:", e);
+      paymentsError = true;
+    }
+  }
 
   // Team panel only for owners on a team-enabled plan.
   let team: { id: string; name: string; members: Awaited<ReturnType<typeof listTeamMembers>> } | null = null;
@@ -55,6 +75,9 @@ export default async function Billing({
   return (
     <BillingPage
       side={side}
+      showSideToggle={lockedSide === null}
+      payments={payments}
+      paymentsError={paymentsError}
       displayName={user.displayName}
       profileImageUrl={user.profileImageUrl}
       email={user.primaryEmail}

@@ -194,7 +194,24 @@ export async function upsertSubscription(
     .insert({ user_id: input.userId, side: input.side, ...row })
     .select("*")
     .single();
-  if (error) throw new Error(`upsertSubscription(insert): ${error.message}`);
+  if (error) {
+    // Stripe sends checkout.session.completed and customer.subscription.created
+    // at the same moment; both can miss the row above and race to insert.
+    // The loser lands here on the (user_id, side) unique key — the row now
+    // exists, so apply this event as an update instead of failing.
+    if ((error as { code?: string }).code === "23505") {
+      const { data: updated, error: e2 } = await client.database
+        .from("subscriptions")
+        .update(row)
+        .eq("user_id", input.userId)
+        .eq("side", input.side)
+        .select("*")
+        .single();
+      if (e2) throw new Error(`upsertSubscription(race update): ${e2.message}`);
+      return subRowToStored(updated as SubscriptionRow);
+    }
+    throw new Error(`upsertSubscription(insert): ${error.message}`);
+  }
   return subRowToStored(data as SubscriptionRow);
 }
 
