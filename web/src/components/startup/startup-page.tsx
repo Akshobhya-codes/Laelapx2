@@ -9,7 +9,13 @@ import {
   formatUsd,
   formatUsdShort,
 } from "@/components/motion/animated-number";
-import { BlurredField, GateBanner } from "./blurred-field";
+import {
+  BlurredField,
+  GateBanner,
+  GateProvider,
+  UnlockToast,
+  type GateReason,
+} from "./blurred-field";
 
 const NAV_LINKS = [
   { id: "problem", label: "Problem" },
@@ -37,16 +43,26 @@ export function StartupPage({
   locks = DEFAULT_LOCKS,
   canSeeContact = true,
   viewerSignedIn = false,
+  gateReason = "anon",
+  quotaNote = null,
+  unlockToast = null,
 }: {
   data: Submission;
   locks?: StartupLocks;
   canSeeContact?: boolean;
   viewerSignedIn?: boolean;
+  /** Why contact details are hidden, when they are. Decided server-side. */
+  gateReason?: GateReason;
+  quotaNote?: string | null;
+  /** Shown once when the investor just spent a weekly unlock on this page. */
+  unlockToast?: { remaining: number | null; weekly: number | null } | null;
 }) {
   return (
+    <GateProvider reason={gateReason}>
     <div className="bg-paper text-ink">
       <StartupNav data={data} />
-      {!canSeeContact && <GateBanner viewerSignedIn={viewerSignedIn} />}
+      {!canSeeContact && <GateBanner reason={gateReason} quotaNote={quotaNote} />}
+      {canSeeContact && unlockToast && <UnlockToast {...unlockToast} />}
       <Hero
         data={data}
         locks={locks}
@@ -76,6 +92,7 @@ export function StartupPage({
       />
       <Footer data={data} />
     </div>
+    </GateProvider>
   );
 }
 

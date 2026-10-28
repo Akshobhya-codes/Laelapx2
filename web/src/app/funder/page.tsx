@@ -1,10 +1,11 @@
 import { stackServerApp } from "@/stack";
 import { getInvestorByOwner, thesisFitScore } from "@/lib/insforge/investors";
-import { listAllSubmissions } from "@/lib/insforge/submissions";
 import {
   listSavedForInvestor,
   listConnectsForInvestor,
 } from "@/lib/insforge/audience";
+import { getInvestorEntitlement } from "@/lib/billing/entitlements";
+import { listInvestorVisibleSubmissions } from "@/lib/billing/discovery";
 import { FunderHome } from "./funder-home";
 
 export const metadata = { title: "Investor workspace · Laelapx" };
@@ -13,12 +14,15 @@ export const dynamic = "force-dynamic";
 export default async function FunderHomePage() {
   const user = await stackServerApp.getUser({ or: "redirect" });
 
-  const [thesis, allSubs, saved, connects] = await Promise.all([
+  const [thesis, ent, saved, connects] = await Promise.all([
     getInvestorByOwner(user.id),
-    listAllSubmissions({ limit: 200 }),
+    getInvestorEntitlement({ userId: user.id, email: user.primaryEmail }),
     listSavedForInvestor(user.id),
     listConnectsForInvestor(user.id),
   ]);
+
+  // Only investor-visible founders count — same set Discover shows.
+  const allSubs = ent.active ? await listInvestorVisibleSubmissions({ limit: 200 }) : [];
 
   let topMatches: {
     slug: string;
@@ -31,12 +35,10 @@ export default async function FunderHomePage() {
   }[] = [];
   let strongFitCount = 0;
 
-  if (thesis) {
+  if (thesis && ent.active) {
     const ranked = allSubs
-      .map((s) => ({
-        s,
-        fit: thesisFitScore(thesis.data, s).score,
-      }))
+      .filter((s) => s.ownerUserId !== user.id)
+      .map((s) => ({ s, fit: thesisFitScore(thesis.data, s).score }))
       .sort((a, b) => b.fit - a.fit);
     strongFitCount = ranked.filter((r) => r.fit >= 65).length;
     topMatches = ranked.slice(0, 4).map(({ s, fit }) => ({
@@ -72,6 +74,17 @@ export default async function FunderHomePage() {
         connectCount: connects.length,
       }}
       topMatches={topMatches}
+      access={{
+        active: ent.active,
+        planId: ent.plan?.id ?? null,
+        planName: ent.plan?.name ?? null,
+        pilotExhausted: ent.pilotExhausted,
+        expired: !ent.active && !!ent.subscription,
+        isTeamMember: ent.isTeamMember,
+        teamName: ent.teamName,
+        quota: ent.quota,
+        periodEndsAt: ent.periodEndsAt,
+      }}
     />
   );
 }

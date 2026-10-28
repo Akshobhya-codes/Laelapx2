@@ -5,6 +5,19 @@ import { motion } from "framer-motion";
 import { Reveal } from "@/components/motion/reveal";
 import { AnimatedNumber, formatUsdShort } from "@/components/motion/animated-number";
 import { FunderNav } from "./discover/discover";
+import type { InvestorQuota } from "@/lib/billing/entitlements";
+
+type Access = {
+  active: boolean;
+  planId: string | null;
+  planName: string | null;
+  pilotExhausted: boolean;
+  expired: boolean;
+  isTeamMember: boolean;
+  teamName: string | null;
+  quota: InvestorQuota;
+  periodEndsAt: string | null;
+};
 
 type Thesis = {
   fundName: string;
@@ -30,6 +43,7 @@ export function FunderHome({
   thesis,
   stats,
   topMatches,
+  access,
 }: {
   displayName: string | null;
   profileImageUrl: string | null;
@@ -41,12 +55,19 @@ export function FunderHome({
     connectCount: number;
   };
   topMatches: Match[];
+  access: Access;
 }) {
   const firstName = displayName?.split(" ")[0] || "you";
+  const planBadge = !access.active
+    ? { name: access.expired ? "Plan ended" : "No plan", tone: "warn" as const }
+    : {
+        name: access.isTeamMember ? `${access.planName} · team` : access.planName ?? "—",
+        tone: access.planId === "pilot" ? ("neutral" as const) : ("paid" as const),
+      };
 
   return (
     <div className="min-h-screen bg-paper text-ink">
-      <FunderNav firstName={firstName} profileImageUrl={profileImageUrl} />
+      <FunderNav firstName={firstName} profileImageUrl={profileImageUrl} planBadge={planBadge} />
 
       <header className="border-b border-ink/8 bg-paper-2 px-6 py-14">
         <div className="mx-auto max-w-6xl">
@@ -88,17 +109,43 @@ export function FunderHome({
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-14">
-        {!thesis ? (
+        {!access.active ? (
+          <NoPlanCTA access={access} />
+        ) : !thesis ? (
           <NoThesisCTA />
         ) : (
           <>
             {/* Stats row */}
             <Reveal>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard
-                  label="Live submissions"
+                  label={
+                    access.quota.total !== null
+                      ? "Pilot profiles left"
+                      : access.quota.weekly === null
+                      ? "Profiles opened"
+                      : "Profiles left this week"
+                  }
+                  value={
+                    access.quota.total !== null
+                      ? access.quota.remainingTotal ?? 0
+                      : access.quota.weekly === null
+                      ? access.quota.usedTotal
+                      : access.quota.remainingThisWeek ?? 0
+                  }
+                  helper={
+                    access.quota.total !== null
+                      ? `of ${access.quota.total} during the pilot`
+                      : access.quota.weekly === null
+                      ? `${access.planName} · no weekly limit`
+                      : `of ${access.quota.weekly} · ${access.planName}`
+                  }
+                  href="/billing?side=investor"
+                />
+                <StatCard
+                  label="Matching founders"
                   value={stats.totalLive}
-                  helper="Across all founders on Laelapx"
+                  helper="Opted in and over the quality bar"
                 />
                 <StatCard
                   label="Strong-fit matches"
@@ -197,6 +244,51 @@ export function FunderHome({
         )}
       </main>
     </div>
+  );
+}
+
+/* ─── EMPTY STATE: NO PLAN ────────────────────────────────────────────── */
+function NoPlanCTA({ access }: { access: Access }) {
+  const canPilot = !access.pilotExhausted && !access.expired;
+  return (
+    <Reveal>
+      <div className="overflow-hidden rounded-2xl border border-blue/30 bg-gradient-to-br from-blue/[0.06] via-paper to-paper p-10 sm:p-14">
+        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue">
+          {access.expired ? "Plan ended" : "Get started"}
+        </div>
+        <h2 className="mt-3 max-w-xl text-[clamp(28px,3.5vw,42px)] font-extrabold leading-[1.1] tracking-[-0.025em] text-navy">
+          {access.expired
+            ? "Your investor plan has ended."
+            : canPilot
+            ? "Try the matching free for 60 days."
+            : "Pick a plan to start sourcing."}
+        </h2>
+        <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-ink-soft">
+          {access.expired
+            ? "Everything you saved is still here. Choose a plan to keep the deal flow coming."
+            : canPilot
+            ? "15 founder profiles against your criteria, and we track whether each one was useful. No card needed."
+            : "Angel through Enterprise — every plan surfaces founders matched to your thesis, weekly."}
+        </p>
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Link
+            href={canPilot ? "/funder/discover" : "/pricing?side=investor"}
+            className="inline-flex items-center gap-2 rounded-md bg-blue px-6 py-3.5 text-[14px] font-bold text-white transition-colors hover:bg-blue-light"
+          >
+            {canPilot ? "Start the free pilot" : "See investor plans"}
+            <span className="text-base">→</span>
+          </Link>
+          {canPilot && (
+            <Link
+              href="/pricing?side=investor"
+              className="inline-flex items-center gap-2 rounded-md border border-navy px-6 py-3.5 text-[14px] font-bold text-navy transition-colors hover:bg-navy hover:text-white"
+            >
+              Compare plans
+            </Link>
+          )}
+        </div>
+      </div>
+    </Reveal>
   );
 }
 

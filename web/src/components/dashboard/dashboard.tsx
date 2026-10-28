@@ -9,7 +9,10 @@ import { Reveal } from "@/components/motion/reveal";
 import { AnimatedNumber, formatUsdShort } from "@/components/motion/animated-number";
 import { NotificationsBell } from "@/components/notifications/bell";
 import { SearchBar } from "@/components/search/search-bar";
+import { PlanBadge } from "@/components/billing/locked-section";
 import slugify from "slugify";
+
+type PlanBadgeProps = { name: string; tone: "neutral" | "paid" | "warn" };
 
 /**
  * DashboardShell — layout-only wrapper (nav + header + main). The page
@@ -21,12 +24,14 @@ export function DashboardShell({
   snapshot,
   displayName,
   profileImageUrl,
+  planBadge,
   children,
 }: {
   data: Submission;
   snapshot: Snapshot;
   displayName: string | null;
   profileImageUrl: string | null;
+  planBadge?: PlanBadgeProps;
   children: React.ReactNode;
 }) {
   const slug = slugify(data.companyName, { lower: true, strict: true });
@@ -37,6 +42,7 @@ export function DashboardShell({
         slug={slug}
         displayName={displayName}
         profileImageUrl={profileImageUrl}
+        planBadge={planBadge}
       />
       <Header data={data} snapshot={snapshot} />
       <main className="mx-auto max-w-6xl px-6 pb-20 pt-2">{children}</main>
@@ -50,11 +56,13 @@ function CompanyHubNav({
   slug,
   displayName,
   profileImageUrl,
+  planBadge,
 }: {
   data: Submission;
   slug: string;
   displayName: string | null;
   profileImageUrl: string | null;
+  planBadge?: PlanBadgeProps;
 }) {
   const firstName = displayName?.split(" ")[0] || "you";
   return (
@@ -93,6 +101,9 @@ function CompanyHubNav({
           >
             Messages
           </Link>
+          {planBadge && (
+            <PlanBadge planName={planBadge.name} tone={planBadge.tone} href="/billing?side=founder" />
+          )}
           <NotificationsBell />
           <Link
             href="/welcome?switch=1"

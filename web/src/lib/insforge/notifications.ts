@@ -7,7 +7,11 @@ export type NotificationKind =
   | "connect_requested"
   | "connect_accepted"
   | "connect_declined"
-  | "message_received";
+  | "message_received"
+  // Billing (migration 0009)
+  | "subscription_changed"
+  | "review_ordered"
+  | "review_delivered";
 
 export type NotificationPayload = {
   startupSlug?: string;

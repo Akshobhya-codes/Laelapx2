@@ -21,6 +21,8 @@ import {
   connectRequestedEmail,
   connectAcceptedEmail,
 } from "@/lib/email/templates";
+import { getInvestorEntitlement } from "@/lib/billing/entitlements";
+import { isProfileUnlocked } from "@/lib/insforge/billing";
 
 /**
  * Toggle save on a startup. Notifies the founder when newly saved.
@@ -67,6 +69,18 @@ export async function requestConnectAction(
   const user = await stackServerApp.getUser({ or: "redirect" });
   const sub = await getSubmissionBySlug(slug);
   if (!sub) throw new Error("Submission not found");
+
+  // Server-side gate: the UI hides the button, but the action is the wall.
+  // Owners can connect to their own startup in test mode.
+  if (sub.ownerUserId !== user.id) {
+    const ent = await getInvestorEntitlement({ userId: user.id, email: user.primaryEmail });
+    if (!ent.active) {
+      throw new Error("An active investor plan is required to request a connect.");
+    }
+    if (!(await isProfileUnlocked(ent.accountUserId, sub.id))) {
+      throw new Error("Open this founder's profile first — it uses one of your weekly unlocks.");
+    }
+  }
 
   await requestConnect(sub.id, user.id, message.trim() || null);
 

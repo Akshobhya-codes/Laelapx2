@@ -14,12 +14,19 @@ export function StartupActionBar({
   initialSaved,
   initialConnectPending,
   isOwner = false,
+  canConnect = true,
+  lockHref = "/pricing?side=investor",
+  lockLabel = "Plan required to connect",
 }: {
   slug: string;
   companyName: string;
   initialSaved: boolean;
   initialConnectPending: boolean;
   isOwner?: boolean;
+  /** False when the profile isn't unlocked for this investor account. */
+  canConnect?: boolean;
+  lockHref?: string;
+  lockLabel?: string;
 }) {
   const [saved, setSaved] = useState(initialSaved);
   const [connectPending, setConnectPending] = useState(initialConnectPending);
@@ -71,20 +78,29 @@ export function StartupActionBar({
             {saved ? "Saved" : "Save"}
           </motion.button>
 
-          <motion.button
-            type="button"
-            onClick={() => setShowConnect(true)}
-            disabled={connectPending}
-            whileTap={{ scale: 0.95 }}
-            className={clsx(
-              "flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-bold transition-colors",
-              connectPending
-                ? "bg-white/10 text-white/55 cursor-not-allowed"
-                : "bg-white text-navy hover:bg-blue-light"
-            )}
-          >
-            {connectPending ? "Connect requested ✓" : "Request connect →"}
-          </motion.button>
+          {canConnect ? (
+            <motion.button
+              type="button"
+              onClick={() => setShowConnect(true)}
+              disabled={connectPending}
+              whileTap={{ scale: 0.95 }}
+              className={clsx(
+                "flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-bold transition-colors",
+                connectPending
+                  ? "bg-white/10 text-white/55 cursor-not-allowed"
+                  : "bg-white text-navy hover:bg-blue-light"
+              )}
+            >
+              {connectPending ? "Connect requested ✓" : "Request connect →"}
+            </motion.button>
+          ) : (
+            <a
+              href={lockHref}
+              className="flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-[13px] font-bold text-white/80 transition-colors hover:bg-white/10"
+            >
+              🔒 {lockLabel}
+            </a>
+          )}
         </motion.div>
       </div>
 

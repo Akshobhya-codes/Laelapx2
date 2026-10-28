@@ -12,6 +12,22 @@ import {
 import { NotificationsBell } from "@/components/notifications/bell";
 import { SearchBar } from "@/components/search/search-bar";
 import { toggleSaveAction } from "@/app/actions/investor";
+import { startPilotAction } from "@/app/actions/billing";
+import { PlanBadge } from "@/components/billing/locked-section";
+import type { InvestorQuota } from "@/lib/billing/entitlements";
+
+/** What the signed-in investor is allowed to see. Built in page.tsx. */
+export type DiscoverAccess = {
+  active: boolean;
+  planId: string | null;
+  planName: string | null;
+  pilotExhausted: boolean;
+  expired: boolean;
+  isTeamMember: boolean;
+  teamName: string | null;
+  quota: InvestorQuota;
+  justStartedPilot: boolean;
+};
 
 type Card = {
   slug: string;
@@ -30,6 +46,8 @@ type Card = {
   isSaved: boolean;
   connectStatus: "pending" | "accepted" | "declined" | null;
   conversationId: string | null;
+  /** Already opened by this account — opening again costs nothing. */
+  unlocked: boolean;
 };
 
 const STAGES = ["Pre-Seed", "Seed", "Series A", "Series B+"] as const;
@@ -39,11 +57,13 @@ export function Discover({
   profileImageUrl,
   thesis,
   cards,
+  access,
 }: {
   displayName: string | null;
   profileImageUrl: string | null;
   thesis: { fundName: string } | null;
   cards: Card[];
+  access: DiscoverAccess;
 }) {
   const firstName = displayName?.split(" ")[0] || "you";
   const [stageFilter, setStageFilter] = useState<string | null>(null);
@@ -76,6 +96,7 @@ export function Discover({
         firstName={firstName}
         profileImageUrl={profileImageUrl}
         breadcrumb="Discover"
+        planBadge={planBadgeFor(access)}
       />
 
       <header className="border-b border-ink/8 bg-paper-2 px-6 py-12">
@@ -126,6 +147,12 @@ export function Discover({
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-12">
+        {!access.active ? (
+          <NoAccess access={access} />
+        ) : (
+        <>
+        <QuotaStrip access={access} />
+
         {/* Filter bar */}
         <Reveal>
           <div className="mb-8 space-y-4">
@@ -214,14 +241,144 @@ export function Discover({
                     ease: [0.16, 1, 0.3, 1],
                   }}
                 >
-                  <DiscoverCard card={c} hasThesis={!!thesis} />
+                  <DiscoverCard
+                    card={c}
+                    hasThesis={!!thesis}
+                    canUnlock={access.quota.canUnlock}
+                  />
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
         )}
+        </>
+        )}
       </main>
     </div>
+  );
+}
+
+/* ─── ACCESS: plan badge, quota strip, no-plan state ──────────────────── */
+
+function planBadgeFor(access: DiscoverAccess) {
+  if (!access.active || !access.planName) {
+    return { name: access.expired ? "Plan ended" : "No plan", tone: "warn" as const };
+  }
+  return {
+    name: access.isTeamMember ? `${access.planName} · team` : access.planName,
+    tone: access.planId === "pilot" ? ("neutral" as const) : ("paid" as const),
+  };
+}
+
+function QuotaStrip({ access }: { access: DiscoverAccess }) {
+  const q = access.quota;
+  const resets = new Date(q.weekResetsAt).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+  const exhausted = !q.canUnlock;
+  return (
+    <Reveal>
+      <div
+        className={clsx(
+          "mb-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-5 py-3 text-[13px]",
+          exhausted ? "border-flag-amber/30 bg-flag-amber/10" : "border-ink/10 bg-white"
+        )}
+      >
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+          {access.justStartedPilot && (
+            <span className="rounded-full bg-flag-green/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-flag-green">
+              Pilot started
+            </span>
+          )}
+          <span className="font-bold text-ink">
+            {q.total !== null
+              ? `${q.remainingTotal} of ${q.total} pilot profiles left`
+              : q.weekly === null
+              ? "Unlimited profiles"
+              : `${q.remainingThisWeek} of ${q.weekly} profiles left this week`}
+          </span>
+          <span className="text-ink-faint">
+            {q.total !== null
+              ? "Opening a founder's full profile uses one."
+              : q.weekly === null
+              ? "Open as many as you like."
+              : `Opening a founder's full profile uses one · resets ${resets}.`}
+          </span>
+        </div>
+        {exhausted ? (
+          <Link href="/pricing?side=investor" className="font-bold text-blue hover:text-blue-light">
+            Need more this week? →
+          </Link>
+        ) : (
+          <Link href="/billing?side=investor" className="font-semibold text-ink-faint hover:text-ink">
+            {access.planName}{access.isTeamMember ? ` · ${access.teamName}` : ""} · manage
+          </Link>
+        )}
+      </div>
+    </Reveal>
+  );
+}
+
+function NoAccess({ access }: { access: DiscoverAccess }) {
+  const [pending, start] = useTransition();
+  const [err, setErr] = useState<string | null>(null);
+  const canPilot = !access.pilotExhausted && !access.expired;
+  return (
+    <Reveal>
+      <div className="overflow-hidden rounded-2xl border border-blue/30 bg-gradient-to-br from-blue/[0.06] via-paper to-paper p-10 sm:p-14">
+        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue">
+          {access.expired ? "Plan ended" : "Investor access"}
+        </div>
+        <h2 className="mt-3 max-w-xl text-[clamp(28px,3.5vw,42px)] font-extrabold leading-[1.1] tracking-[-0.025em] text-navy">
+          {access.expired
+            ? "Your investor plan has ended."
+            : "Founders who match your criteria, every week."}
+        </h2>
+        <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-ink-soft">
+          {access.expired
+            ? "Pick a plan to keep the deal flow coming. Everything you saved and every note you wrote is still here."
+            : canPilot
+            ? "Try it free for 60 days: we'll surface 15 founder profiles against your stated criteria and track whether they were useful. No card needed."
+            : "Pick a plan to see founder profiles matched to your thesis."}
+        </p>
+        <div className="mt-7 flex flex-wrap gap-3">
+          {canPilot && (
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                setErr(null);
+                start(async () => {
+                  try {
+                    await startPilotAction();
+                  } catch (e) {
+                    if (e && typeof e === "object" && "digest" in e) throw e;
+                    setErr(e instanceof Error ? e.message : "Couldn't start the pilot");
+                  }
+                });
+              }}
+              className="inline-flex items-center gap-2 rounded-md bg-blue px-6 py-3.5 text-[14px] font-bold text-white transition-colors hover:bg-blue-light disabled:opacity-60"
+            >
+              {pending ? "Starting…" : "Start the free pilot"}
+              <span className="text-base">→</span>
+            </button>
+          )}
+          <Link
+            href="/pricing?side=investor"
+            className="inline-flex items-center gap-2 rounded-md border border-navy px-6 py-3.5 text-[14px] font-bold text-navy transition-colors hover:bg-navy hover:text-white"
+          >
+            See investor plans
+          </Link>
+        </div>
+        {err && <p className="mt-3 text-[13px] text-flag-red">{err}</p>}
+        <p className="mt-6 text-[11px] italic text-ink-faint">
+          Investor access is limited to founder-approved profiles and materials. Laelapx does not provide
+          investment advice; you are responsible for your own diligence.
+        </p>
+      </div>
+    </Reveal>
   );
 }
 
@@ -229,9 +386,11 @@ export function Discover({
 function DiscoverCard({
   card,
   hasThesis,
+  canUnlock,
 }: {
   card: Card;
   hasThesis: boolean;
+  canUnlock: boolean;
 }) {
   const initials = card.name
     .split(" ")
@@ -240,10 +399,19 @@ function DiscoverCard({
     .join("")
     .toUpperCase();
 
+  // Unlocked profiles always open. Locked ones open (and spend a unit) while
+  // quota remains; once it's gone the card points at billing instead.
+  const blocked = !card.unlocked && !canUnlock;
+
   return (
     <Link
-      href={`/s/${card.slug}`}
-      className="group relative flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-6 transition-all hover:border-blue/40 hover:shadow-[0_8px_32px_rgba(28,43,66,0.08)] hover:-translate-y-0.5"
+      href={blocked ? "/billing?side=investor" : `/s/${card.slug}`}
+      className={clsx(
+        "group relative flex h-full flex-col rounded-2xl border bg-white p-6 transition-all hover:-translate-y-0.5",
+        blocked
+          ? "border-dashed border-ink/15 hover:border-flag-amber/50"
+          : "border-ink/10 hover:border-blue/40 hover:shadow-[0_8px_32px_rgba(28,43,66,0.08)]"
+      )}
     >
       <SaveStar slug={card.slug} initialSaved={card.isSaved} />
 
@@ -318,8 +486,13 @@ function DiscoverCard({
           </span>{" "}
           · {card.roundType} · {card.hq}
         </div>
-        <span className="text-[12px] font-bold text-blue transition-colors group-hover:text-blue-light">
-          View →
+        <span
+          className={clsx(
+            "text-[12px] font-bold transition-colors",
+            blocked ? "text-flag-amber" : "text-blue group-hover:text-blue-light"
+          )}
+        >
+          {blocked ? "🔒 Limit reached" : card.unlocked ? "Open →" : "Unlock →"}
         </span>
       </div>
     </Link>
@@ -518,10 +691,12 @@ export function FunderNav({
   firstName,
   profileImageUrl,
   breadcrumb,
+  planBadge,
 }: {
   firstName: string;
   profileImageUrl: string | null;
   breadcrumb?: string;
+  planBadge?: { name: string; tone: "neutral" | "paid" | "warn" };
 }) {
   return (
     <nav className="sticky top-0 z-20 border-b border-ink/8 bg-paper/85 backdrop-blur-sm">
@@ -556,6 +731,9 @@ export function FunderNav({
         </div>
 
         <div className="flex flex-shrink-0 items-center gap-3">
+          {planBadge && (
+            <PlanBadge planName={planBadge.name} tone={planBadge.tone} href="/billing?side=investor" />
+          )}
           <NotificationsBell />
           <Link
             href="/welcome?switch=1"
@@ -602,6 +780,7 @@ export function FunderNav({
         <SubNavLink href="/funder/connects">Connects</SubNavLink>
         <SubNavLink href="/funder/thesis">Thesis</SubNavLink>
         <SubNavLink href="/messages">Messages</SubNavLink>
+        <SubNavLink href="/billing?side=investor">Billing</SubNavLink>
       </div>
     </nav>
   );

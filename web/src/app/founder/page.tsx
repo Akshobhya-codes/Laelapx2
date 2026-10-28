@@ -2,6 +2,7 @@ import { stackServerApp } from "@/stack";
 import { FounderHome } from "./founder-home";
 import { listSubmissionsByOwner } from "@/lib/insforge/submissions";
 import { buildSnapshot } from "@/lib/scoring/rubric";
+import { getFounderEntitlement } from "@/lib/billing/entitlements";
 
 export const metadata = {
   title: "Your projects · Laelapx",
@@ -12,14 +13,18 @@ export const dynamic = "force-dynamic";
 export default async function FounderHomePage() {
   const user = await stackServerApp.getUser({ or: "redirect" });
 
-  const submissions = await listSubmissionsByOwner(user.id);
+  const [submissions, ent] = await Promise.all([
+    listSubmissionsByOwner(user.id),
+    getFounderEntitlement(user.id),
+  ]);
   const projects = submissions.map((s) => ({
     slug: s.slug,
     name: s.data.companyName,
     oneLiner: s.data.oneLiner,
     stage: s.data.stage,
     sectors: s.data.sectors.slice(0, 3),
-    score: buildSnapshot(s.data).composite,
+    // Cached LLM score when the plan has one; the rubric otherwise.
+    score: s.scoredSnapshot?.composite ?? buildSnapshot(s.data).composite,
     productStage: s.data.productStage,
     launched: s.data.launched,
     lastUpdatedRel: relativeTime(s.updatedAt),
@@ -31,6 +36,7 @@ export default async function FounderHomePage() {
       email={user.primaryEmail}
       profileImageUrl={user.profileImageUrl}
       projects={projects}
+      planBadge={{ name: ent.plan.name, tone: ent.isPaid ? "paid" : "neutral" }}
     />
   );
 }
