@@ -29,6 +29,15 @@ import { getSubmissionBySlug } from "@/lib/insforge/submissions";
 import { getFounderEntitlement } from "@/lib/billing/entitlements";
 import { investorVisibility } from "@/lib/billing/visibility";
 import { FOUNDER_PLANS } from "@/lib/billing/plans";
+import { DeckReviewPanel, IterationPanel } from "@/components/billing/deck-review-panel";
+import {
+  listDeckReviews,
+  countDeckReviewsLast30Days,
+  listScoreHistory,
+  recordScoreHistory,
+} from "@/lib/insforge/founder-tools";
+import { DECK_REVIEWS_PER_MONTH } from "@/lib/scoring/deck-review";
+import { historyPointFor } from "@/lib/scoring/snapshot-llm";
 
 type Params = { slug: string };
 
@@ -89,6 +98,29 @@ export default async function CompanyHubPage({
 
   const plus = FOUNDER_PLANS.founder_plus.name;
   const top = FOUNDER_PLANS.laelapx_plus.name;
+
+  // Laelapx+: deep deck review + iteration feedback.
+  let deck: { reviews: Awaited<ReturnType<typeof listDeckReviews>>; remaining: number } | null = null;
+  let history: Awaited<ReturnType<typeof listScoreHistory>> = [];
+  if (f.deepDeckReview) {
+    const [reviews, used, hist] = await Promise.all([
+      listDeckReviews(stored.id),
+      countDeckReviewsLast30Days(user.id),
+      listScoreHistory(stored.id),
+    ]);
+    deck = { reviews, remaining: Math.max(0, DECK_REVIEWS_PER_MONTH - used) };
+    history = hist;
+    // Backfill this revision if it was scored before history existed.
+    const recorded = hist.some((h) => new Date(h.submissionUpdatedAt).getTime() === new Date(stored.updatedAt).getTime());
+    if (!recorded && snapshot.sections?.length) {
+      const point = historyPointFor(stored, snapshot);
+      await recordScoreHistory(point);
+      history = [
+        ...hist,
+        { submissionUpdatedAt: point.submissionUpdatedAt, composite: point.composite, rating: point.rating, sections: point.sections, createdAt: new Date().toISOString() },
+      ];
+    }
+  }
 
   return (
     <DashboardShell
@@ -161,6 +193,36 @@ export default async function CompanyHubPage({
         editHref={`/founder/${stored.slug}/edit`}
         isPaid={ent.isPaid}
       />
+
+      {deck ? (
+        <>
+          <DeckReviewPanel
+            slug={stored.slug}
+            hasDeck={!!data.pitchDeckUrl}
+            remaining={deck.remaining}
+            perMonth={DECK_REVIEWS_PER_MONTH}
+            reviews={deck.reviews.map((r) => ({
+              id: r.id,
+              status: r.status,
+              deckScore: r.deckScore,
+              review: r.review,
+              error: r.error,
+              createdAt: r.createdAt,
+            }))}
+          />
+          <IterationPanel
+            history={history.map((h) => ({ at: h.submissionUpdatedAt, composite: h.composite, sections: h.sections }))}
+          />
+        </>
+      ) : (
+        <LockedSection
+          eyebrow="Deep deck review + iteration feedback"
+          title="Your deck read slide by slide, and every revision tracked."
+          blurb="We read the actual PDF the way an investor would, score how ready it is, and name the fixes. Each time you revise, you see what improved — on the deck and on your fundability score."
+          planName={top}
+          bullets={["Slide-by-slide verdicts", "Top fixes, ranked", "Score history across revisions", "Ongoing async support from the team"]}
+        />
+      )}
 
       {f.researchTools ? (
         <Suspense fallback={<ExternalFundsSkeleton />}>

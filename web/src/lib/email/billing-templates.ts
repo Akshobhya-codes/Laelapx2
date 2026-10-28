@@ -135,6 +135,43 @@ export function reviewOrderAdminEmail(input: {
   };
 }
 
+/* ─── SUPPORT ────────────────────────────────────────────────────────── */
+
+export function supportFromFounderEmail(input: {
+  founderName: string;
+  founderEmail: string | null;
+  body: string;
+  threadUserId: string;
+}) {
+  return {
+    subject: `Support — ${input.founderName}`,
+    html: shell({
+      preheader: input.body.slice(0, 90),
+      bodyHtml:
+        h(`New message from ${escapeHtml(input.founderName)}`) +
+        p(`<span style="color:#9a968e;">${input.founderEmail ? escapeHtml(input.founderEmail) : "no email on file"} · Laelapx+</span>`) +
+        `<div style="margin:6px 0 4px;padding:14px 16px;border-left:3px solid #2c5ba8;background:#f7f5f0;font-size:14px;line-height:1.6;white-space:pre-wrap;">${escapeHtml(input.body)}</div>`,
+      ctaLabel: "Reply in admin",
+      ctaHref: `${APP_URL}/admin?tab=support&thread=${encodeURIComponent(input.threadUserId)}`,
+    }),
+  };
+}
+
+export function supportReplyEmail(input: { founderFirstName: string; body: string }) {
+  return {
+    subject: "The Laelapx team replied",
+    html: shell({
+      preheader: input.body.slice(0, 90),
+      bodyHtml:
+        h("We replied to your message.") +
+        p(`Hi ${escapeHtml(input.founderFirstName)} —`) +
+        `<div style="margin:6px 0 4px;padding:14px 16px;border-left:3px solid #2c5ba8;background:#f7f5f0;font-size:14px;line-height:1.6;white-space:pre-wrap;">${escapeHtml(input.body)}</div>`,
+      ctaLabel: "Open the thread",
+      ctaHref: `${APP_URL}/support`,
+    }),
+  };
+}
+
 export function reviewDeliveredEmail(input: {
   founderFirstName: string;
   memoUrl: string | null;

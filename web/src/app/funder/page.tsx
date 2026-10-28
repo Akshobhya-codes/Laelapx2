@@ -6,6 +6,8 @@ import {
 } from "@/lib/insforge/audience";
 import { getInvestorEntitlement } from "@/lib/billing/entitlements";
 import { listInvestorVisibleSubmissions } from "@/lib/billing/discovery";
+import { applyCriteria } from "@/lib/billing/criteria";
+import { getCustomCriteria, EMPTY_CRITERIA } from "@/lib/insforge/investor-workspace";
 import { FunderHome } from "./funder-home";
 
 export const metadata = { title: "Investor workspace · Laelapx" };
@@ -21,8 +23,17 @@ export default async function FunderHomePage() {
     listConnectsForInvestor(user.id),
   ]);
 
-  // Only investor-visible founders count — same set Discover shows.
-  const allSubs = ent.active ? await listInvestorVisibleSubmissions({ limit: 200 }) : [];
+  // Only investor-visible founders count — the same set Discover shows,
+  // after the priority window and any custom criteria.
+  const f = ent.active ? ent.plan?.features : undefined;
+  let allSubs: Awaited<ReturnType<typeof listInvestorVisibleSubmissions>>["submissions"] = [];
+  if (ent.active) {
+    const [visible, criteria] = await Promise.all([
+      listInvestorVisibleSubmissions({ limit: 200, priority: !!f?.priorityReview }),
+      f?.customCriteria ? getCustomCriteria(ent.accountUserId) : Promise.resolve(EMPTY_CRITERIA),
+    ]);
+    allSubs = applyCriteria(visible.submissions, criteria).kept;
+  }
 
   let topMatches: {
     slug: string;

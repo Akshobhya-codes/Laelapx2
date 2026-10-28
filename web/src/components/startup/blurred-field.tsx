@@ -22,7 +22,9 @@ export type GateReason =
   /** Investor plan is active but this week's / the pilot's profile quota is spent. */
   | "quota"
   /** Investor plan ended (pilot expired, subscription cancelled). */
-  | "expired";
+  | "expired"
+  /** The founder hasn't opted in to investor contact. No plan unlocks this. */
+  | "no-consent";
 
 const GateContext = createContext<GateReason>("anon");
 
@@ -55,6 +57,12 @@ function ctaFor(reason: GateReason): { href: string; label: string; long: string
         href: "/pricing?side=investor",
         label: "Renew",
         long: "Your investor plan has ended. Pick a plan to keep unlocking founders.",
+      };
+    case "no-consent":
+      return {
+        href: "/funder/discover",
+        label: "Private",
+        long: "This founder hasn't opened their contact details to investors.",
       };
     case "no-plan":
     default:
@@ -159,20 +167,21 @@ export function GateBanner({
             </span>
           </span>
         </span>
-        <Link
-          href={cta.href}
-          className="rounded-full bg-blue-light px-3 py-1 text-[11px] font-bold text-navy transition-colors hover:bg-white"
-        >
-          {reason === "quota" ? "See plans" : cta.label} →
-        </Link>
+        {reason !== "no-consent" && (
+          <Link
+            href={cta.href}
+            className="rounded-full bg-blue-light px-3 py-1 text-[11px] font-bold text-navy transition-colors hover:bg-white"
+          >
+            {reason === "quota" ? "See plans" : cta.label} →
+          </Link>
+        )}
       </div>
     </motion.div>
   );
 }
 
 /** Small "unlocked this profile" toast for investors who just spent quota. */
-export function UnlockToast({ remaining, weekly }: { remaining: number | null; weekly: number | null }) {
-  if (weekly === null) return null;
+export function UnlockToast({ text }: { text: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -180,7 +189,7 @@ export function UnlockToast({ remaining, weekly }: { remaining: number | null; w
       transition={{ delay: 0.3, duration: 0.4 }}
       className="fixed bottom-24 left-1/2 z-40 -translate-x-1/2 rounded-full border border-ink/10 bg-white px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-ink-soft shadow-[0_8px_24px_rgba(28,43,66,0.12)]"
     >
-      Profile unlocked · {remaining} of {weekly} left this week
+      {text}
     </motion.div>
   );
 }

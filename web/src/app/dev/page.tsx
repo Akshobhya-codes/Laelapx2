@@ -219,7 +219,42 @@ export default async function Home() {
             href="/admin"
             number="18"
             title="Admin"
-            body="ADMIN_EMAILS only. Founder Review queue (start / deliver memo), subscriber table with MRR, pilot feedback scores."
+            body="ADMIN_EMAILS only. Founder Review queue, support inbox, event publishing, subscribers with MRR, pilot feedback."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/funder/pipeline"
+            number="19"
+            title="Pipeline"
+            body="Micro Fund+. Kanban of every founder the team opened; stages, meetings, owner + partner decision on Institutional."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/funder/criteria"
+            number="20"
+            title="Custom criteria"
+            body="Emerging Fund+. Hard filters (MRR, customers, score, countries, stage, keywords) with a live preview count."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/funder/analytics"
+            number="21"
+            title="Analytics"
+            body="Institutional+. Weekly deal flow, funnel, pipeline by stage, partner activity, quarterly market insights."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/events"
+            number="22"
+            title="Events"
+            body="Founder+ for sessions and workshops, Laelapx+ for in-person. RSVP with capacity; join link only after RSVP."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/support"
+            number="23"
+            title="Support"
+            body="Laelapx+. Async thread with the team; replies come from /admin and arrive by email."
             cta="Open →"
           />
         </div>
@@ -265,6 +300,10 @@ export default async function Home() {
             <Status status="done">Stripe Checkout + customer portal + signed webhook (/api/stripe/webhook) → subscriptions table</Status>
             <Status status="done">$499 Founder Review: one-time checkout → /admin queue → memo delivered to /billing + email</Status>
             <Status status="done">AI narrative + gap analysis cached per submission revision (was 3 OpenAI calls per refresh)</Status>
+            <Status status="done">Contact unlocks require founder consent (open to investor contact) — no plan overrides it, no quota spent</Status>
+            <Status status="done">Investor: stage/sector filters (Syndicate+), pipeline board (Micro Fund+), meetings + custom criteria + priority review (Emerging+), partner workflow + analytics + quarterly insights (Institutional+)</Status>
+            <Status status="done">Founder: events + RSVP (Founder+; in-person Laelapx+), async support thread, deep deck review (reads the PDF) + score history across revisions (Laelapx+)</Status>
+            <Status status="done">Admin: support inbox + event publishing alongside the review queue</Status>
             <Status status="next">Add STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET + ADMIN_EMAILS, run scripts/stripe-setup.mjs, test with 4242 card</Status>
             <Status status="next">Connect Vercel to GitHub, then production deploy</Status>
           </ul>

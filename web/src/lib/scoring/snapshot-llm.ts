@@ -7,6 +7,18 @@ import {
   persistScoredSnapshot,
   type StoredSubmission,
 } from "@/lib/insforge/submissions";
+import { recordScoreHistory } from "@/lib/insforge/founder-tools";
+
+/** The score_history row for a snapshot of a given submission revision. */
+export function historyPointFor(stored: StoredSubmission, snapshot: Snapshot) {
+  return {
+    submissionId: stored.id,
+    submissionUpdatedAt: stored.updatedAt,
+    composite: snapshot.composite,
+    rating: snapshot.rating,
+    sections: (snapshot.sections ?? []).map((s) => ({ id: s.id, name: s.name, score: s.score })),
+  };
+}
 
 /**
  * Build a Fundability Snapshot using the LLM-driven, stage-specific rubric.
@@ -42,6 +54,9 @@ export async function buildSnapshotLlm(
     // Fire-and-forget persistence so we don't block the dashboard render on
     // the write. Worst case: a transient write failure → recompute next load.
     void persistScoredSnapshot(stored.id, snapshot, stored.updatedAt);
+    // One history row per scored revision — iteration feedback (Laelapx+)
+    // reads these to show how each edit moved the score.
+    void recordScoreHistory(historyPointFor(stored, snapshot));
     return snapshot;
   } catch {
     return buildSnapshot(stored.data);

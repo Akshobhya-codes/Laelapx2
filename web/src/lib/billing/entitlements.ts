@@ -123,8 +123,20 @@ export function nextWeekStart(now = new Date()): Date {
   return d;
 }
 
-export const getInvestorEntitlement = cache(
-  async (input: { userId: string; email: string | null }): Promise<InvestorEntitlement> => {
+/**
+ * React `cache()` keys on argument identity, so it gets primitives: an
+ * object literal built at each call site would never hit.
+ */
+export function getInvestorEntitlement(input: {
+  userId: string;
+  email: string | null;
+}): Promise<InvestorEntitlement> {
+  return resolveInvestorEntitlement(input.userId, input.email);
+}
+
+const resolveInvestorEntitlement = cache(
+  async (userId: string, email: string | null): Promise<InvestorEntitlement> => {
+    const input = { userId, email };
     // A team member inherits the owner's subscription and quota.
     const membership = await findMembershipForUser(input);
     const accountUserId = membership ? membership.team.ownerUserId : input.userId;

@@ -21,6 +21,19 @@ import {
 import { startCheckoutAction, startPilotAction } from "@/app/actions/billing";
 import { Reveal } from "@/components/motion/reveal";
 
+/**
+ * Largest annual discount across founder plans, computed from the plan
+ * table so the label can never drift from the real prices.
+ * (Founder+: $100/yr vs $180 → 44%; Laelapx+: $250 vs $360 → 31%.)
+ */
+const ANNUAL_SAVINGS_PCT = Math.floor(
+  Math.max(
+    ...Object.values(FOUNDER_PLANS)
+      .filter((p) => (p.price.monthly ?? 0) > 0 && (p.price.annual ?? 0) > 0)
+      .map((p) => (1 - p.price.annual! / (p.price.monthly! * 12)) * 100)
+  )
+);
+
 export function PricingPage({
   initialSide,
   signedIn,
@@ -162,7 +175,7 @@ export function PricingPage({
               Annual
             </span>
             <span className="rounded-full bg-flag-green/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-flag-green">
-              2+ months free
+              Save up to {ANNUAL_SAVINGS_PCT}%
             </span>
           </div>
         )}
@@ -386,7 +399,7 @@ function PlanCard({
     >
       {plan.recommended && (
         <span className="absolute -top-3 left-6 rounded-full bg-blue px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
-          Most chosen
+          Recommended
         </span>
       )}
       {isCurrent && (

@@ -397,6 +397,8 @@ function MatchCard({ match }: { match: Match }) {
     >
       <Link
         href={`/s/${match.slug}`}
+        // Opening a profile spends quota, so never let a prefetch render it.
+        prefetch={false}
         className="group flex items-center gap-4 rounded-xl border border-ink/10 bg-white p-4 transition-all hover:border-blue/40"
       >
         <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg bg-gradient-to-br from-blue to-navy text-[13px] font-black text-white">

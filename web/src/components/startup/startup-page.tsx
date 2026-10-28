@@ -54,15 +54,15 @@ export function StartupPage({
   /** Why contact details are hidden, when they are. Decided server-side. */
   gateReason?: GateReason;
   quotaNote?: string | null;
-  /** Shown once when the investor just spent a weekly unlock on this page. */
-  unlockToast?: { remaining: number | null; weekly: number | null } | null;
+  /** Shown once when the investor just spent an unlock on this page. */
+  unlockToast?: string | null;
 }) {
   return (
     <GateProvider reason={gateReason}>
     <div className="bg-paper text-ink">
       <StartupNav data={data} />
       {!canSeeContact && <GateBanner reason={gateReason} quotaNote={quotaNote} />}
-      {canSeeContact && unlockToast && <UnlockToast {...unlockToast} />}
+      {canSeeContact && unlockToast && <UnlockToast text={unlockToast} />}
       <Hero
         data={data}
         locks={locks}

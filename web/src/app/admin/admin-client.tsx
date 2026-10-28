@@ -7,6 +7,12 @@ import { Reveal } from "@/components/motion/reveal";
 import { formatPrice } from "@/lib/billing/plans";
 import type { ReviewOrderStatus } from "@/lib/insforge/billing";
 import { adminUpdateReviewOrderAction } from "@/app/actions/billing";
+import {
+  SupportInbox,
+  EventsManager,
+  type SupportThreadView,
+  type AdminEventView,
+} from "./admin-tools";
 
 type Person = { name: string; email: string | null };
 
@@ -47,16 +53,32 @@ type Props = {
     note: string | null;
     createdAt: string;
   }[];
+  support: SupportThreadView[];
+  events: AdminEventView[];
+  initialTab: Tab;
+  initialThread: string | null;
 };
 
-type Tab = "reviews" | "subscribers" | "pilot";
+export type Tab = "reviews" | "support" | "events" | "subscribers" | "pilot";
 
 const fmt = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
 
-export function AdminPage({ adminName, stats, orders, subscribers, feedback }: Props) {
-  const [tab, setTab] = useState<Tab>("reviews");
+export function AdminPage({
+  adminName,
+  stats,
+  orders,
+  subscribers,
+  feedback,
+  support,
+  events,
+  initialTab,
+  initialThread,
+}: Props) {
+  const [tab, setTab] = useState<Tab>(initialTab);
   const useful = feedback.filter((f) => f.useful).length;
+  const unreadSupport = support.reduce((n, t) => n + t.unread, 0);
+  const upcoming = events.filter((e) => !e.past).length;
 
   return (
     <div className="min-h-screen bg-paper text-ink">
@@ -87,6 +109,8 @@ export function AdminPage({ adminName, stats, orders, subscribers, feedback }: P
           {(
             [
               ["reviews", `Review queue (${orders.filter((o) => o.status !== "delivered" && o.status !== "refunded").length})`],
+              ["support", `Support${unreadSupport ? ` (${unreadSupport} new)` : ` (${support.length})`}`],
+              ["events", `Events (${upcoming} upcoming)`],
               ["subscribers", `Subscribers (${subscribers.length})`],
               ["pilot", `Pilot feedback (${feedback.length})`],
             ] as [Tab, string][]
@@ -107,6 +131,8 @@ export function AdminPage({ adminName, stats, orders, subscribers, feedback }: P
         </div>
 
         <div className="mt-8">
+          {tab === "support" && <SupportInbox threads={support} initialThread={initialThread} />}
+          {tab === "events" && <EventsManager events={events} />}
           {tab === "reviews" && (
             orders.length === 0 ? (
               <Empty>No review orders yet. They&apos;ll appear here the moment a founder pays.</Empty>

@@ -27,6 +27,15 @@ export type DiscoverAccess = {
   teamName: string | null;
   quota: InvestorQuota;
   justStartedPilot: boolean;
+  /** Stage / sector filters (Syndicate and up). */
+  filters: boolean;
+  /** Founders screened out by the account's custom criteria (Emerging+). */
+  criteriaHidden: number;
+  hasCriteria: boolean;
+  /** Founders still inside the priority window, held back from this plan. */
+  heldBack: number;
+  /** This plan gets priority review (Emerging+). */
+  priority: boolean;
 };
 
 type Card = {
@@ -48,6 +57,8 @@ type Card = {
   conversationId: string | null;
   /** Already opened by this account — opening again costs nothing. */
   unlocked: boolean;
+  /** Newly visible; this account sees it early via priority review. */
+  priorityNew: boolean;
 };
 
 const STAGES = ["Pre-Seed", "Seed", "Series A", "Series B+"] as const;
@@ -75,8 +86,9 @@ export function Discover({
   ).sort();
 
   const filtered = cards.filter((c) => {
-    if (stageFilter && c.stage !== stageFilter) return false;
-    if (sectorFilter && !c.sectors.includes(sectorFilter)) return false;
+    // Stage / sector filters are a Syndicate+ feature; ignored otherwise.
+    if (access.filters && stageFilter && c.stage !== stageFilter) return false;
+    if (access.filters && sectorFilter && !c.sectors.includes(sectorFilter)) return false;
     if (search) {
       const q = search.toLowerCase();
       if (
@@ -169,6 +181,15 @@ export function Discover({
               </span>
             </div>
 
+            {!access.filters ? (
+              <Link
+                href="/pricing?side=investor"
+                className="inline-flex items-center gap-2 rounded-full border border-dashed border-ink/20 bg-white px-3.5 py-1.5 text-[12px] font-semibold text-ink-soft transition-colors hover:border-blue/40 hover:text-ink"
+              >
+                🔒 Stage and sector filters are part of Syndicate and up
+              </Link>
+            ) : (
+            <>
             <div className="flex flex-wrap items-center gap-2">
               <FilterPill
                 active={stageFilter === null}
@@ -209,6 +230,8 @@ export function Discover({
                   </FilterPill>
                 ))}
               </div>
+            )}
+            </>
             )}
           </div>
         </Reveal>
@@ -316,6 +339,24 @@ function QuotaStrip({ access }: { access: DiscoverAccess }) {
             {access.planName}{access.isTeamMember ? ` · ${access.teamName}` : ""} · manage
           </Link>
         )}
+        {(access.criteriaHidden > 0 || access.heldBack > 0 || access.priority) && (
+          <div className="flex w-full flex-wrap gap-x-5 gap-y-1 border-t border-ink/8 pt-2 text-[12px] text-ink-faint">
+            {access.hasCriteria && (
+              <span>
+                {access.criteriaHidden} hidden by your{" "}
+                <Link href="/funder/criteria" className="font-semibold text-blue hover:underline">custom criteria</Link>
+              </span>
+            )}
+            {access.priority && (
+              <span>Priority review: newly visible founders reach you first.</span>
+            )}
+            {access.heldBack > 0 && (
+              <span>
+                {access.heldBack} newly visible founder{access.heldBack === 1 ? "" : "s"} still in the priority window (Emerging Fund and up see them first).
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </Reveal>
   );
@@ -406,6 +447,8 @@ function DiscoverCard({
   return (
     <Link
       href={blocked ? "/billing?side=investor" : `/s/${card.slug}`}
+      // Opening a profile spends quota, so never let a prefetch render it.
+      prefetch={false}
       className={clsx(
         "group relative flex h-full flex-col rounded-2xl border bg-white p-6 transition-all hover:-translate-y-0.5",
         blocked
@@ -444,6 +487,11 @@ function DiscoverCard({
 
       {/* Tags */}
       <div className="mb-5 flex flex-wrap gap-1.5">
+        {card.priorityNew && (
+          <span className="rounded-md bg-flag-green/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-flag-green">
+            New · priority
+          </span>
+        )}
         <Tag>{card.stage}</Tag>
         {card.sectors.slice(0, 3).map((s) => (
           <Tag key={s} muted>
@@ -776,9 +824,12 @@ export function FunderNav({
       <div className="mx-auto hidden max-w-6xl items-center gap-1 px-6 pb-1 md:flex">
         <SubNavLink href="/funder">Home</SubNavLink>
         <SubNavLink href="/funder/discover">Discover</SubNavLink>
+        <SubNavLink href="/funder/pipeline">Pipeline</SubNavLink>
         <SubNavLink href="/funder/saved">Saved</SubNavLink>
         <SubNavLink href="/funder/connects">Connects</SubNavLink>
         <SubNavLink href="/funder/thesis">Thesis</SubNavLink>
+        <SubNavLink href="/funder/criteria">Criteria</SubNavLink>
+        <SubNavLink href="/funder/analytics">Analytics</SubNavLink>
         <SubNavLink href="/messages">Messages</SubNavLink>
         <SubNavLink href="/billing?side=investor">Billing</SubNavLink>
       </div>

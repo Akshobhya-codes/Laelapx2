@@ -11,7 +11,10 @@ export type NotificationKind =
   // Billing (migration 0009)
   | "subscription_changed"
   | "review_ordered"
-  | "review_delivered";
+  | "review_delivered"
+  // Plan features (migration 0010)
+  | "support_reply"
+  | "deal_assigned";
 
 export type NotificationPayload = {
   startupSlug?: string;

@@ -96,6 +96,18 @@ function CompanyHubNav({
         {/* Account */}
         <div className="flex flex-shrink-0 items-center gap-3">
           <Link
+            href="/events"
+            className="hidden text-[12px] font-semibold text-ink-soft transition-colors hover:text-ink xl:inline"
+          >
+            Events
+          </Link>
+          <Link
+            href="/support"
+            className="hidden text-[12px] font-semibold text-ink-soft transition-colors hover:text-ink xl:inline"
+          >
+            Support
+          </Link>
+          <Link
             href="/messages"
             className="hidden text-[12px] font-semibold text-ink-soft transition-colors hover:text-ink lg:inline"
           >

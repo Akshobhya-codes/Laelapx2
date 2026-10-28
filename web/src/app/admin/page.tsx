@@ -6,32 +6,48 @@ import {
   listAllSubscriptions,
   listAllPilotFeedback,
 } from "@/lib/insforge/billing";
+import { listSupportInbox, listAllEvents, listRsvps } from "@/lib/insforge/founder-tools";
 import { listProfilesByUserIds } from "@/lib/insforge/profiles";
 import { listAllSubmissions } from "@/lib/insforge/submissions";
 import { getPlan } from "@/lib/billing/plans";
 import { isSubscriptionActive } from "@/lib/billing/entitlements";
-import { AdminPage } from "./admin-client";
+import { AdminPage, type Tab } from "./admin-client";
 
 export const metadata = { title: "Admin · Laelapx" };
 export const dynamic = "force-dynamic";
 
-export default async function Admin() {
+const TABS: Tab[] = ["reviews", "support", "events", "subscribers", "pilot"];
+
+/** Request-time clock read, kept out of the component body. */
+const isPast = (iso: string) => new Date(iso).getTime() < Date.now();
+
+export default async function Admin({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string; thread?: string }>;
+}) {
   const user = await stackServerApp.getUser({ or: "redirect" });
   // 404 rather than 403: non-admins shouldn't learn the route exists.
   if (!isAdminEmail(user.primaryEmail)) notFound();
+  const sp = await searchParams;
 
-  const [orders, subs, feedback, submissions] = await Promise.all([
+  const [orders, subs, feedback, submissions, inbox, events] = await Promise.all([
     listAllReviewOrders(),
     listAllSubscriptions(),
     listAllPilotFeedback(),
     listAllSubmissions({ limit: 500 }),
+    listSupportInbox(),
+    listAllEvents(),
   ]);
+  const rsvps = await listRsvps(events.map((e) => e.id));
 
   const userIds = Array.from(
     new Set([
       ...orders.map((o) => o.userId),
       ...subs.map((s) => s.userId),
       ...feedback.map((f) => f.investorUserId),
+      ...inbox.map((t) => t.threadUserId),
+      ...Array.from(rsvps.values()).flat(),
     ])
   );
   const profiles = await listProfilesByUserIds(userIds);
@@ -40,6 +56,10 @@ export default async function Admin() {
     return { name: p?.displayName ?? id.slice(0, 8), email: p?.email ?? null };
   };
   const subById = new Map(submissions.map((s) => [s.id, s]));
+  const founderPlanOf = (id: string) => {
+    const s = subs.find((x) => x.userId === id && x.side === "founder");
+    return s && isSubscriptionActive(s) ? getPlan("founder", s.plan)?.name ?? s.plan : "Free";
+  };
 
   // MRR: monthly price, annual/12. Pilots and inactive rows contribute 0.
   let mrrCents = 0;
@@ -53,9 +73,13 @@ export default async function Admin() {
     else if (plan.price.monthly) mrrCents += plan.price.monthly;
   }
 
+  const initialTab: Tab = TABS.includes(sp.tab as Tab) ? (sp.tab as Tab) : "reviews";
+
   return (
     <AdminPage
       adminName={user.displayName}
+      initialTab={initialTab}
+      initialThread={sp.thread ?? null}
       stats={{
         mrrCents: Math.round(mrrCents),
         activeFounders: activeBySide.founder,
@@ -98,6 +122,24 @@ export default async function Admin() {
         useful: f.useful,
         note: f.note,
         createdAt: f.createdAt,
+      }))}
+      support={inbox.map((t) => ({
+        threadUserId: t.threadUserId,
+        founder: who(t.threadUserId),
+        plan: founderPlanOf(t.threadUserId),
+        unread: t.unreadByTeam,
+        lastAt: t.lastAt,
+        messages: t.messages.map((m) => ({ id: m.id, fromTeam: m.fromTeam, body: m.body, createdAt: m.createdAt })),
+      }))}
+      events={events.map((e) => ({
+        id: e.id,
+        title: e.title,
+        kind: e.kind,
+        startsAt: e.startsAt,
+        location: e.location,
+        capacity: e.capacity,
+        attendees: (rsvps.get(e.id) ?? []).map(who),
+        past: isPast(e.startsAt),
       }))}
     />
   );

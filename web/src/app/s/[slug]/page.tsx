@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { StartupPage } from "@/components/startup/startup-page";
 import { StartupActionBar } from "@/components/startup/startup-action-bar";
 import type { GateReason } from "@/components/startup/blurred-field";
-import { PilotFeedback, InvestorNote } from "@/components/billing/investor-widgets";
+import { PilotFeedback, InvestorWorkspace } from "@/components/billing/investor-widgets";
 import { getSubmissionBySlug } from "@/lib/insforge/submissions";
 import { getInvestorByOwner } from "@/lib/insforge/investors";
 import {
@@ -17,6 +17,7 @@ import {
   type InvestorEntitlement,
 } from "@/lib/billing/entitlements";
 import { getPilotFeedbackMap, getInvestorNote } from "@/lib/insforge/billing";
+import { listMeetings } from "@/lib/insforge/investor-workspace";
 import { stackServerApp } from "@/stack";
 import type { Metadata } from "next";
 
@@ -74,11 +75,15 @@ export default async function StartupSlugPage({
   /* ─── The paywall ────────────────────────────────────────────────────
    * Contact details (deck, demo, founder LinkedIns) are visible to:
    *   - the owner, always;
-   *   - an investor with an active plan, once this profile is unlocked for
-   *     their account. The first open spends one unit of the weekly (or
-   *     pilot) quota; later opens are free, for the whole team.
-   * Everyone else gets the page with those fields stripped server-side.
+   *   - an investor with an active plan, when the founder has opted in to
+   *     investor contact, once this profile is unlocked for their account.
+   *     The first open spends one unit of the weekly (or pilot) quota;
+   *     later opens are free, for the whole team.
+   * Without the founder's consent no plan unlocks anything, and no quota
+   * is spent. Everyone else gets the page with those fields stripped
+   * server-side.
    */
+  const consented = stored.data.openToInvestorContact;
   let ent: InvestorEntitlement | null = null;
   let canSeeContact = isOwner;
   let gateReason: GateReason = "anon";
@@ -86,14 +91,18 @@ export default async function StartupSlugPage({
 
   if (!isOwner && viewer) {
     ent = await getInvestorEntitlement({ userId: viewer.id, email: viewer.primaryEmail });
-    if (ent.active) {
+    if (!ent.active) {
+      gateReason = ent.pilotExhausted || ent.subscription ? "expired" : "no-plan";
+    } else if (!consented) {
+      gateReason = "no-consent";
+    } else {
       const r = await unlockProfileIfAllowed(ent, stored.id, viewer.id);
       canSeeContact = r.unlocked;
       spentQuota = r.spentQuota;
       if (!r.unlocked) gateReason = "quota";
-    } else {
-      gateReason = ent.pilotExhausted || ent.subscription ? "expired" : "no-plan";
     }
+  } else if (!isOwner && !consented) {
+    gateReason = "no-consent";
   }
 
   const canActAsInvestor = !!viewer && !!viewerInvestor;
@@ -119,28 +128,28 @@ export default async function StartupSlugPage({
     });
   }
 
-  // For investor viewers (incl. owners testing): pre-fetch save / connect state,
-  // plus the pilot feedback and note widgets where the plan includes them.
+  // Investor-side state: save / connect, plus the workspace widgets the
+  // plan includes. All of it only once the profile is actually open.
   let initialSaved = false;
   let initialConnectPending = false;
-  let pilotFeedback: { useful: boolean; note: string | null } | null = null;
-  let note: { body: string; stage: string | null; updatedAt: string } | null = null;
   if (canActAsInvestor) {
     [initialSaved, initialConnectPending] = await Promise.all([
       isSavedByInvestor(stored.id, viewer!.id),
       hasPendingConnect(stored.id, viewer!.id),
     ]);
   }
-  const showPilotFeedback = !isOwner && !!ent?.active && ent.plan?.id === "pilot" && canSeeContact;
-  const showNotes = !isOwner && !!ent?.active && !!ent.plan?.features.notes;
-  if (showPilotFeedback) {
-    const fb = (await getPilotFeedbackMap(viewer!.id)).get(stored.id);
-    pilotFeedback = fb ? { useful: fb.useful, note: fb.note } : null;
-  }
-  if (showNotes && ent) {
-    const n = await getInvestorNote(ent.accountUserId, stored.id);
-    note = n ? { body: n.body, stage: n.stage, updatedAt: n.updatedAt } : null;
-  }
+
+  const features = ent?.active ? ent.plan?.features : undefined;
+  const opened = !isOwner && canSeeContact && !!ent;
+  const showPilotFeedback = opened && ent!.plan?.id === "pilot";
+  const showWorkspace = opened && !!features?.notes;
+  const canTrackMeetings = opened && !!features?.meetingTracking;
+
+  const [pilotFb, note, meetings] = await Promise.all([
+    showPilotFeedback ? getPilotFeedbackMap(viewer!.id).then((m) => m.get(stored.id) ?? null) : null,
+    showWorkspace ? getInvestorNote(ent!.accountUserId, stored.id) : null,
+    canTrackMeetings ? listMeetings(ent!.accountUserId, stored.id) : [],
+  ]);
 
   // Redact protected reach-out URLs before they reach the client bundle. We
   // also expose a "locks" map so the UI can still render the blurred slot
@@ -173,6 +182,16 @@ export default async function StartupSlugPage({
         : `${q.remainingThisWeek} of ${q.weekly} left · resets ${new Date(q.weekResetsAt).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}.`
       : null;
 
+  // Quota was computed before this unlock, so subtract the one just spent.
+  let unlockToast: string | null = null;
+  if (spentQuota && q) {
+    if (q.total !== null && q.remainingTotal !== null) {
+      unlockToast = `Profile unlocked · ${q.remainingTotal - 1} of ${q.total} pilot profiles left`;
+    } else if (q.weekly !== null && q.remainingThisWeek !== null) {
+      unlockToast = `Profile unlocked · ${q.remainingThisWeek - 1} of ${q.weekly} left this week`;
+    }
+  }
+
   return (
     <>
       <StartupPage
@@ -182,9 +201,7 @@ export default async function StartupSlugPage({
         viewerSignedIn={!!viewer}
         gateReason={gateReason}
         quotaNote={quotaNote}
-        unlockToast={
-          spentQuota && q ? { remaining: q.remainingThisWeek !== null ? q.remainingThisWeek - 1 : null, weekly: q.weekly } : null
-        }
+        unlockToast={unlockToast}
       />
       {canActAsInvestor && (
         <StartupActionBar
@@ -195,11 +212,36 @@ export default async function StartupSlugPage({
           isOwner={isOwner}
           canConnect={canConnect}
           lockHref={gateReason === "quota" ? "/billing?side=investor" : "/pricing?side=investor"}
-          lockLabel={gateReason === "quota" ? "Weekly limit reached" : "Plan required to connect"}
+          lockLabel={
+            gateReason === "quota"
+              ? "Weekly limit reached"
+              : gateReason === "no-consent"
+              ? "Founder not open to contact"
+              : "Plan required to connect"
+          }
         />
       )}
-      {showPilotFeedback && <PilotFeedback slug={stored.slug} initial={pilotFeedback} />}
-      {showNotes && <InvestorNote slug={stored.slug} initial={note} teamName={ent?.teamName ?? null} />}
+      {showPilotFeedback && (
+        <PilotFeedback
+          slug={stored.slug}
+          initial={pilotFb ? { useful: pilotFb.useful, note: pilotFb.note } : null}
+        />
+      )}
+      {showWorkspace && (
+        <InvestorWorkspace
+          slug={stored.slug}
+          initialNote={note ? { body: note.body, stage: note.stage, updatedAt: note.updatedAt } : null}
+          teamName={ent?.teamName ?? null}
+          canTrackMeetings={canTrackMeetings}
+          meetings={meetings.map((m) => ({
+            id: m.id,
+            metOn: m.metOn,
+            kind: m.kind,
+            attendees: m.attendees,
+            notes: m.notes,
+          }))}
+        />
+      )}
     </>
   );
 }
