@@ -120,6 +120,7 @@ export async function openPortalAction(side: Side): Promise<never> {
   const url = await createPortalSession({
     customerId,
     returnPath: returnPathFor(side),
+    side,
   });
   redirect(url);
 }

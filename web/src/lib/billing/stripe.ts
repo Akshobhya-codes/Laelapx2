@@ -140,13 +140,30 @@ export async function createReviewCheckout(input: {
 
 /* ─── PORTAL ─────────────────────────────────────────────────────────── */
 
+/**
+ * Each side has its own portal configuration (created by
+ * scripts/stripe-setup.mjs, tagged metadata.laelapx_side) so a founder can
+ * only switch between founder plans and an investor between investor plans.
+ */
+async function portalConfigurationFor(side: "founder" | "investor"): Promise<string | undefined> {
+  const stripe = getStripe();
+  const configs = await stripe.billingPortal.configurations.list({ active: true, limit: 100 });
+  return configs.data.find((c) => c.metadata?.laelapx_side === side)?.id;
+}
+
 export async function createPortalSession(input: {
   customerId: string;
   returnPath: string;
+  side: "founder" | "investor";
 }): Promise<string> {
   const stripe = getStripe();
+  const configuration = await portalConfigurationFor(input.side);
+  if (!configuration) {
+    throw new Error("Stripe customer portal isn't set up. Run: node scripts/stripe-setup.mjs");
+  }
   const session = await stripe.billingPortal.sessions.create({
     customer: input.customerId,
+    configuration,
     return_url: `${APP_URL}${input.returnPath}`,
   });
   return session.url;

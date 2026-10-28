@@ -8,6 +8,7 @@ import {
 import { getPlan, type Side } from "@/lib/billing/plans";
 import {
   claimBillingEvent,
+  releaseBillingEvent,
   upsertSubscription,
   getUserIdByStripeCustomer,
   getSubscriptionByStripeId,
@@ -71,7 +72,10 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     // 500 makes Stripe retry, which is what we want for a transient DB error.
+    // Release the claim first, or the retry would be skipped as a duplicate
+    // and the event silently lost.
     console.error(`[stripe] ${event.type} failed:`, err);
+    await releaseBillingEvent(event.id).catch(() => {});
     return new Response("Handler error", { status: 500 });
   }
 

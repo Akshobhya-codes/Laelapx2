@@ -265,6 +265,15 @@ export async function claimBillingEvent(
   throw new Error(`claimBillingEvent: ${error.message}`);
 }
 
+/**
+ * Undo a claim when handling failed, so Stripe's retry of the same event is
+ * processed instead of being skipped as a duplicate.
+ */
+export async function releaseBillingEvent(stripeEventId: string): Promise<void> {
+  const client = getInsforge();
+  await client.database.from("billing_events").delete().eq("stripe_event_id", stripeEventId);
+}
+
 /* ─── TEAMS ──────────────────────────────────────────────────────────── */
 
 export type StoredTeam = {
