@@ -14,14 +14,15 @@ export function VisibilityCard({
   completeness,
   fundability,
   editHref,
-  isPaid,
+  eligible,
 }: {
   visible: boolean;
   blockers: string[];
   completeness: number;
   fundability: number;
   editHref: string;
-  isPaid: boolean;
+  /** The founder's plan includes investor visibility (every plan does today). */
+  eligible: boolean;
 }) {
   const pct = Math.round(completeness * 100);
   return (
@@ -46,9 +47,9 @@ export function VisibilityCard({
           <h3 className="text-[20px] font-extrabold tracking-tight text-navy">
             {visible
               ? "Investors whose thesis fits can find you."
-              : isPaid
+              : eligible
               ? "Not yet visible to investors."
-              : "Investor visibility is off on the Free plan."}
+              : "Investor visibility isn't included in your plan."}
           </h3>
           <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
             {visible
@@ -71,9 +72,9 @@ export function VisibilityCard({
             <Meter label="Complete" value={pct} suffix="%" ok={pct >= 70} />
             <Meter label="Fundability" value={fundability} ok={fundability >= 45} />
           </div>
-          {!isPaid ? (
+          {!eligible ? (
             <Link href="/pricing" className="rounded-md bg-navy px-4 py-2 text-[12px] font-bold text-white hover:bg-blue">
-              See Founder+ →
+              See plans →
             </Link>
           ) : !visible ? (
             <Link href={editHref} className="rounded-md border border-navy px-4 py-2 text-[12px] font-bold text-navy hover:bg-navy hover:text-white">
@@ -83,7 +84,7 @@ export function VisibilityCard({
         </div>
       </div>
       <p className="mt-5 text-[11px] italic text-ink-faint">
-        Paid status does not change your fundability score or investor-fit score.
+        Every plan can be visible to investors. Paid status does not change your fundability score or investor-fit score.
       </p>
     </motion.section>
   );

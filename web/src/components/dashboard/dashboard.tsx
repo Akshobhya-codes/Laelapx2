@@ -25,6 +25,7 @@ export function DashboardShell({
   displayName,
   profileImageUrl,
   planBadge,
+  gapCount,
   children,
 }: {
   data: Submission;
@@ -32,6 +33,8 @@ export function DashboardShell({
   displayName: string | null;
   profileImageUrl: string | null;
   planBadge?: PlanBadgeProps;
+  /** Total gaps found, when `snapshot.gaps` was trimmed for the Free plan. */
+  gapCount?: number;
   children: React.ReactNode;
 }) {
   const slug = slugify(data.companyName, { lower: true, strict: true });
@@ -44,7 +47,7 @@ export function DashboardShell({
         profileImageUrl={profileImageUrl}
         planBadge={planBadge}
       />
-      <Header data={data} snapshot={snapshot} />
+      <Header data={data} snapshot={snapshot} gapCount={gapCount ?? snapshot.gaps.length} />
       <main className="mx-auto max-w-6xl px-6 pb-20 pt-2">{children}</main>
     </div>
   );
@@ -200,7 +203,7 @@ function HubTab({
 }
 
 /* ─── HEADER ─────────────────────────────────────────────────────────── */
-function Header({ data, snapshot }: { data: Submission; snapshot: Snapshot }) {
+function Header({ data, snapshot, gapCount }: { data: Submission; snapshot: Snapshot; gapCount: number }) {
   return (
     <header className="border-b border-ink/8 bg-paper-2 px-6 py-14">
       <div className="mx-auto max-w-6xl">
@@ -232,7 +235,7 @@ function Header({ data, snapshot }: { data: Submission; snapshot: Snapshot }) {
             <SummaryPill label="Rating" value={snapshot.rating} tone="default" />
             <SummaryPill
               label="Gaps surfaced"
-              value={String(snapshot.gaps.length)}
+              value={String(gapCount)}
               tone="default"
             />
             <SummaryPill
@@ -279,7 +282,14 @@ function SummaryPill({
 }
 
 /* ─── SCORE SECTION ──────────────────────────────────────────────────── */
-export function ScoreSection({ snapshot }: { snapshot: Snapshot }) {
+export function ScoreSection({
+  snapshot,
+  limited = false,
+}: {
+  snapshot: Snapshot;
+  /** Free plan: show the score and rating only; the breakdown is locked. */
+  limited?: boolean;
+}) {
   const useRich = !!snapshot.sections && snapshot.sections.length > 0;
   return (
     <section className="mt-16">
@@ -309,7 +319,9 @@ export function ScoreSection({ snapshot }: { snapshot: Snapshot }) {
         </Reveal>
 
         <Reveal delay={0.2}>
-          {useRich ? (
+          {limited ? (
+            <LockedBreakdown />
+          ) : useRich ? (
             <RichSectionsPanel sections={snapshot.sections!} />
           ) : (
             <div className="rounded-2xl border border-ink/10 bg-white p-8">
@@ -332,6 +344,48 @@ export function ScoreSection({ snapshot }: { snapshot: Snapshot }) {
         </Reveal>
       </div>
     </section>
+  );
+}
+
+/* ─── LOCKED BREAKDOWN (Free plan) ──────────────────────────────────── */
+// Placeholder bars only: no real sub-scores are sent to the browser, so the
+// breakdown can't be read out of the page source.
+const PLACEHOLDER_BARS = [72, 48, 85, 60, 38];
+function LockedBreakdown() {
+  return (
+    <div className="relative h-full overflow-hidden rounded-2xl border border-ink/10 bg-white p-8">
+      <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-ink-faint">
+        Section breakdown
+      </div>
+      <div aria-hidden className="mt-5 space-y-5 blur-[5px] select-none">
+        {PLACEHOLDER_BARS.map((w, i) => (
+          <div key={i}>
+            <div className="mb-1.5 flex justify-between">
+              <span className="h-3 w-24 rounded bg-ink/15" />
+              <span className="h-3 w-6 rounded bg-ink/15" />
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-ink/8">
+              <div className="h-full rounded-full bg-blue/60" style={{ width: `${w}%` }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/55 p-8 text-center">
+        <div className="text-[18px] font-extrabold tracking-tight text-navy">
+          See how every section scores
+        </div>
+        <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-ink-soft">
+          The full report breaks your score down section by section, with the
+          reasoning behind each one. It unlocks on Founder+ and Laelapx+.
+        </p>
+        <Link
+          href="/pricing"
+          className="mt-5 rounded-md bg-navy px-5 py-2.5 text-[13px] font-bold text-white transition-colors hover:bg-blue"
+        >
+          Unlock the full report →
+        </Link>
+      </div>
+    </div>
   );
 }
 
@@ -491,23 +545,59 @@ function SubScoreBar({ sub, delay }: { sub: SubScore; delay: number }) {
 }
 
 /* ─── GAPS ───────────────────────────────────────────────────────────── */
-export function GapsSection({ gaps }: { gaps: Gap[] }) {
+export function GapsSection({
+  gaps,
+  limit,
+  hiddenCount = 0,
+}: {
+  gaps: Gap[];
+  /** Free plan: show only this many gaps (the most important first). */
+  limit?: number;
+  /** How many more gaps exist beyond the ones passed in (Free plan). */
+  hiddenCount?: number;
+}) {
   if (gaps.length === 0) return null;
+  const shown = limit ? gaps.slice(0, limit) : gaps;
+  const more = hiddenCount + (gaps.length - shown.length);
   return (
     <section className="mt-20">
       <Reveal>
         <SectionTitle
           eyebrow="02 — Gap analysis"
-          title="What investors are likely to flag."
+          title={limit ? "Your biggest gap right now." : "What investors are likely to flag."}
         />
       </Reveal>
 
       <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-        {gaps.map((g, i) => (
+        {shown.map((g, i) => (
           <Reveal key={`${g.axis}-${g.title}-${i}`} delay={i * 0.08}>
             <GapCard gap={g} />
           </Reveal>
         ))}
+        {limit ? (
+          <Reveal delay={0.1}>
+            <div className="flex h-full flex-col justify-between rounded-xl border border-dashed border-blue/35 bg-blue/[0.04] p-6">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue">
+                  {more > 0 ? `${more} more ${more === 1 ? "gap" : "gaps"} found` : "The full gap analysis"}
+                </div>
+                <h3 className="mt-3 text-[18px] font-extrabold tracking-tight text-navy">
+                  Unlock every gap and how to close it.
+                </h3>
+                <p className="mt-3 text-[14px] leading-[1.6] text-ink-soft">
+                  Founder+ and Laelapx+ show every gap investors are likely to
+                  flag, ranked by impact, each with a concrete fix.
+                </p>
+              </div>
+              <Link
+                href="/pricing"
+                className="mt-5 self-start rounded-md bg-navy px-5 py-2.5 text-[13px] font-bold text-white transition-colors hover:bg-blue"
+              >
+                See plans →
+              </Link>
+            </div>
+          </Reveal>
+        ) : null}
       </div>
     </section>
   );

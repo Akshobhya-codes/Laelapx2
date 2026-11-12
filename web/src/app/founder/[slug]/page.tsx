@@ -96,6 +96,15 @@ export default async function CompanyHubPage({
     ent.plan
   );
 
+  // Free plan: score + rating + the single biggest gap. Strip everything else
+  // here, on the server — the dashboard is a client component, so whatever we
+  // pass it ends up in the page payload.
+  const limited = !f.fullReport;
+  const shown: typeof snapshot = limited
+    ? { ...snapshot, subscores: [], sections: undefined, topGaps: undefined, gaps: snapshot.gaps.slice(0, 1) }
+    : snapshot;
+  const hiddenGaps = limited ? Math.max(0, snapshot.gaps.length - shown.gaps.length) : 0;
+
   const plus = FOUNDER_PLANS.founder_plus.name;
   const top = FOUNDER_PLANS.laelapx_plus.name;
 
@@ -125,7 +134,8 @@ export default async function CompanyHubPage({
   return (
     <DashboardShell
       data={data}
-      snapshot={snapshot}
+      snapshot={shown}
+      gapCount={snapshot.gaps.length}
       displayName={user.displayName}
       profileImageUrl={user.profileImageUrl}
       planBadge={{ name: ent.plan.name, tone: ent.isPaid ? "paid" : "neutral" }}
@@ -136,27 +146,16 @@ export default async function CompanyHubPage({
         </Suspense>
       ) : null}
 
-      <ScoreSection snapshot={snapshot} />
+      <ScoreSection snapshot={shown} limited={limited} />
 
       {enrichmentPromise ? (
         <Suspense fallback={<GapsSkeleton />}>
           <GapsBlock promise={enrichmentPromise} fallbackGaps={snapshot.gaps} />
         </Suspense>
       ) : (
-        <>
-          <GapsSection gaps={snapshot.gaps} />
-          <LockedSection
-            eyebrow="Full fundability report"
-            title="See the whole picture, section by section."
-            blurb="The full report scores every section of your submission against a stage-specific rubric, explains the composite in plain English, and ranks the fixes by how much each one moves the needle."
-            planName={plus}
-            bullets={[
-              "Stage-specific rubric (pre-seed, seed, Series A, B+)",
-              "AI narrative explaining your score",
-              "Prioritized fixes with concrete next steps",
-            ]}
-          />
-        </>
+        // Free: one gap plus an unlock card (the locked breakdown above
+        // already pitches the full report).
+        <GapsSection gaps={shown.gaps} limit={1} hiddenCount={hiddenGaps} />
       )}
 
       {f.researchTools ? (
@@ -191,7 +190,7 @@ export default async function CompanyHubPage({
         completeness={visibility.completeness}
         fundability={visibility.fundability}
         editHref={`/founder/${stored.slug}/edit`}
-        isPaid={ent.isPaid}
+        eligible={f.investorVisibility}
       />
 
       {deck ? (

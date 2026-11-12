@@ -5,14 +5,15 @@ import { buildSnapshot } from "@/lib/scoring/rubric";
 /**
  * When does a founder's startup show up in investor discovery?
  *
- * From the plan sheet: a paying founder is visible to investors only when
+ * Every plan, Free included, includes investor visibility. A founder is
+ * visible to investors only when
  *   1. the founder consents,
  *   2. the profile meets platform completeness,
  *   3. it meets the fundability / quality threshold,
  *   4. it meets the investor's own fit criteria (that's the matching itself).
  *
- * Free-tier founders are never surfaced ("No investor visibility"). Their
- * public page (/s/[slug]) still works — it's a link they share themselves.
+ * Paid founder plans buy depth of feedback, not visibility. The public page
+ * (/s/[slug]) works regardless — it's a link founders share themselves.
  *
  * These are platform-side gates, and they do not change anyone's score.
  */
@@ -65,7 +66,7 @@ export function investorVisibility(
   const blockers: string[] = [];
 
   if (!plan.features.investorVisibility) {
-    blockers.push("Investor visibility is part of Founder+ and Laelapx+.");
+    blockers.push("Investor visibility isn't included in your plan.");
   }
   if (!s.data.openToInvestorContact) {
     blockers.push("You haven't opted in. Turn on \"Open to investor contact\" in your submission.");
