@@ -36,7 +36,10 @@ function loadEnv() {
 }
 
 const env = loadEnv();
-const key = env.STRIPE_SECRET_KEY;
+// A key in the process environment wins, so live setup can run without ever
+// writing the live key into .env.local:
+//   STRIPE_SECRET_KEY=sk_live_... node scripts/stripe-setup.mjs
+const key = process.env.STRIPE_SECRET_KEY || env.STRIPE_SECRET_KEY;
 if (!key) {
   console.error("STRIPE_SECRET_KEY missing in .env.local");
   process.exit(1);
