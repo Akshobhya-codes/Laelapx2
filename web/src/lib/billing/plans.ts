@@ -216,6 +216,20 @@ export const FOUNDER_REVIEW = {
   turnaroundDays: 5,
 };
 
+/**
+ * Concierge applications (Laelapx+ only): the Laelapx team applies to an
+ * out-of-network fund on the founder's behalf. Charged per application, plus
+ * a one-time kickoff call before the first one so the team learns the company.
+ * One-time Stripe payments with inline prices, so there is nothing to set up
+ * in the Stripe dashboard.
+ */
+export const CONCIERGE = {
+  applicationCents: usd(20),
+  kickoffCents: usd(20),
+  /** Plan that unlocks fund research and concierge applications. */
+  requiredFeature: "researchTools" as const,
+};
+
 /* ─── INVESTOR ───────────────────────────────────────────────────────── */
 
 const INVESTOR_BASE: InvestorFeatures = {

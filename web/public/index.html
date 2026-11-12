@@ -112,12 +112,23 @@ img,canvas,svg{display:block}
 .scroll-cue i{display:block;width:1px;height:42px;background:linear-gradient(var(--cream),transparent);transform-origin:top;animation:cue 2.4s var(--ease) infinite}
 @keyframes cue{0%{transform:scaleY(0)}45%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
 
-/* ── Ticker ──────────────────────────────────────────── */
-.ticker{overflow:hidden;padding:46px 0 34px;border-bottom:1px solid var(--rule);color:var(--cobalt)}
-.ticker-track{display:flex;gap:56px;width:max-content;will-change:transform}
-.ticker-track span{font:400 clamp(34px,5vw,72px)/1 var(--serif);letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:56px}
-.ticker-track span::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--peach);flex:none}
-.ticker-track span:nth-child(even){font-style:italic}
+/* ── Network marquee ─────────────────────────────────── */
+.network{padding:52px 0 40px;border-bottom:1px solid var(--rule)}
+.network-head{display:flex;justify-content:center;margin-bottom:28px}
+.network-head .eyebrow{color:var(--ink-faint)}
+.marquee{position:relative;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.marquee-track{display:flex;align-items:center;gap:72px;padding-right:72px;width:max-content;animation:marquee var(--marquee-dur,60s) linear infinite}
+.marquee:hover .marquee-track{animation-play-state:paused}
+@keyframes marquee{to{transform:translateX(-50%)}}
+.m-item{display:flex;align-items:center;gap:12px;flex:none;color:var(--cobalt-ink);opacity:.78;transition:opacity .3s}
+.m-item:hover{opacity:1}
+.m-logo{display:block;height:34px;background:currentColor;-webkit-mask:var(--src) center/contain no-repeat;mask:var(--src) center/contain no-repeat}
+.m-word{font:600 26px/1 var(--serif);letter-spacing:-.02em;white-space:nowrap}
+.m-icon{width:24px;height:24px;border-radius:6px;filter:grayscale(1) contrast(1.1);opacity:.85}
+.m-name{font:500 21px/1 var(--serif);letter-spacing:-.01em;white-space:nowrap}
+.m-partner .m-tag{font:600 9px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--cobalt);border:1px solid rgba(28,61,170,.3);border-radius:999px;padding:5px 7px}
+.network-note{text-align:center;margin-top:26px;font-size:11px;color:var(--ink-faint)}
+@media (prefers-reduced-motion:reduce){.marquee-track{animation:none;flex-wrap:wrap;justify-content:center;width:auto;row-gap:28px}.marquee{-webkit-mask-image:none;mask-image:none}}
 
 /* ── Reality ─────────────────────────────────────────── */
 .reality{padding:clamp(100px,16vh,180px) 0}
@@ -359,9 +370,11 @@ footer{padding:64px 0 48px}
 </section>
 
 <!-- ═══ TICKER ═════════════════════════════════════════ -->
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track" id="ticker"></div>
-</div>
+<section class="network" aria-label="Potential investments from">
+  <div class="network-head"><span class="eyebrow">Potential investments from</span></div>
+  <div class="marquee"><div class="marquee-track" id="marqueeTrack"></div></div>
+  <p class="network-note wrap">Partners are marked. Other firms invest at our founders’ stages and sectors and are not affiliated with Laelapx.</p>
+</section>
 
 <!-- ═══ REALITY ════════════════════════════════════════ -->
 <section class="reality">
@@ -980,9 +993,35 @@ let rT;
 addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(() => buildAll(false), 180); });
 
 /* ─── Text helpers ─────────────────────────────────────────── */
-const ticker = document.getElementById("ticker");
-const WORDS = ["Problem", "Why now", "Solution", "Market", "Team", "Traction", "Go-to-market", "The ask"];
-ticker.innerHTML = [...WORDS, ...WORDS, ...WORDS].map((w) => `<span>${w}</span>`).join("");
+/* ─── Network marquee ──────────────────────────────────────── */
+// Partners are firms Laelapx works with; the rest are well-known pre-seed /
+// seed investors that take open applications in our founders' sectors.
+// Logos are normalised (trimmed, transparent) PNGs in /logos, drawn in one ink
+// colour via CSS mask. `r` is each logo's width/height ratio.
+const NETWORK = [
+  { name: "Brokd", word: true, partner: true },
+  { name: "Blackbox", logo: "/logos/blackbox.png", r: 4.72 },
+  { name: "Linda Mar Ventures", logo: "/logos/linda-mar-ventures.png", r: 3.26, h: 46, partner: true },
+  { name: "Techstars", logo: "/logos/techstars.png", r: 5.73 },
+  { name: "500 Global", logo: "/logos/500-global.png", r: 2.87 },
+  { name: "Antler", logo: "/logos/antler.png", r: 4.17 },
+  { name: "Pear VC", logo: "/logos/pear-vc.png", r: 2.54 },
+  { name: "Seedcamp", logo: "/logos/seedcamp.png", r: 6.35 },
+  { name: "Afore Capital", logo: "/logos/afore-capital.png", r: 2.52 },
+];
+const marqueeTrack = document.getElementById("marqueeTrack");
+(function renderMarquee() {
+  const items = NETWORK.map((n) => {
+    const mark = n.word
+      ? `<span class="m-word">${n.name}</span>`
+      : `<span class="m-logo" role="img" aria-label="${n.name}" style="--src:url('${n.logo}');height:${n.h || 34}px;width:${Math.round(Math.min(n.r * (n.h || 34), 190))}px"></span>`;
+    return `<span class="m-item${n.partner ? " m-partner" : ""}">${mark}${n.partner ? '<span class="m-tag">Partner</span>' : ""}</span>`;
+  });
+  // Two copies side by side; the track slides by exactly one copy for a seamless loop.
+  const once = items.join("");
+  marqueeTrack.innerHTML = once + `<span aria-hidden="true" style="display:contents">${once}</span>`;
+  marqueeTrack.style.setProperty("--marquee-dur", `${items.length * 5}s`);
+})();
 
 const revealText = document.getElementById("revealText");
 (function splitWords(el) {
@@ -1076,9 +1115,6 @@ function frame(time) {
   }
   nav.classList.toggle("solid", heroEl.getBoundingClientRect().bottom < vh * 0.15 && !menu.classList.contains("open"));
 
-  // TICKER — drifts with scroll
-  const tr = ticker.getBoundingClientRect();
-  if (tr.bottom > -50 && tr.top < vh + 50) tf(ticker, `translate3d(${-((scrollY * 0.35) % (ticker.scrollWidth / 3))}px,0,0)`);
 
   // REALITY — words light up as they cross the viewport
   const rr = revealText.getBoundingClientRect();

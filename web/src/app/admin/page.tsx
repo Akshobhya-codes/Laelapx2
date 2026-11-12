@@ -12,12 +12,13 @@ import { listAllSubmissions } from "@/lib/insforge/submissions";
 import { getPlan } from "@/lib/billing/plans";
 import { isSubscriptionActive } from "@/lib/billing/entitlements";
 import { listAppUsers } from "@/lib/insforge/app-users";
+import { listAllApplications, listAllKickoffs, listAllExternalFunds } from "@/lib/insforge/fund-network";
 import { AdminPage, type Tab } from "./admin-client";
 
 export const metadata = { title: "Admin · Laelapx" };
 export const dynamic = "force-dynamic";
 
-const TABS: Tab[] = ["reviews", "support", "events", "subscribers", "signups", "pilot"];
+const TABS: Tab[] = ["reviews", "applications", "support", "events", "subscribers", "signups", "pilot"];
 
 /** Request-time clock read, kept out of the component body. */
 const isPast = (iso: string) => new Date(iso).getTime() < Date.now();
@@ -42,6 +43,12 @@ export default async function Admin({
     // Soft-fail so a missing 0011 migration can't take down the whole admin page.
     listAppUsers().catch(() => []),
   ]);
+  // Fund network (migration 0012). Soft-fail so the rest of admin still loads.
+  const [applications, kickoffs, funds] = await Promise.all([
+    listAllApplications().catch(() => []),
+    listAllKickoffs().catch(() => []),
+    listAllExternalFunds().catch(() => []),
+  ]);
   const rsvps = await listRsvps(events.map((e) => e.id));
 
   const userIds = Array.from(
@@ -51,6 +58,8 @@ export default async function Admin({
       ...feedback.map((f) => f.investorUserId),
       ...inbox.map((t) => t.threadUserId),
       ...Array.from(rsvps.values()).flat(),
+      ...applications.map((a) => a.founderUserId),
+      ...kickoffs.map((k) => k.founderUserId),
     ])
   );
   const profiles = await listProfilesByUserIds(userIds);
@@ -117,6 +126,38 @@ export default async function Admin({
         renewsAt: s.trialEnd ?? s.currentPeriodEnd,
         seats: s.seats,
         updatedAt: s.updatedAt,
+      }))}
+      applications={applications.map((a) => {
+        const sub = subById.get(a.submissionId);
+        const fund = funds.find((f) => f.domain === a.fundDomain);
+        return {
+          id: a.id,
+          founder: who(a.founderUserId),
+          companyName: sub?.data.companyName ?? "—",
+          slug: sub?.slug ?? null,
+          fundName: fund?.fundName ?? a.fundDomain,
+          fundUrl: fund?.applyUrl || fund?.websiteUrl || `https://${a.fundDomain}`,
+          mode: a.mode,
+          status: a.status,
+          amountCents: a.amountCents,
+          founderNotes: a.founderNotes,
+          adminNotes: a.adminNotes,
+          createdAt: a.createdAt,
+        };
+      })}
+      kickoffs={kickoffs.map((k) => ({
+        founderUserId: k.founderUserId,
+        founder: who(k.founderUserId),
+        status: k.status,
+        scheduledFor: k.scheduledFor,
+        adminNotes: k.adminNotes,
+      }))}
+      funds={funds.map((f) => ({
+        domain: f.domain,
+        fundName: f.fundName,
+        websiteUrl: f.websiteUrl,
+        showInMarquee: f.showInMarquee,
+        lastSeenAt: f.lastSeenAt,
       }))}
       signups={appUsers.map((u) => {
         const paid = subs
