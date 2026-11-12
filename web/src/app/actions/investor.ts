@@ -21,6 +21,8 @@ import {
   connectRequestedEmail,
   connectAcceptedEmail,
 } from "@/lib/email/templates";
+import { getInvestorEntitlement } from "@/lib/billing/entitlements";
+import { isProfileUnlocked } from "@/lib/insforge/billing";
 
 /**
  * Toggle save on a startup. Notifies the founder when newly saved.
@@ -67,6 +69,18 @@ export async function requestConnectAction(
   const user = await stackServerApp.getUser({ or: "redirect" });
   const sub = await getSubmissionBySlug(slug);
   if (!sub) throw new Error("Submission not found");
+
+  // Server-side gate: the UI hides the button, but the action is the wall.
+  // Owners can connect to their own startup in test mode.
+  if (sub.ownerUserId !== user.id) {
+    const ent = await getInvestorEntitlement({ userId: user.id, email: user.primaryEmail });
+    if (!ent.active) {
+      throw new Error("An active investor plan is required to request a connect.");
+    }
+    if (!(await isProfileUnlocked(ent.accountUserId, sub.id))) {
+      throw new Error("Open this founder's profile first — it uses one of your weekly unlocks.");
+    }
+  }
 
   await requestConnect(sub.id, user.id, message.trim() || null);
 
@@ -136,13 +150,15 @@ export async function respondConnectAction(
     message: string | null;
   };
 
-  await respondToConnect(connectId, accept);
-
   // Look up the submission to get founder id + slug + name.
   const sub = await getSubmissionBySlug(ownerSlug);
   if (!sub) throw new Error("Submission not found");
-  // Defense-in-depth: only the owner can respond.
+  // Authorize BEFORE mutating: only the owner of the startup this request
+  // was sent to may accept or decline it.
   if (sub.ownerUserId !== user.id) throw new Error("Not authorized");
+  if (connect.submission_id !== sub.id) throw new Error("Not authorized");
+
+  await respondToConnect(connectId, accept);
 
   if (accept) {
     // Create / fetch the conversation.

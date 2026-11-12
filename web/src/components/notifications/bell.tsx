@@ -22,6 +22,12 @@ const KIND_META: Record<NotificationKind, { icon: string; color: string }> = {
   },
   connect_declined: { icon: "✕", color: "bg-ink/8 text-ink-faint" },
   message_received: { icon: "💬", color: "bg-blue-light/20 text-blue" },
+  // Billing
+  subscription_changed: { icon: "✦", color: "bg-flag-green/15 text-flag-green" },
+  review_ordered: { icon: "📄", color: "bg-blue/15 text-blue" },
+  review_delivered: { icon: "✓", color: "bg-flag-green/15 text-flag-green" },
+  support_reply: { icon: "💬", color: "bg-blue/15 text-blue" },
+  deal_assigned: { icon: "→", color: "bg-blue/15 text-blue" },
 };
 
 export function NotificationsBell() {
@@ -260,6 +266,16 @@ function titleFor(n: StoredNotification): string {
       return `${startup ?? "Founder"} passed on your request`;
     case "message_received":
       return `${from} sent you a message`;
+    case "subscription_changed":
+      return n.payload.message ?? "Your plan changed";
+    case "review_ordered":
+      return "Founder Review ordered";
+    case "review_delivered":
+      return "Your Founder Review is ready";
+    case "support_reply":
+      return "The Laelapx team replied";
+    case "deal_assigned":
+      return `${from} assigned you ${startup ?? "a deal"}`;
   }
 }
 
@@ -268,6 +284,9 @@ function bodyFor(n: StoredNotification): string | null {
     return `“${n.payload.message}”`;
   }
   if (n.kind === "message_received" && n.payload.message) {
+    return n.payload.message;
+  }
+  if ((n.kind === "review_ordered" || n.kind === "support_reply") && n.payload.message) {
     return n.payload.message;
   }
   return null;

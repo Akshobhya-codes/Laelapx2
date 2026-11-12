@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { stackServerApp } from "@/stack";
 import { ensureProfile } from "@/lib/insforge/profiles";
+import { recordAppUser } from "@/lib/insforge/app-users";
 import { RoleChooser } from "./role-chooser";
 
 export const metadata = {
@@ -20,12 +21,16 @@ export default async function WelcomePage({
 
   // First-time + recurring sign-in: lazy-create / refresh the LinkedIn-style
   // profile row keyed by Stack Auth user_id. Idempotent.
-  await ensureProfile({
-    userId: user.id,
-    displayName: user.displayName,
-    email: user.primaryEmail,
-    profileImageUrl: user.profileImageUrl,
-  });
+  await Promise.all([
+    ensureProfile({
+      userId: user.id,
+      displayName: user.displayName,
+      email: user.primaryEmail,
+      profileImageUrl: user.profileImageUrl,
+    }),
+    // Internal sign-up log (app_users). Soft-fails, never blocks sign-in.
+    recordAppUser(user),
+  ]);
 
   // If a role is already saved AND the user isn't explicitly switching, fast-
   // path to the right home.

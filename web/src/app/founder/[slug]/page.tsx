@@ -5,6 +5,7 @@ import {
   DashboardShell,
   ScoreSection,
   MatchesSection,
+  GapsSection,
 } from "@/components/dashboard/dashboard";
 import {
   NarrativeBlock,
@@ -18,10 +19,25 @@ import { ExternalFundsBlock } from "@/components/dashboard/external-funds-block"
 import { ExternalFundsSkeleton } from "@/components/dashboard/external-funds-section";
 import { MarketSignalsBlock } from "@/components/dashboard/market-signals-block";
 import { MarketSignalsSkeleton } from "@/components/dashboard/market-signals-section";
+import { LockedSection } from "@/components/billing/locked-section";
+import { VisibilityCard } from "@/components/billing/visibility-card";
 import { buildSnapshotLlm } from "@/lib/scoring/snapshot-llm";
+import { buildSnapshot } from "@/lib/scoring/rubric";
 import { matchInvestorsFromInsforge } from "@/lib/insforge/investors";
-import { enrichSnapshot } from "@/lib/scoring/llm-narrative";
+import { enrichSnapshotCached } from "@/lib/scoring/llm-narrative";
 import { getSubmissionBySlug } from "@/lib/insforge/submissions";
+import { getFounderEntitlement } from "@/lib/billing/entitlements";
+import { investorVisibility } from "@/lib/billing/visibility";
+import { FOUNDER_PLANS } from "@/lib/billing/plans";
+import { DeckReviewPanel, IterationPanel } from "@/components/billing/deck-review-panel";
+import {
+  listDeckReviews,
+  countDeckReviewsLast30Days,
+  listScoreHistory,
+  recordScoreHistory,
+} from "@/lib/insforge/founder-tools";
+import { DECK_REVIEWS_PER_MONTH } from "@/lib/scoring/deck-review";
+import { historyPointFor } from "@/lib/scoring/snapshot-llm";
 
 type Params = { slug: string };
 
@@ -56,47 +72,170 @@ export default async function CompanyHubPage({
   if (stored.ownerUserId !== user.id) notFound();
 
   const data = stored.data;
-  // LLM-driven, stage-specific Fundability score. Cached per
-  // (submissionId, updatedAt) so only the first load after an edit pays
-  // the latency; subsequent loads are instant.
+  const ent = await getFounderEntitlement(user.id);
+  const f = ent.plan.features;
+
+  /* ─── What the plan buys ─────────────────────────────────────────────
+   * Free:     deterministic rubric score + rubric gaps. No LLM calls at all,
+   *           so a free dashboard costs nothing to serve.
+   * Founder+: the LLM-scored stage-specific report, AI narrative,
+   *           prioritized gaps, and investor-fit matches.
+   * Laelapx+: + market signals and external fund research.
+   * The score itself is the same rubric for everyone — paying changes how
+   * deep the explanation goes, not the number.
+   */
   const [snapshot, matches] = await Promise.all([
-    buildSnapshotLlm(stored),
-    matchInvestorsFromInsforge(stored, {
-      excludeOwnerUserId: user.id,
-      top: 6,
-    }),
+    f.fullReport ? buildSnapshotLlm(stored) : Promise.resolve(buildSnapshot(data)),
+    f.investorFit
+      ? matchInvestorsFromInsforge(stored, { excludeOwnerUserId: user.id, top: 6 })
+      : Promise.resolve([]),
   ]);
-  const enrichmentPromise = enrichSnapshot(data, snapshot);
+  const enrichmentPromise = f.fullReport ? enrichSnapshotCached(stored, snapshot) : null;
+  const visibility = investorVisibility(
+    { ...stored, scoredSnapshot: snapshot, scoredForUpdatedAt: stored.updatedAt },
+    ent.plan
+  );
+
+  // Free plan: score + rating + the single biggest gap. Strip everything else
+  // here, on the server — the dashboard is a client component, so whatever we
+  // pass it ends up in the page payload.
+  const limited = !f.fullReport;
+  const shown: typeof snapshot = limited
+    ? { ...snapshot, subscores: [], sections: undefined, topGaps: undefined, gaps: snapshot.gaps.slice(0, 1) }
+    : snapshot;
+  const hiddenGaps = limited ? Math.max(0, snapshot.gaps.length - shown.gaps.length) : 0;
+
+  const plus = FOUNDER_PLANS.founder_plus.name;
+  const top = FOUNDER_PLANS.laelapx_plus.name;
+
+  // Laelapx+: deep deck review + iteration feedback.
+  let deck: { reviews: Awaited<ReturnType<typeof listDeckReviews>>; remaining: number } | null = null;
+  let history: Awaited<ReturnType<typeof listScoreHistory>> = [];
+  if (f.deepDeckReview) {
+    const [reviews, used, hist] = await Promise.all([
+      listDeckReviews(stored.id),
+      countDeckReviewsLast30Days(user.id),
+      listScoreHistory(stored.id),
+    ]);
+    deck = { reviews, remaining: Math.max(0, DECK_REVIEWS_PER_MONTH - used) };
+    history = hist;
+    // Backfill this revision if it was scored before history existed.
+    const recorded = hist.some((h) => new Date(h.submissionUpdatedAt).getTime() === new Date(stored.updatedAt).getTime());
+    if (!recorded && snapshot.sections?.length) {
+      const point = historyPointFor(stored, snapshot);
+      await recordScoreHistory(point);
+      history = [
+        ...hist,
+        { submissionUpdatedAt: point.submissionUpdatedAt, composite: point.composite, rating: point.rating, sections: point.sections, createdAt: new Date().toISOString() },
+      ];
+    }
+  }
 
   return (
     <DashboardShell
       data={data}
-      snapshot={snapshot}
+      snapshot={shown}
+      gapCount={snapshot.gaps.length}
       displayName={user.displayName}
       profileImageUrl={user.profileImageUrl}
+      planBadge={{ name: ent.plan.name, tone: ent.isPaid ? "paid" : "neutral" }}
     >
-      <Suspense fallback={<NarrativeSkeleton />}>
-        <NarrativeBlock promise={enrichmentPromise} />
-      </Suspense>
+      {enrichmentPromise ? (
+        <Suspense fallback={<NarrativeSkeleton />}>
+          <NarrativeBlock promise={enrichmentPromise} />
+        </Suspense>
+      ) : null}
 
-      <ScoreSection snapshot={snapshot} />
+      <ScoreSection snapshot={shown} limited={limited} />
 
-      <Suspense fallback={<GapsSkeleton />}>
-        <GapsBlock
-          promise={enrichmentPromise}
-          fallbackGaps={snapshot.gaps}
+      {enrichmentPromise ? (
+        <Suspense fallback={<GapsSkeleton />}>
+          <GapsBlock promise={enrichmentPromise} fallbackGaps={snapshot.gaps} />
+        </Suspense>
+      ) : (
+        // Free: one gap plus an unlock card (the locked breakdown above
+        // already pitches the full report).
+        <GapsSection gaps={shown.gaps} limit={1} hiddenCount={hiddenGaps} />
+      )}
+
+      {f.researchTools ? (
+        <Suspense fallback={<MarketSignalsSkeleton />}>
+          <MarketSignalsBlock submission={stored} />
+        </Suspense>
+      ) : (
+        <LockedSection
+          eyebrow="Market signals"
+          title="What's moving in your market this month."
+          blurb="Funding rounds, launches, and exits in your sector and stage, pulled from the web and matched to your submission."
+          planName={top}
+          compact
         />
-      </Suspense>
+      )}
 
-      <Suspense fallback={<MarketSignalsSkeleton />}>
-        <MarketSignalsBlock submission={stored} />
-      </Suspense>
+      {f.investorFit ? (
+        <MatchesSection matches={matches} />
+      ) : (
+        <LockedSection
+          eyebrow="Investor-fit analysis"
+          title="Which investors on Laelapx already fit."
+          blurb="Every investor thesis on the platform, scored against your stage, sector, round size, and traction — with the reasons for each match."
+          planName={plus}
+          bullets={["Fit score per investor", "Why they match (or don't)", "Eligible for investor visibility, with your consent"]}
+        />
+      )}
 
-      <MatchesSection matches={matches} />
+      <VisibilityCard
+        visible={visibility.visible}
+        blockers={visibility.blockers}
+        completeness={visibility.completeness}
+        fundability={visibility.fundability}
+        editHref={`/founder/${stored.slug}/edit`}
+        eligible={f.investorVisibility}
+      />
 
-      <Suspense fallback={<ExternalFundsSkeleton />}>
-        <ExternalFundsBlock submission={stored} />
-      </Suspense>
+      {deck ? (
+        <>
+          <DeckReviewPanel
+            slug={stored.slug}
+            hasDeck={!!data.pitchDeckUrl}
+            remaining={deck.remaining}
+            perMonth={DECK_REVIEWS_PER_MONTH}
+            reviews={deck.reviews.map((r) => ({
+              id: r.id,
+              status: r.status,
+              deckScore: r.deckScore,
+              review: r.review,
+              error: r.error,
+              createdAt: r.createdAt,
+            }))}
+          />
+          <IterationPanel
+            history={history.map((h) => ({ at: h.submissionUpdatedAt, composite: h.composite, sections: h.sections }))}
+          />
+        </>
+      ) : (
+        <LockedSection
+          eyebrow="Deep deck review + iteration feedback"
+          title="Your deck read slide by slide, and every revision tracked."
+          blurb="We read the actual PDF the way an investor would, score how ready it is, and name the fixes. Each time you revise, you see what improved — on the deck and on your fundability score."
+          planName={top}
+          bullets={["Slide-by-slide verdicts", "Top fixes, ranked", "Score history across revisions", "Ongoing async support from the team"]}
+        />
+      )}
+
+      {f.researchTools ? (
+        <Suspense fallback={<ExternalFundsSkeleton />}>
+          <ExternalFundsBlock submission={stored} />
+        </Suspense>
+      ) : (
+        <LockedSection
+          eyebrow="External fund research"
+          title="VCs beyond Laelapx whose public thesis matches yours."
+          blurb="We search the web for funds writing checks at your stage in your sector, read their published criteria, and rank them against your submission."
+          planName={top}
+          compact
+        />
+      )}
 
       <Suspense fallback={<AudienceSkeleton />}>
         <Audience submission={stored} />

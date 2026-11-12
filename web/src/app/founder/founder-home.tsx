@@ -6,6 +6,9 @@ import { Reveal } from "@/components/motion/reveal";
 import { AnimatedNumber } from "@/components/motion/animated-number";
 import { NotificationsBell } from "@/components/notifications/bell";
 import { SearchBar } from "@/components/search/search-bar";
+import { PlanBadge } from "@/components/billing/locked-section";
+
+type PlanBadgeProps = { name: string; tone: "neutral" | "paid" | "warn" };
 
 type Project = {
   slug: string;
@@ -24,11 +27,13 @@ export function FounderHome({
   email,
   profileImageUrl,
   projects,
+  planBadge,
 }: {
   displayName: string | null;
   email: string | null;
   profileImageUrl: string | null;
   projects: Project[];
+  planBadge?: PlanBadgeProps;
 }) {
   const firstName = displayName?.split(" ")[0] || "there";
   const isEmpty = projects.length === 0;
@@ -39,6 +44,7 @@ export function FounderHome({
         firstName={firstName}
         email={email}
         profileImageUrl={profileImageUrl}
+        planBadge={planBadge}
       />
 
       <header className="border-b border-ink/8 bg-paper-2 px-6 py-14">
@@ -107,10 +113,12 @@ function FounderNav({
   firstName,
   email,
   profileImageUrl,
+  planBadge,
 }: {
   firstName: string;
   email: string | null;
   profileImageUrl: string | null;
+  planBadge?: PlanBadgeProps;
 }) {
   return (
     <nav className="sticky top-0 z-20 border-b border-ink/8 bg-paper/85 backdrop-blur-sm">
@@ -133,11 +141,26 @@ function FounderNav({
 
         <div className="flex flex-shrink-0 items-center gap-3">
           <Link
+            href="/events"
+            className="hidden text-[12px] font-semibold text-ink-soft transition-colors hover:text-ink lg:inline"
+          >
+            Events
+          </Link>
+          <Link
+            href="/support"
+            className="hidden text-[12px] font-semibold text-ink-soft transition-colors hover:text-ink lg:inline"
+          >
+            Support
+          </Link>
+          <Link
             href="/messages"
             className="hidden text-[12px] font-semibold text-ink-soft transition-colors hover:text-ink lg:inline"
           >
             Messages
           </Link>
+          {planBadge && (
+            <PlanBadge planName={planBadge.name} tone={planBadge.tone} href="/billing?side=founder" />
+          )}
           <NotificationsBell />
           <Link
             href="/welcome?switch=1"

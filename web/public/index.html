@@ -1,1384 +1,1152 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Laelapx — Fundability Intelligence</title>
-<meta name="description" content="Know why investors pass before you pitch. Pre-analyzed deal flow for investors, fundability snapshots for founders.">
+<meta name="description" content="Know why investors pass before you pitch. A Fundability Snapshot for founders — score, gaps, and the investors who already fit. Pre-read deal flow for investors.">
 <meta property="og:title" content="Laelapx — Fundability Intelligence">
-<meta property="og:description" content="Know why before you pitch. Signal over noise for investors.">
+<meta property="og:description" content="Know why before you pitch.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://laelapx.com/">
-<meta property="og:image" content="https://laelapx.com/og.png">
+<meta property="og:url" content="https://www.laelapx.com/">
+<meta property="og:image" content="https://www.laelapx.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Laelapx — Fundability Intelligence">
-<meta name="twitter:description" content="Know why before you pitch. Signal over noise for investors.">
-<meta name="twitter:image" content="https://laelapx.com/og.png">
+<meta name="twitter:description" content="Know why before you pitch.">
+<meta name="twitter:image" content="https://www.laelapx.com/og.png">
+<meta name="theme-color" content="#1C3DAA">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Laelapx",
-  "alternateName": "Laelapx — Fundability Intelligence",
-  "url": "https://laelapx.com",
-  "logo": "https://laelapx.com/og.png",
-  "description": "Fundability intelligence — pre-analyzed deal flow for investors and fundability snapshots for founders.",
-  "email": "hello@laelapx.com"
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Laelapx",
-  "url": "https://laelapx.com"
-}
+{"@context":"https://schema.org","@type":"Organization","name":"Laelapx","alternateName":"Laelapx — Fundability Intelligence","url":"https://www.laelapx.com","logo":"https://www.laelapx.com/og.png","description":"Fundability intelligence — fundability snapshots for founders and pre-read deal flow for investors.","email":"hello@laelapx.com"}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --cobalt:#1C3DAA;
+  --cobalt-deep:#132C82;
+  --cobalt-ink:#0E2266;
+  --cream:#F4E6CC;
+  --cream-2:#EFDDBD;
+  --paper:#FBF4E6;
+  --peach:#F6C9A0;
+  --peach-hi:#FAD7B5;
+  --ink:#14204A;
+  --ink-soft:rgba(20,32,74,.68);
+  --ink-faint:rgba(20,32,74,.45);
+  --rule:rgba(20,32,74,.14);
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --inset:12px;
+  --radius:28px;
+  --pad:clamp(20px,5vw,72px);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img,canvas,svg{display:block}
+::selection{background:var(--peach);color:var(--cobalt-ink)}
+.eyebrow{font:600 11px/1 var(--sans);letter-spacing:.24em;text-transform:uppercase}
+.serif{font-family:var(--serif);font-optical-sizing:auto}
+.wrap{max-width:1240px;margin:0 auto;padding:0 var(--pad)}
 
-:root {
-  --bg: #f7f5f0;
-  --surface: #edeae3;
-  --surface-2: #e2ded6;
-  --navy: #1c2b42;
-  --navy-2: #253d5c;
-  --blue: #2c5ba8;
-  --blue-lt: #4a78cc;
-  --blue-dim: rgba(44,91,168,0.07);
-  --blue-bd: rgba(44,91,168,0.18);
-  --text-1: #191714;
-  --text-2: #5a5650;
-  --text-3: #9a968e;
-  --border: rgba(25,23,20,0.1);
-  --white: #ffffff;
-  --red: #c44040;
-  --red-dim: rgba(196,64,64,0.07);
-  --red-bd: rgba(196,64,64,0.16);
-  --green: #2a9c52;
-  --green-dim: rgba(42,156,82,0.08);
-  --green-bd: rgba(42,156,82,0.2);
-  --amber: #c8871a;
-  --amber-dim: rgba(200,135,26,0.08);
-  --max: 1080px;
-  --pad: clamp(20px, 5vw, 80px);
-  --r: 4px;
-  --r-lg: 10px;
-}
+/* ── Buttons ─────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 24px;border-radius:999px;font:600 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;transition:transform .5s var(--ease),background .3s,color .3s,box-shadow .5s var(--ease);white-space:nowrap}
+.btn .arr{transition:transform .5s var(--ease)}
+.btn:hover .arr{transform:translateX(4px)}
+.btn-peach{background:var(--peach);color:var(--cobalt-ink);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 10px 30px -12px rgba(8,20,70,.55)}
+.btn-peach:hover{background:var(--peach-hi);transform:translateY(-2px)}
+.btn-cobalt{background:var(--cobalt);color:var(--cream)}
+.btn-cobalt:hover{background:var(--cobalt-deep);transform:translateY(-2px)}
+.link-u{display:inline-flex;align-items:center;gap:8px;font:600 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;padding:6px 0;border-bottom:1px solid currentColor;opacity:.92;transition:opacity .3s}
+.link-u:hover{opacity:1}
+.link-u .arr{transition:transform .5s var(--ease)}
+.link-u:hover .arr{transform:translateX(4px)}
 
-html { scroll-behavior: smooth; }
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text-1);
-  -webkit-font-smoothing: antialiased;
-  line-height: 1;
-  overflow-x: hidden;
-}
-a { color: inherit; text-decoration: none; }
+/* ── Nav ─────────────────────────────────────────────── */
+.nav{position:fixed;z-index:50;top:calc(var(--inset) + 10px);left:calc(var(--inset) + 10px);right:calc(var(--inset) + 10px);display:flex;align-items:center;justify-content:space-between;gap:20px;padding:10px 12px 10px 22px;border-radius:999px;color:var(--cream);transition:background .5s var(--ease),color .5s var(--ease),box-shadow .5s var(--ease),backdrop-filter .5s}
+.nav.solid{background:rgba(251,244,230,.95);color:var(--cobalt-ink);box-shadow:0 1px 0 var(--rule),0 18px 40px -28px rgba(14,34,102,.45);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3)}
+.brand{font:600 26px/1 var(--serif);letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.brand i{font-style:normal;color:var(--peach);margin-left:1px}
+/* The Laelapx mark, recoloured to the surrounding ink via its alpha channel. */
+.mark{flex:none;width:32px;height:32px;background:currentColor;-webkit-mask:url(/laelapx-logo.png) center/209% no-repeat;mask:url(/laelapx-logo.png) center/209% no-repeat;transition:transform .9s var(--ease)}
+.brand:hover .mark{transform:rotate(-180deg)}
+.nav.solid .brand i{color:var(--cobalt)}
+.nav-links{display:flex;gap:30px}
+.nav-links a{font:600 11px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;opacity:.82;transition:opacity .3s}
+.nav-links a:hover{opacity:1}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-signin{font:600 11px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;opacity:.82}
+.nav-signin:hover{opacity:1}
+.nav .btn{height:40px;padding:0 18px;font-size:11px}
+.nav.solid .btn-peach{background:var(--cobalt);color:var(--cream);box-shadow:none}
+.menu-btn{display:none;width:40px;height:40px;border-radius:50%;border:1.5px solid currentColor;align-items:center;justify-content:center;background:none;color:inherit;cursor:pointer}
+.menu-btn span{display:block;width:14px;height:1.5px;background:currentColor;box-shadow:0 -4px 0 currentColor,0 4px 0 currentColor}
+.mobile-menu{position:fixed;inset:var(--inset);z-index:49;border-radius:var(--radius);background:var(--cobalt);color:var(--cream);display:flex;flex-direction:column;justify-content:center;gap:22px;padding:40px var(--pad);opacity:0;pointer-events:none;transform:scale(.98);transition:opacity .4s var(--ease),transform .5s var(--ease)}
+.mobile-menu.open{opacity:1;pointer-events:auto;transform:none}
+.mobile-menu a{font:500 38px/1.1 var(--serif)}
+.mobile-menu .btn{align-self:flex-start;margin-top:12px}
 
-/* ─── VIEW SWITCHING ─── */
-body[data-view="founders"] .investor-only { display: none !important; }
-body[data-view="investors"] .founder-only { display: none !important; }
+/* ── Hero ────────────────────────────────────────────── */
+.hero{position:relative;height:250vh}
+.stage{position:sticky;top:0;height:100vh;height:100svh;padding:var(--inset)}
+.stage-inner{position:relative;height:100%;border-radius:var(--radius);overflow:hidden;background:var(--cobalt);isolation:isolate}
+.layer{position:absolute;left:0;top:0;will-change:transform;pointer-events:none}
+.hero-copy{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;text-align:center;padding:clamp(108px,15vh,150px) var(--pad) 0;color:var(--cream);will-change:transform,opacity}
+.hero-copy .eyebrow{opacity:.85;margin-bottom:22px}
+.hero h1{font:600 clamp(50px,8vw,124px)/.9 var(--serif);letter-spacing:-.035em;font-variation-settings:"opsz" 144;text-wrap:balance}
+.hero h1 span{display:block}
+.hero-sub{max-width:460px;margin:26px auto 0;font-size:clamp(15px,1.25vw,17px);line-height:1.55;opacity:.9}
+.hero-ctas{display:flex;align-items:center;gap:28px;margin-top:30px;flex-wrap:wrap;justify-content:center}
+.hero-whisper{position:absolute;z-index:19;left:0;right:0;top:30%;text-align:center;color:var(--cream);padding:0 var(--pad);opacity:0;will-change:transform,opacity;pointer-events:none}
+.hero-whisper p{font:500 clamp(30px,4.4vw,64px)/1.05 var(--serif);letter-spacing:-.02em;max-width:14em;margin:0 auto;text-wrap:balance}
+.hero-whisper p em{font-style:italic;color:var(--peach)}
+.scroll-cue{position:absolute;z-index:21;bottom:26px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--cream);opacity:.8}
+.scroll-cue i{display:block;width:1px;height:42px;background:linear-gradient(var(--cream),transparent);transform-origin:top;animation:cue 2.4s var(--ease) infinite}
+@keyframes cue{0%{transform:scaleY(0)}45%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
 
-/* ─── ANIMATIONS ─── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeLeft {
-  from { opacity: 0; transform: translateX(44px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
+/* ── Ticker ──────────────────────────────────────────── */
+.ticker{overflow:hidden;padding:46px 0 34px;border-bottom:1px solid var(--rule);color:var(--cobalt)}
+.ticker-track{display:flex;gap:56px;width:max-content;will-change:transform}
+.ticker-track span{font:400 clamp(34px,5vw,72px)/1 var(--serif);letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:56px}
+.ticker-track span::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--peach);flex:none}
+.ticker-track span:nth-child(even){font-style:italic}
 
-.hero-label   { animation: fadeUp  0.65s cubic-bezier(.16,1,.3,1) 0.08s both; }
-.hero-h1      { animation: fadeUp  0.8s  cubic-bezier(.16,1,.3,1) 0.24s both; }
-.hero-sub     { animation: fadeUp  0.65s cubic-bezier(.16,1,.3,1) 0.44s both; }
-.hero-actions { animation: fadeUp  0.65s cubic-bezier(.16,1,.3,1) 0.6s  both; }
-.hero-card-col { animation: fadeLeft 0.85s cubic-bezier(.16,1,.3,1) 0.42s both; }
+/* ── Reality ─────────────────────────────────────────── */
+.reality{padding:clamp(100px,16vh,180px) 0}
+.reality-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(40px,7vw,120px);align-items:start}
+.big-stat{font:600 clamp(110px,17vw,250px)/.82 var(--serif);letter-spacing:-.05em;color:var(--cobalt);font-variation-settings:"opsz" 144}
+.stat-cap{margin-top:22px;max-width:300px;color:var(--ink-soft);font-size:15px}
+.stat-src{display:block;margin-top:10px;font-size:12px;color:var(--ink-faint)}
+.reveal-text{font:400 clamp(26px,3vw,42px)/1.22 var(--serif);letter-spacing:-.015em;color:var(--ink)}
+.reveal-text .w{opacity:.14;transition:opacity .25s linear}
+.reveal-text .w.on{opacity:1}
+.reveal-text em{font-style:italic;color:var(--cobalt)}
 
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.65s cubic-bezier(.16,1,.3,1),
-              transform 0.65s cubic-bezier(.16,1,.3,1);
-}
-.reveal.in { opacity: 1; transform: none; }
-.d1 { transition-delay: 0.07s; }
-.d2 { transition-delay: 0.15s; }
-.d3 { transition-delay: 0.23s; }
-.d4 { transition-delay: 0.31s; }
+/* ── Pinned Snapshot ─────────────────────────────────── */
+.snap{position:relative;height:460vh}
+.snap-stage{position:sticky;top:0;height:100vh;height:100svh;padding:var(--inset)}
+.snap-panel{position:relative;height:100%;border-radius:var(--radius);background:var(--cobalt);color:var(--cream);overflow:hidden;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:center;gap:clamp(24px,5vw,80px);padding:clamp(90px,12vh,120px) clamp(24px,6vw,96px) clamp(40px,7vh,72px)}
+.snap-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.snap-left,.snap-right{position:relative;z-index:1}
+.snap-left .eyebrow{color:var(--peach);margin-bottom:26px;display:block}
+.snap-steps{position:relative;min-height:300px}
+.snap-step{position:absolute;inset:0 0 auto 0;opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .8s var(--ease)}
+.snap-step.on{opacity:1;transform:none}
+.snap-step .num{font:500 13px/1 var(--sans);letter-spacing:.2em;opacity:.7}
+.snap-step h3{font:500 clamp(38px,4.6vw,68px)/1 var(--serif);letter-spacing:-.025em;margin:16px 0 18px}
+.snap-step p{max-width:400px;opacity:.86;font-size:16px}
+.snap-dots{display:flex;gap:8px;margin-top:28px}
+.snap-dots i{width:28px;height:3px;border-radius:3px;background:rgba(244,230,204,.25);overflow:hidden;position:relative}
+.snap-dots i b{position:absolute;inset:0;background:var(--peach);transform-origin:left;transform:scaleX(0)}
+/* product card */
+.card{background:var(--paper);color:var(--ink);border-radius:22px;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 40px 80px -30px rgba(5,14,50,.7),0 0 0 1px rgba(14,34,102,.08);padding:clamp(20px,2.4vw,32px);max-width:620px;margin-left:auto;will-change:transform}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--rule)}
+.card-co{display:flex;align-items:center;gap:12px}
+.card-logo{width:38px;height:38px;border-radius:10px;background:var(--cobalt);color:var(--cream);display:grid;place-items:center;font:600 18px/1 var(--serif)}
+.card-co b{display:block;font:600 15px/1.2 var(--sans)}
+.card-co small{display:block;font-size:12px;color:var(--ink-faint)}
+.pill{font:600 10px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;padding:7px 10px;border-radius:999px;background:var(--cream);color:var(--cobalt-ink);white-space:nowrap}
+.card-top{display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,36px);align-items:center;padding:24px 0}
+.dial{position:relative;width:clamp(120px,13vw,164px);aspect-ratio:1}
+.dial svg{width:100%;height:100%;transform:rotate(-90deg)}
+.dial-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dial-num b{font:600 clamp(40px,4.4vw,56px)/1 var(--serif);letter-spacing:-.03em;color:var(--cobalt);font-variant-numeric:tabular-nums}
+.dial-num small{font-size:11px;color:var(--ink-faint);letter-spacing:.08em;margin-top:4px}
+.dial-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.rating{font:600 10px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--cobalt);padding:7px 10px;border-radius:999px;background:var(--cream);opacity:0;transform:translateY(6px);transition:opacity .5s var(--ease),transform .6s var(--ease)}
+.rating.on{opacity:1;transform:none}
+.bars{display:grid;gap:13px}
+.bar-row{display:grid;grid-template-columns:78px 1fr 30px;align-items:center;gap:12px;font-size:13px}
+.bar-row span{color:var(--ink-soft)}
+.bar-row b{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:8px;background:var(--cream);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:8px;background:var(--cobalt);transform-origin:left;transform:scaleX(0)}
+.bar.warn i{background:#D9824A}
+.card-low{position:relative;border-top:1px solid var(--rule);padding-top:18px;min-height:244px}
+.low-pane{position:absolute;inset:18px 0 0 0;opacity:0;transition:opacity .5s var(--ease)}
+.low-pane.on{opacity:1}
+.low-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.low-title b{font:600 11px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint)}
+.low-title small{font-size:12px;color:var(--ink-faint)}
+.row{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;background:#fff;box-shadow:0 0 0 1px var(--rule);margin-bottom:8px;opacity:0;transform:translateX(26px)}
+.row .sev{flex:none;font:700 9px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;padding:6px 8px;border-radius:6px}
+.sev.high{background:#F8DCCB;color:#9A3E12}
+.sev.med{background:#F6E7C2;color:#7A5A10}
+.row .txt{flex:1;min-width:0}
+.row .txt b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .txt small{display:block;font-size:12px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .fit{flex:none;font:600 15px/1 var(--serif);color:var(--cobalt)}
+.row .fit small{font:500 10px/1 var(--sans);color:var(--ink-faint);margin-left:2px}
+.fund-ava{flex:none;width:30px;height:30px;border-radius:50%;background:var(--cream);color:var(--cobalt-ink);display:grid;place-items:center;font:600 13px/1 var(--serif)}
+.sample-note{margin-top:14px;font-size:11px;color:rgba(244,230,204,.6);text-align:right;max-width:620px;margin-left:auto}
 
-/* ─── NAV ─── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 var(--pad); height: 62px;
-  background: var(--navy);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  gap: 20px;
-}
-.nav-logo { font-size: 17px; font-weight: 900; letter-spacing: -0.5px; color: #fff; flex-shrink: 0; }
-.nav-logo span { color: var(--blue-lt); }
+/* ── How it works ────────────────────────────────────── */
+.how{padding:clamp(110px,16vh,180px) 0 clamp(80px,12vh,140px)}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:clamp(48px,7vh,84px);flex-wrap:wrap}
+.sec-head .eyebrow{color:var(--cobalt);display:block;margin-bottom:20px}
+.sec-head h2{font:500 clamp(44px,6vw,92px)/.95 var(--serif);letter-spacing:-.035em;color:var(--cobalt-ink);max-width:11em;text-wrap:balance}
+.sec-head h2 em{font-style:italic;color:var(--cobalt)}
+.sec-head p{max-width:340px;color:var(--ink-soft)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2vw,28px)}
+.step{position:relative;background:var(--cream);border-radius:22px;padding:28px 28px 34px;overflow:hidden;opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1.2s var(--ease)}
+.step.in{opacity:1;transform:none}
+.step:nth-child(2){transition-delay:.12s}
+.step:nth-child(3){transition-delay:.24s}
+.step-art{height:170px;margin:-6px -6px 22px;border-radius:16px;background:var(--cobalt);position:relative;overflow:hidden}
+.step-art canvas{position:absolute;inset:0;transition:transform 1.2s var(--ease)}
+.step:hover .step-art canvas{transform:scale(1.06)}
+.step .n{font:600 11px/1 var(--sans);letter-spacing:.2em;color:var(--cobalt)}
+.step h3{font:500 30px/1.05 var(--serif);letter-spacing:-.02em;margin:12px 0 10px;color:var(--cobalt-ink)}
+.step p{font-size:15px;color:var(--ink-soft)}
 
-/* Audience Toggle */
-.nav-toggle {
-  display: flex; align-items: center;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 40px; padding: 3px;
-  gap: 2px;
-}
-.nav-toggle-btn {
-  font-size: 12px; font-weight: 600; letter-spacing: 0.2px;
-  color: rgba(255,255,255,0.42);
-  padding: 7px 18px; border-radius: 36px;
-  cursor: pointer; border: none; background: transparent;
-  transition: background 0.22s, color 0.22s;
-  white-space: nowrap;
-}
-.nav-toggle-btn.active {
-  background: var(--blue);
-  color: #fff;
-}
-.nav-toggle-btn:hover:not(.active) { color: rgba(255,255,255,0.76); }
+/* ── Investors ───────────────────────────────────────── */
+.inv{padding:0 var(--inset)}
+.inv-panel{position:relative;border-radius:var(--radius);background:var(--cobalt-ink);color:var(--cream);overflow:hidden;padding:clamp(80px,13vh,150px) 0}
+.inv-globe{position:absolute;right:-8vw;top:50%;width:min(64vw,820px);aspect-ratio:1;transform:translateY(-50%);pointer-events:none;opacity:.7}
+.inv-grid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(40px,6vw,96px);align-items:center}
+.inv .eyebrow{color:var(--peach);display:block;margin-bottom:22px}
+.inv h2{font:500 clamp(44px,5.6vw,86px)/.95 var(--serif);letter-spacing:-.035em;text-wrap:balance}
+.inv h2 em{font-style:italic;color:var(--peach)}
+.inv-copy p{margin-top:24px;max-width:440px;opacity:.85}
+.inv-list{margin:30px 0 36px;display:grid;gap:12px;max-width:440px}
+.inv-list li{list-style:none;display:flex;gap:14px;font-size:15px;opacity:.9}
+.inv-list li::before{content:"";flex:none;width:7px;height:7px;margin-top:9px;border-radius:50%;background:var(--peach)}
+.deals{display:grid;gap:14px;max-width:470px;margin-left:auto;width:100%}
+.deal{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:18px;background:#16307F;box-shadow:0 0 0 1px rgba(244,230,204,.14) inset,0 24px 50px -24px rgba(3,10,40,.8);will-change:transform}
+.deal .score{flex:none;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:var(--cream);color:var(--cobalt-ink);font:600 22px/1 var(--serif)}
+.deal .meta{flex:1;min-width:0}
+.deal .meta b{display:block;font-size:15px;font-weight:600}
+.deal .meta small{display:block;font-size:12px;opacity:.65}
+.deal .tag{font:600 10px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;padding:6px 9px;border-radius:999px;background:rgba(246,201,160,.16);color:var(--peach);white-space:nowrap}
+.deal.dim{background:#122868;box-shadow:0 0 0 1px rgba(244,230,204,.1) inset}
+.deal.dim .score{background:rgba(244,230,204,.12);color:rgba(244,230,204,.5)}
+.deal.dim .meta{opacity:.55}
+.deals-foot{font-size:12px;opacity:.6;text-align:right;margin-top:4px}
 
-.nav-right { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
-.nav-cta {
-  font-size: 13px; font-weight: 600; color: #fff;
-  background: var(--blue); padding: 9px 18px; border-radius: var(--r);
-  transition: background 0.2s; white-space: nowrap;
-}
-.nav-cta:hover { background: var(--blue-lt); }
+/* ── Principles ──────────────────────────────────────── */
+.principles{padding:clamp(110px,16vh,180px) 0}
+.pr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--rule)}
+.pr{padding:34px 34px 10px 0;opacity:0;transform:translateY(30px);transition:opacity 1s var(--ease),transform 1.2s var(--ease)}
+.pr+.pr{padding-left:34px;border-left:1px solid var(--rule)}
+.pr.in{opacity:1;transform:none}
+.pr:nth-child(2){transition-delay:.1s}.pr:nth-child(3){transition-delay:.2s}
+.pr .not{font:500 12px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);text-decoration:line-through;text-decoration-color:rgba(20,32,74,.35)}
+.pr h3{font:500 32px/1.05 var(--serif);letter-spacing:-.02em;color:var(--cobalt-ink);margin:16px 0 12px}
+.pr p{color:var(--ink-soft);font-size:15px}
 
-/* ─── HERO ─── */
-.hero {
-  min-height: 100vh;
-  background-color: var(--navy);
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
-  display: grid;
-  align-items: center;
-  padding: 130px var(--pad) 100px;
-  position: relative;
-}
-.hero-inner {
-  max-width: var(--max); margin: 0 auto; width: 100%;
-  display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 72px;
-  align-items: center;
-}
-.hero-inner.wide { grid-template-columns: 1.1fr 0.9fr; }
-.hero-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--blue-lt); margin-bottom: 22px; display: block;
-}
-.hero-h1 {
-  font-size: clamp(48px, 6.5vw, 84px); font-weight: 800; color: #fff;
-  line-height: 1.04; letter-spacing: -2.5px; margin-bottom: 28px;
-}
-.hero-sub {
-  font-size: 18px; font-weight: 400; color: rgba(255,255,255,0.65);
-  line-height: 1.68; max-width: 460px; margin-bottom: 40px;
-}
-.hero-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-.btn-primary {
-  display: inline-flex; align-items: center; gap: 7px;
-  background: var(--blue); color: #fff;
-  font-size: 14px; font-weight: 600;
-  padding: 14px 26px; border-radius: var(--r);
-  transition: background 0.2s, transform 0.15s;
-}
-.btn-primary:hover { background: var(--blue-lt); transform: translateY(-1px); }
-.btn-ghost { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.45); transition: color 0.2s; }
-.btn-ghost:hover { color: rgba(255,255,255,0.85); }
+/* ── Final CTA ───────────────────────────────────────── */
+.final{position:relative;height:170vh}
+.final-stage{position:sticky;top:0;height:100vh;height:100svh;padding:var(--inset)}
+.final-inner{position:relative;height:100%;border-radius:var(--radius);overflow:hidden;background:var(--cobalt);isolation:isolate}
+.final-copy{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;text-align:center;padding:clamp(110px,17vh,170px) var(--pad) 0;color:var(--cream);will-change:transform,opacity}
+.final-copy h2{font:600 clamp(50px,8.4vw,124px)/.9 var(--serif);letter-spacing:-.035em;font-variation-settings:"opsz" 144}
+.final-copy h2 span{display:block}
+.final-copy p{max-width:470px;margin:24px auto 30px;opacity:.88}
 
-/* ─── SNAPSHOT CARD (Founders) ─── */
-.snapshot-card {
-  background: #fff;
-  border-radius: var(--r-lg);
-  padding: 30px;
-  border: 1px solid rgba(0,0,0,0.1);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-}
-.sc-header {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px;
-}
-.sc-title { font-size: 11px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--text-3); }
-.sc-badge {
-  font-size: 11px; font-weight: 600;
-  background: var(--blue-dim); color: var(--blue);
-  padding: 4px 10px; border-radius: 20px; border: 1px solid var(--blue-bd);
-}
-.sc-score-row { display: flex; align-items: center; gap: 22px; margin-bottom: 28px; }
-.sc-gauge {
-  width: 88px; height: 88px; flex-shrink: 0;
-  background: conic-gradient(var(--blue) 0deg 259deg, #e2ded6 259deg 360deg);
-  border-radius: 50%; position: relative;
-}
-.sc-gauge::after {
-  content: '72';
-  position: absolute; inset: 11px;
-  background: #fff; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px;
-}
-.sc-score-info { flex: 1; }
-.sc-score-label { font-size: 20px; font-weight: 800; color: var(--text-1); margin-bottom: 6px; }
-.sc-score-sub { font-size: 12px; color: var(--text-2); line-height: 1.55; }
-.sc-bars { display: flex; flex-direction: column; gap: 11px; margin-bottom: 26px; }
-.sc-bar-row { display: flex; align-items: center; gap: 10px; }
-.sc-bar-label { font-size: 11px; font-weight: 600; color: var(--text-2); width: 68px; flex-shrink: 0; }
-.sc-bar-track { flex: 1; height: 5px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
-.sc-bar-fill { height: 100%; border-radius: 3px; background: var(--blue); width: 0; transition: width 1.1s cubic-bezier(.16,1,.3,1); }
-.sc-bar-fill.low { background: var(--red); }
-.sc-bar-val { font-size: 11px; font-weight: 700; color: var(--text-3); width: 26px; text-align: right; }
-.sc-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-top: 18px; border-top: 1px solid var(--border);
-}
-.sc-investors { font-size: 13px; font-weight: 700; color: var(--text-1); }
-.sc-investors span { color: var(--blue); }
-.sc-gap-tag {
-  font-size: 11px; font-weight: 600;
-  background: var(--red-dim); color: var(--red);
-  padding: 4px 10px; border-radius: 20px; border: 1px solid var(--red-bd);
-}
+/* ── Emblem sign-off ─────────────────────────────────── */
+.emblem{padding:clamp(100px,15vh,170px) 0 clamp(40px,6vh,70px);text-align:center}
+.emblem-art{position:relative;width:min(400px,72vw);aspect-ratio:1;margin:0 auto}
+.emblem-art canvas{position:absolute;inset:0;will-change:transform}
+.emblem-art::after{content:"";position:absolute;inset:-6%;border-radius:50%;border:1px solid var(--rule)}
+.emblem .eyebrow{display:block;color:var(--cobalt);margin-top:44px}
+.emblem p{font:400 clamp(26px,3vw,40px)/1.18 var(--serif);letter-spacing:-.015em;color:var(--cobalt-ink);max-width:17em;margin:18px auto 0;text-wrap:balance}
+.emblem p em{font-style:italic;color:var(--cobalt)}
 
-/* ─── DEAL FLOW VISUAL (Investors) ─── */
-.deal-panel {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: var(--r-lg); padding: 22px;
-}
-.deal-header {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
-}
-.deal-header-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.3); }
-.deal-header-count { font-size: 11px; font-weight: 600; color: var(--blue-lt); }
-.deal-stack { display: flex; flex-direction: column; gap: 10px; }
-.deal-card {
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px; padding: 16px 18px;
-  display: flex; align-items: center; gap: 14px;
-  transition: background 0.2s;
-}
-.deal-card.highlighted { background: rgba(255,255,255,0.1); border-color: rgba(74,120,204,0.4); }
-.deal-score {
-  width: 42px; height: 42px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 800; flex-shrink: 0;
-}
-.deal-score.high { background: var(--green-dim); border: 1.5px solid var(--green-bd); color: var(--green); }
-.deal-score.mid { background: var(--amber-dim); border: 1.5px solid rgba(200,135,26,0.25); color: var(--amber); }
-.deal-info { flex: 1; min-width: 0; }
-.deal-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.88); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.deal-meta { display: flex; gap: 5px; flex-wrap: wrap; }
-.deal-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; padding: 2px 7px; border-radius: 3px; }
-.deal-tag.stage { background: rgba(74,120,204,0.12); color: var(--blue-lt); }
-.deal-tag.sector { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
-.deal-match { text-align: right; flex-shrink: 0; }
-.deal-match-pct { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.65); display: block; margin-bottom: 2px; }
-.deal-match-label { font-size: 10px; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 0.8px; }
-.deal-unmatched {
-  border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; padding: 13px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.deal-unmatched p { font-size: 12px; color: rgba(255,255,255,0.22); font-style: italic; }
-.deal-unmatched span { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.18); text-transform: uppercase; letter-spacing: 1px; }
+/* ── Footer ──────────────────────────────────────────── */
+footer{padding:64px 0 48px}
+.foot{display:flex;justify-content:space-between;align-items:end;gap:32px;flex-wrap:wrap}
+.foot .brand{font-size:44px;color:var(--cobalt-ink)}
+.foot .brand i{color:var(--cobalt)}
+.foot-tag{margin-top:10px;color:var(--ink-faint);font-size:14px}
+.foot-links{display:flex;gap:28px;flex-wrap:wrap}
+.foot-links a{font:600 11px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft)}
+.foot-links a:hover{color:var(--cobalt)}
+.foot-legal{margin-top:40px;padding-top:22px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:12px;color:var(--ink-faint)}
 
-/* ─── SHARED SECTION STYLES ─── */
-.section-eyebrow {
-  font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--blue); margin-bottom: 18px; display: block;
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width:980px){
+  .nav-links,.nav-signin{display:none}
+  .menu-btn{display:inline-flex}
+  .reality-grid,.inv-grid{grid-template-columns:1fr}
+  .steps,.pr-grid{grid-template-columns:1fr}
+  .pr+.pr{padding-left:0;border-left:0;border-top:1px solid var(--rule)}
+  .deals{margin-left:0}
+  .inv-globe{right:-30vw;top:auto;bottom:-20vw;transform:none;width:110vw;opacity:.55}
+  .snap-panel{grid-template-columns:1fr;align-content:center;gap:18px;padding:96px 18px 22px}
+  .snap-steps{min-height:150px}
+  .snap-step h3{font-size:34px;margin:10px 0 8px}
+  .snap-step p{font-size:14px}
+  .snap-dots{display:none}
+  .snap-left .eyebrow{margin-bottom:14px}
+  .card{margin:0 auto;padding:18px}
+  .card-top{padding:16px 0}
+  .card-low{min-height:238px}
+  .sample-note{text-align:center;margin:10px auto 0}
 }
-.section-h2 {
-  font-size: clamp(32px, 4vw, 52px); font-weight: 800;
-  letter-spacing: -1.5px; line-height: 1.1; color: var(--text-1); margin-bottom: 18px;
+@media (max-width:600px){
+  :root{--inset:8px;--radius:22px}
+  .nav{padding:8px 8px 8px 18px}
+  .nav .btn{display:none}
+  .hero-ctas{gap:18px}
+  .bar-row{grid-template-columns:64px 1fr 26px;font-size:12px}
+  .row{padding:9px 10px}
+  .row .txt small{display:none}
+  .card-head .pill{display:none}
+  .scroll-cue{display:none}
+  .card-low{min-height:200px}
+  .row{margin-bottom:6px}
 }
-.section-sub { font-size: 17px; font-weight: 400; color: var(--text-2); line-height: 1.72; max-width: 560px; }
-
-/* ─── STAT ─── */
-.stat-section { padding: 110px var(--pad); background: var(--bg); overflow: hidden; }
-.stat-inner {
-  max-width: var(--max); margin: 0 auto; position: relative;
-  display: grid; grid-template-columns: 1fr 1.3fr; gap: 80px; align-items: center;
-}
-.stat-deco {
-  position: absolute; right: -32px; top: 50%; transform: translateY(-50%);
-  font-size: 220px; font-weight: 900; color: rgba(25,23,20,0.04);
-  letter-spacing: -10px; line-height: 1; pointer-events: none; user-select: none; white-space: nowrap;
-}
-.stat-inner > div { position: relative; z-index: 1; }
-.stat-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 18px; display: block; }
-.stat-number {
-  font-size: clamp(64px, 10vw, 108px); font-weight: 800;
-  color: var(--text-1); letter-spacing: -4px; line-height: 1; margin-bottom: 10px;
-}
-.stat-unit { font-size: 17px; font-weight: 500; color: var(--text-2); margin-bottom: 10px; line-height: 1.5; }
-.stat-source { font-size: 11px; color: var(--text-3); letter-spacing: 0.3px; }
-.stat-body h2 {
-  font-size: clamp(26px, 3.2vw, 40px); font-weight: 800;
-  letter-spacing: -1px; line-height: 1.22; color: var(--text-1); margin-bottom: 22px;
-}
-.stat-body p { font-size: 17px; color: var(--text-2); line-height: 1.72; }
-
-/* ─── PROBLEM (founders: pain cards) ─── */
-.problem-section { padding: 110px var(--pad); background: var(--surface); }
-.problem-inner { max-width: var(--max); margin: 0 auto; }
-.pain-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 56px; }
-.pain-card {
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 28px 24px;
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-.pain-card:hover { border-color: var(--red-bd); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
-.pain-icon {
-  width: 38px; height: 38px; border-radius: var(--r);
-  background: var(--red-dim); border: 1px solid var(--red-bd);
-  display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
-}
-.pain-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--red); }
-.pain-card h3 { font-size: 15px; font-weight: 800; color: var(--text-1); margin-bottom: 10px; }
-.pain-card p { font-size: 14px; color: var(--text-2); line-height: 1.68; }
-
-/* ─── PROBLEM (investors: noise cards) ─── */
-.noise-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 56px; }
-.noise-card {
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 28px 24px;
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-.noise-card:hover { border-color: rgba(136,150,176,0.3); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
-.noise-icon {
-  width: 38px; height: 38px; border-radius: var(--r);
-  background: rgba(154,150,142,0.1); border: 1px solid rgba(154,150,142,0.2);
-  display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
-}
-.noise-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--text-3); }
-.noise-card h3 { font-size: 15px; font-weight: 800; color: var(--text-1); margin-bottom: 10px; }
-.noise-card p { font-size: 14px; color: var(--text-2); line-height: 1.68; }
-
-/* ─── FEATURES ─── */
-.features-section { padding: 120px var(--pad); background: var(--bg); }
-.features-inner { max-width: var(--max); margin: 0 auto; }
-.features-header { margin-bottom: 72px; }
-.features-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 2px; background: var(--border);
-  border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden;
-}
-.feature-card { background: var(--bg); padding: 48px 44px; transition: background 0.2s; }
-.feature-card:hover { background: var(--surface); }
-
-/* Feature CSS icons */
-.fi {
-  width: 44px; height: 44px; margin-bottom: 22px;
-  position: relative;
-  background: var(--blue-dim); border: 1px solid var(--blue-bd);
-  border-radius: var(--r); flex-shrink: 0;
-  display: block;
-}
-/* Score icon — circular gauge ring + center dot */
-.fi-score { border-radius: 50%; }
-.fi-score::before {
-  content: ''; position: absolute; inset: 9px;
-  border-radius: 50%; border: 2px solid var(--blue);
-}
-.fi-score::after {
-  content: ''; position: absolute;
-  bottom: 11px; left: 50%; transform: translateX(-50%);
-  width: 5px; height: 5px; background: var(--blue); border-radius: 50%;
-}
-/* Bar chart icon — three flex columns */
-.fi-bars { display: flex; align-items: flex-end; gap: 3px; padding: 10px 10px 11px; border-radius: var(--r); }
-.fi-bars span { flex: 1; background: var(--blue); border-radius: 1px; display: block; }
-/* Lines icon — horizontal rule stack */
-.fi-lines { display: flex; flex-direction: column; gap: 5px; padding: 12px 11px; justify-content: center; border-radius: var(--r); }
-.fi-lines span { height: 2px; border-radius: 1px; display: block; }
-/* Target icon — concentric rings */
-.fi-target { border-radius: 50%; }
-.fi-target::before {
-  content: ''; position: absolute; inset: 9px;
-  border: 2px solid var(--blue); border-radius: 50%; opacity: 0.45;
-}
-.fi-target::after {
-  content: ''; position: absolute; inset: 17px;
-  background: var(--blue); border-radius: 50%;
-}
-
-.feature-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: block; }
-.feature-card h3 { font-size: 22px; font-weight: 800; color: var(--text-1); letter-spacing: -0.4px; margin-bottom: 14px; }
-.feature-card p { font-size: 16px; color: var(--text-2); line-height: 1.72; }
-
-/* ─── HOW IT WORKS ─── */
-.hiw-section { padding: 120px var(--pad); background: var(--navy); }
-.hiw-inner { max-width: var(--max); margin: 0 auto; }
-.hiw-header { text-align: center; margin-bottom: 72px; }
-.hiw-header .section-eyebrow { color: var(--blue-lt); }
-.hiw-header .section-h2 { color: #fff; }
-.hiw-header .section-sub { color: rgba(255,255,255,0.55); margin: 0 auto; }
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; position: relative; }
-.steps::before {
-  content: ''; position: absolute; top: 48px;
-  left: calc(33.33% + 9px); right: calc(33.33% + 9px);
-  height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.06) 100%);
-  pointer-events: none;
-}
-.step {
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--r); padding: 44px 32px;
-  transition: background 0.2s, border-color 0.2s;
-}
-.step:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.16); }
-.step-num { font-size: 52px; font-weight: 900; color: rgba(255,255,255,0.07); letter-spacing: -2px; line-height: 1; margin-bottom: 20px; }
-.step h3 { font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 12px; }
-.step p { font-size: 15px; color: rgba(255,255,255,0.62); line-height: 1.72; }
-
-/* ─── BEFORE / AFTER (founders) ─── */
-.ba-section { padding: 120px var(--pad); background: var(--bg); }
-.ba-inner { max-width: var(--max); margin: 0 auto; }
-.ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 64px; position: relative; }
-.ba-arrow {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  width: 34px; height: 34px; z-index: 2;
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; color: var(--text-3);
-}
-.ba-col { border-radius: var(--r-lg); padding: 44px; }
-.ba-before { background: var(--surface); border: 1px solid var(--border); }
-.ba-after { background: var(--navy-2); border: 1px solid rgba(255,255,255,0.08); }
-.ba-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-  margin-bottom: 28px; display: block;
-}
-.ba-before .ba-label { color: var(--text-3); }
-.ba-after .ba-label { color: var(--blue-lt); }
-.ba-items { display: flex; flex-direction: column; gap: 15px; }
-.ba-item { display: flex; align-items: flex-start; gap: 13px; }
-.ba-bullet { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
-.ba-before .ba-bullet { background: var(--red); }
-.ba-after .ba-bullet { background: var(--blue-lt); }
-.ba-before .ba-item p { font-size: 15px; color: var(--text-2); line-height: 1.6; }
-.ba-after .ba-item p { font-size: 15px; color: rgba(255,255,255,0.78); line-height: 1.6; }
-
-/* ─── VALUE (investors) ─── */
-.value-section { padding: 120px var(--pad); background: var(--bg); }
-.value-inner { max-width: var(--max); margin: 0 auto; }
-.value-header { margin-bottom: 72px; }
-.value-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.value-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r-lg); padding: 44px 36px; text-align: center;
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-.value-card:hover { border-color: var(--blue-bd); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
-.value-num {
-  font-size: clamp(44px, 5vw, 64px); font-weight: 800;
-  color: var(--blue); letter-spacing: -2.5px; line-height: 1; margin-bottom: 12px;
-}
-.value-label { font-size: 16px; font-weight: 800; color: var(--text-1); margin-bottom: 12px; }
-.value-sub { font-size: 14px; color: var(--text-2); line-height: 1.65; }
-
-/* ─── WHAT WE ARE / CONTRAST ─── */
-.contrast-section { padding: 110px var(--pad); background: var(--surface); }
-.contrast-inner { max-width: var(--max); margin: 0 auto; }
-.contrast-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 56px; }
-.contrast-card {
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 32px 28px;
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-.contrast-card:hover { border-color: var(--blue-bd); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
-.contrast-not {
-  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--text-3); text-decoration: line-through; margin-bottom: 10px; display: block;
-}
-.contrast-is { font-size: 19px; font-weight: 800; color: var(--text-1); margin-bottom: 12px; display: block; }
-.contrast-card p { font-size: 14px; color: var(--text-2); line-height: 1.68; }
-
-/* ─── QUOTES / PROOF ─── */
-.dark-quote-section { padding: 100px var(--pad); background: var(--navy); }
-.dark-quote-inner { max-width: var(--max); margin: 0 auto; }
-.dark-quote-header { text-align: center; margin-bottom: 60px; }
-.dark-quote-header .section-eyebrow { color: var(--blue-lt); }
-.dark-quote-header .section-h2 { color: #fff; }
-.quote-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.quote-card {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--r); padding: 32px 28px;
-}
-.quote-mark { font-size: 36px; font-weight: 800; color: var(--blue-lt); opacity: 0.45; line-height: 1; margin-bottom: 16px; }
-.quote-card p { font-size: 15px; color: rgba(255,255,255,0.78); line-height: 1.7; font-style: italic; margin-bottom: 20px; }
-.quote-attr { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.3); }
-
-/* ─── CTA ─── */
-.cta-section { padding: 130px var(--pad); background: var(--blue); }
-.cta-inner { max-width: var(--max); margin: 0 auto; text-align: center; }
-.cta-rule { width: 40px; height: 2px; background: rgba(255,255,255,0.28); margin: 0 auto 32px; }
-.cta-inner h2 {
-  font-size: clamp(40px, 5.5vw, 72px); font-weight: 800;
-  color: #fff; letter-spacing: -2.5px; line-height: 1.06; margin-bottom: 20px;
-}
-.cta-inner p {
-  font-size: 18px; color: rgba(255,255,255,0.72);
-  line-height: 1.65; margin-bottom: 44px;
-  max-width: 560px; margin-left: auto; margin-right: auto;
-}
-.btn-white {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: #fff; color: var(--blue); font-size: 15px; font-weight: 700;
-  padding: 16px 32px; border-radius: var(--r);
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.btn-white:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(0,0,0,0.2); }
-
-/* ─── FOOTER ─── */
-footer { background: var(--navy); padding: 44px var(--pad); border-top: 1px solid rgba(255,255,255,0.06); }
-.footer-inner { max-width: var(--max); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-.footer-logo { font-size: 16px; font-weight: 900; color: #fff; }
-.footer-logo span { color: var(--blue-lt); }
-.footer-links { display: flex; gap: 28px; }
-.footer-link { font-size: 13px; color: rgba(255,255,255,0.38); transition: color 0.2s; }
-.footer-link:hover { color: rgba(255,255,255,0.76); }
-.footer-copy { font-size: 12px; color: rgba(255,255,255,0.22); }
-
-/* ─── RESPONSIVE ─── */
-@media (max-width: 860px) {
-  nav { gap: 12px; }
-  .nav-toggle-btn { padding: 7px 13px; font-size: 11px; }
-  .hero-inner { grid-template-columns: 1fr; gap: 56px; }
-  .stat-inner { grid-template-columns: 1fr; gap: 44px; }
-  .stat-deco { display: none; }
-  .pain-grid { grid-template-columns: 1fr 1fr; }
-  .noise-grid { grid-template-columns: 1fr 1fr; }
-  .features-grid { grid-template-columns: 1fr; }
-  .steps { grid-template-columns: 1fr; }
-  .steps::before { display: none; }
-  .ba-grid { grid-template-columns: 1fr; }
-  .ba-arrow { display: none; }
-  .value-grid { grid-template-columns: 1fr; }
-  .contrast-grid { grid-template-columns: 1fr 1fr; }
-  .quote-grid { grid-template-columns: 1fr; }
-  .footer-inner { flex-direction: column; gap: 24px; text-align: center; }
-  .footer-links { flex-wrap: wrap; justify-content: center; }
-}
-@media (max-width: 640px) {
-  .nav-toggle { display: none; }
-  .mobile-toggle-bar {
-    display: flex !important;
-    background: var(--navy-2);
-    padding: 12px var(--pad);
-    gap: 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    position: fixed; top: 62px; left: 0; right: 0; z-index: 99;
-  }
-  .hero { padding-top: 160px; }
-}
-@media (max-width: 540px) {
-  .pain-grid { grid-template-columns: 1fr; }
-  .noise-grid { grid-template-columns: 1fr; }
-  .contrast-grid { grid-template-columns: 1fr; }
-}
-
-/* Mobile toggle bar (hidden by default, shown <640px) */
-.mobile-toggle-bar { display: none; }
-.mobile-toggle-btn {
-  flex: 1; padding: 10px; border-radius: var(--r); border: 1px solid rgba(255,255,255,0.12);
-  background: transparent; color: rgba(255,255,255,0.45);
-  font-size: 13px; font-weight: 600; font-family: inherit;
-  cursor: pointer; text-align: center; transition: background 0.2s, color 0.2s;
-}
-.mobile-toggle-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
-
-/* ─── MODAL ─── */
-@keyframes overlayIn  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes modalSlide { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: none; } }
-
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(15,20,30,0.72);
-  backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px;
-  animation: overlayIn 0.2s ease both;
-}
-.modal-overlay.hidden { display: none; }
-
-.modal {
-  background: #fff;
-  border-radius: var(--r-lg);
-  width: 100%; max-width: 520px;
-  box-shadow: 0 24px 80px rgba(0,0,0,0.22);
-  animation: modalSlide 0.28s cubic-bezier(.16,1,.3,1) both;
-  max-height: 90vh; overflow-y: auto;
-}
-
-.modal-head {
-  background: var(--navy);
-  padding: 24px 28px 22px;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
-}
-.modal-head-text {}
-.modal-eyebrow {
-  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-  color: var(--blue-lt); margin-bottom: 6px; display: block;
-}
-.modal-title { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.4px; }
-.modal-close {
-  background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
-  width: 32px; height: 32px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: rgba(255,255,255,0.6); font-size: 16px;
-  transition: background 0.15s, color 0.15s; line-height: 1;
-}
-.modal-close:hover { background: rgba(255,255,255,0.18); color: #fff; }
-
-.modal-body { padding: 28px; }
-
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.form-field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
-.form-field:last-of-type { margin-bottom: 0; }
-.form-label { font-size: 12px; font-weight: 700; color: var(--text-1); letter-spacing: 0.2px; }
-.form-label span { color: var(--red); margin-left: 2px; }
-
-.form-input, .form-select {
-  font-family: inherit; font-size: 14px; font-weight: 400; color: var(--text-1);
-  background: var(--bg); border: 1.5px solid var(--border);
-  border-radius: var(--r); padding: 11px 14px;
-  transition: border-color 0.18s, box-shadow 0.18s;
-  width: 100%; outline: none; appearance: none; -webkit-appearance: none;
-}
-.form-input::placeholder { color: var(--text-3); }
-.form-input:focus, .form-select:focus {
-  border-color: var(--blue); box-shadow: 0 0 0 3px rgba(44,91,168,0.12);
-}
-.form-select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a968e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center;
-  padding-right: 36px; cursor: pointer;
-}
-
-.form-checkbox-group { display: flex; flex-direction: column; gap: 9px; }
-.form-checkbox {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 13px; color: var(--text-2); cursor: pointer;
-}
-.form-checkbox input[type="checkbox"] {
-  width: 16px; height: 16px; border-radius: 3px;
-  border: 1.5px solid var(--border); background: var(--bg);
-  accent-color: var(--blue); cursor: pointer; flex-shrink: 0;
-}
-
-.form-divider { height: 1px; background: var(--border); margin: 20px 0; }
-
-.form-submit {
-  width: 100%; margin-top: 22px;
-  font-family: inherit; font-size: 14px; font-weight: 700; color: #fff;
-  background: var(--blue); border: none; border-radius: var(--r);
-  padding: 14px 24px; cursor: pointer;
-  transition: background 0.18s, transform 0.12s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.form-submit:hover { background: var(--blue-lt); transform: translateY(-1px); }
-.form-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-.form-note {
-  font-size: 11px; color: var(--text-3); text-align: center; margin-top: 14px; line-height: 1.6;
-}
-
-/* Success / Error states */
-.form-success, .form-error { display: none; text-align: center; padding: 40px 24px; }
-.form-success.show, .form-error.show { display: block; }
-.form-fields.hidden { display: none; }
-
-.success-icon {
-  width: 52px; height: 52px; border-radius: 50%;
-  background: var(--green-dim); border: 2px solid var(--green-bd);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 18px; font-size: 22px;
-}
-.form-success h3 { font-size: 20px; font-weight: 800; color: var(--text-1); margin-bottom: 10px; letter-spacing: -0.3px; }
-.form-success p { font-size: 15px; color: var(--text-2); line-height: 1.65; }
-.form-error p { font-size: 14px; color: var(--red); line-height: 1.6; }
-
-@media (max-width: 540px) {
-  .form-row { grid-template-columns: 1fr; }
-  .modal-body { padding: 20px; }
+@media (prefers-reduced-motion:reduce){
+  .scroll-cue i{animation:none}
+  .step,.pr{opacity:1;transform:none;transition:none}
 }
 </style>
 </head>
-<body data-view="founders">
+<body>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">Laelapx<span>.</span></div>
-
-  <div class="nav-toggle" role="tablist" aria-label="Select audience">
-    <button class="nav-toggle-btn active" data-view="founders" role="tab" aria-selected="true">For Founders</button>
-    <button class="nav-toggle-btn" data-view="investors" role="tab" aria-selected="false">For Investors</button>
+<nav class="nav" id="nav" aria-label="Main">
+  <a href="/" class="brand" aria-label="Laelapx home"><span class="mark" aria-hidden="true"></span><span>Laelapx<i>.</i></span></a>
+  <div class="nav-links">
+    <a href="#snapshot">The Snapshot</a>
+    <a href="#how">How it works</a>
+    <a href="#investors">Investors</a>
+    <a href="/pricing">Pricing</a>
   </div>
-
   <div class="nav-right">
-    <a href="#" class="nav-cta founder-only" onclick="openModal('founders');return false;">Get started →</a>
-    <a href="#" class="nav-cta investor-only" onclick="openModal('investors');return false;">Get started →</a>
+    <a href="/handler/sign-in" class="nav-signin">Sign in</a>
+    <a href="/handler/sign-up" class="btn btn-peach">Get your Snapshot <span class="arr">→</span></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><span></span></button>
   </div>
 </nav>
-
-<!-- MOBILE TOGGLE BAR -->
-<div class="mobile-toggle-bar">
-  <button class="mobile-toggle-btn active" data-view="founders">Founders</button>
-  <button class="mobile-toggle-btn" data-view="investors">Investors</button>
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <a href="#snapshot">The Snapshot</a>
+  <a href="#how">How it works</a>
+  <a href="#investors">For investors</a>
+  <a href="/pricing">Pricing</a>
+  <a href="/handler/sign-in">Sign in</a>
+  <a href="/handler/sign-up" class="btn btn-peach">Get your Snapshot <span class="arr">→</span></a>
 </div>
 
-<!-- ═══════════════════════════════════════ -->
-<!-- FOUNDERS VIEW                          -->
-<!-- ═══════════════════════════════════════ -->
+<main>
+<!-- ═══ HERO ═══════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="stage">
+    <div class="stage-inner" id="heroStage">
+      <!-- halftone layers are injected here, back to front -->
+      <div class="hero-copy" id="heroCopy">
+        <span class="eyebrow">Fundability intelligence</span>
+        <h1><span>Know why.</span><span>Before you pitch.</span></h1>
+        <p class="hero-sub">A Fundability Snapshot of your startup — the score, the gaps, and the investors who already fit — before your first cold email.</p>
+        <div class="hero-ctas">
+          <a href="/handler/sign-up" class="btn btn-peach">Get your Snapshot <span class="arr">→</span></a>
+          <a href="#snapshot" class="link-u">See how it reads <span class="arr">→</span></a>
+        </div>
+      </div>
+      <div class="hero-whisper" id="heroWhisper">
+        <p>Most raises don’t fail in the meeting. <em>They fail before it.</em></p>
+      </div>
+      <div class="scroll-cue" id="scrollCue" aria-hidden="true"><span class="eyebrow" style="font-size:10px">Scroll</span><i></i></div>
+    </div>
+  </div>
+</section>
 
-<!-- FOUNDERS HERO -->
-<section class="hero founder-only">
-  <div class="hero-inner">
+<!-- ═══ TICKER ═════════════════════════════════════════ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="ticker"></div>
+</div>
+
+<!-- ═══ REALITY ════════════════════════════════════════ -->
+<section class="reality">
+  <div class="wrap reality-grid">
     <div>
-      <span class="hero-label">Fundability Intelligence</span>
-      <h1 class="hero-h1">Know why<br>before<br>you pitch.</h1>
-      <p class="hero-sub">Upload your deck. Get a Fundability Snapshot — score, gap analysis, deck feedback, and matched investors — before your first cold email.</p>
-      <p class="hero-sub" style="margin-top:14px;font-size:14px"><a href="/snapshot" style="color:var(--blue);font-weight:600;border-bottom:1px solid var(--blue-bd);padding-bottom:2px">See a sample Snapshot →</a></p>
-      <div class="hero-actions">
-        <a href="#" class="btn-primary" onclick="openModal('founders');return false;">Get started →</a>
-        <a href="#how-founders" class="btn-ghost">How it works ↓</a>
-      </div>
+      <div class="big-stat" id="stat">3:44</div>
+      <p class="stat-cap">Average time an investor spends on a pitch deck.<span class="stat-src">DocSend &amp; Harvard Business School, 2021</span></p>
     </div>
-    <div class="hero-card-col">
-      <div class="snapshot-card">
-        <div class="sc-header">
-          <span class="sc-title">Fundability Snapshot</span>
-          <span class="sc-badge">Pre-Pitch</span>
-        </div>
-        <div class="sc-score-row">
-          <div class="sc-gauge"></div>
-          <div class="sc-score-info">
-            <div class="sc-score-label">72 / 100</div>
-            <div class="sc-score-sub">Above average. Two gaps to close before outreach.</div>
+    <p class="reveal-text" id="revealText">You have less than four minutes to make a case that took months to build. Most decks don’t fail because the company is weak — they fail because the signal doesn’t land. Investors rarely tell you why they passed. <em>Laelapx does, before it costs you the meeting.</em></p>
+  </div>
+</section>
+
+<!-- ═══ SNAPSHOT (pinned, scroll-scrubbed) ═════════════ -->
+<section class="snap" id="snapshot">
+  <div class="snap-stage">
+    <div class="snap-panel" id="snapPanel">
+      <canvas class="snap-bg" id="snapBg" aria-hidden="true"></canvas>
+      <div class="snap-left">
+        <span class="eyebrow">The Fundability Snapshot</span>
+        <div class="snap-steps">
+          <div class="snap-step on" data-step="0">
+            <span class="num">01 — Score</span>
+            <h3>One number. Honestly earned.</h3>
+            <p>Your startup is scored against a rubric built for your stage — problem, solution, market, team, traction, go-to-market, and the ask.</p>
+          </div>
+          <div class="snap-step" data-step="1">
+            <span class="num">02 — Signal</span>
+            <h3>See where it’s strong.</h3>
+            <p>Every section gets its own read, so you know which parts of your story carry the round — and which ones are dead weight.</p>
+          </div>
+          <div class="snap-step" data-step="2">
+            <span class="num">03 — Gaps</span>
+            <h3>Know what gets you a pass.</h3>
+            <p>The specific gaps most likely to cost you a meeting, ranked by severity — each with why it matters and what closing it looks like.</p>
+          </div>
+          <div class="snap-step" data-step="3">
+            <span class="num">04 — Fit</span>
+            <h3>Pitch who already fits.</h3>
+            <p>Investors whose stage, sectors, and check size match your round right now — so outreach starts where fit already exists.</p>
           </div>
         </div>
-        <div class="sc-bars">
-          <div class="sc-bar-row">
-            <span class="sc-bar-label">Market</span>
-            <div class="sc-bar-track"><div class="sc-bar-fill" data-w="84%"></div></div>
-            <span class="sc-bar-val">84</span>
+        <div class="snap-dots" aria-hidden="true"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div>
+      </div>
+      <div class="snap-right">
+        <div class="card" id="snapCard" role="img" aria-label="Sample Fundability Snapshot for a fictional company, Northwind Health: score 72 out of 100, above average, with two gaps and matched investors.">
+          <div class="card-head">
+            <div class="card-co"><div class="card-logo">N</div><div><b>Northwind Health</b><small>Seed · Health, AI/ML</small></div></div>
+            <span class="pill">Fundability Snapshot</span>
           </div>
-          <div class="sc-bar-row">
-            <span class="sc-bar-label">Team</span>
-            <div class="sc-bar-track"><div class="sc-bar-fill" data-w="76%"></div></div>
-            <span class="sc-bar-val">76</span>
+          <div class="card-top">
+            <div class="dial-wrap">
+              <div class="dial">
+                <svg viewBox="0 0 120 120" aria-hidden="true">
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="#F4E6CC" stroke-width="9"/>
+                  <circle id="dialArc" cx="60" cy="60" r="52" fill="none" stroke="#1C3DAA" stroke-width="9" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+                </svg>
+                <div class="dial-num"><b id="dialNum">0</b><small>of 100</small></div>
+              </div>
+              <span class="rating" id="rating">Above average</span>
+            </div>
+            <div class="bars">
+              <div class="bar-row"><span>Market</span><div class="bar"><i data-v="84"></i></div><b data-v="84">0</b></div>
+              <div class="bar-row"><span>Team</span><div class="bar"><i data-v="76"></i></div><b data-v="76">0</b></div>
+              <div class="bar-row"><span>Traction</span><div class="bar warn"><i data-v="48"></i></div><b data-v="48">0</b></div>
+              <div class="bar-row"><span>The ask</span><div class="bar"><i data-v="61"></i></div><b data-v="61">0</b></div>
+            </div>
           </div>
-          <div class="sc-bar-row">
-            <span class="sc-bar-label">Traction</span>
-            <div class="sc-bar-track"><div class="sc-bar-fill low" data-w="48%"></div></div>
-            <span class="sc-bar-val">48</span>
-          </div>
-          <div class="sc-bar-row">
-            <span class="sc-bar-label">Financials</span>
-            <div class="sc-bar-track"><div class="sc-bar-fill" data-w="61%"></div></div>
-            <span class="sc-bar-val">61</span>
+          <div class="card-low">
+            <div class="low-pane on" id="paneGaps">
+              <div class="low-title"><b>Gaps to close</b><small>ranked by impact</small></div>
+              <div class="row"><span class="sev high">High</span><div class="txt"><b>Traction: no retention data</b><small>Pilots listed, but nothing shows customers stay.</small></div></div>
+              <div class="row"><span class="sev med">Med</span><div class="txt"><b>Ask: funds not tied to milestones</b><small>Name what this round proves before the next one.</small></div></div>
+              <div class="row"><span class="sev med">Med</span><div class="txt"><b>Market: TAM is top-down only</b><small>Add a bottom-up count of reachable buyers.</small></div></div>
+            </div>
+            <div class="low-pane" id="paneFit">
+              <div class="low-title"><b>Investors who fit</b><small>stage · sector · check size</small></div>
+              <div class="row"><span class="fund-ava">M</span><div class="txt"><b>Meridian Seed Partners</b><small>Seed · Health, AI/ML · $500K–$2M</small></div><span class="fit">92<small>%</small></span></div>
+              <div class="row"><span class="fund-ava">H</span><div class="txt"><b>Harbor Health Fund</b><small>Seed–A · Health · $1M–$4M</small></div><span class="fit">88<small>%</small></span></div>
+              <div class="row"><span class="fund-ava">A</span><div class="txt"><b>Atlas Ventures</b><small>Seed · AI/ML, B2B · $500K–$3M</small></div><span class="fit">81<small>%</small></span></div>
+            </div>
           </div>
         </div>
-        <div class="sc-footer">
-          <div class="sc-investors"><span>14</span> matching investors</div>
-          <div class="sc-gap-tag">2 gaps flagged</div>
-        </div>
+        <p class="sample-note">Sample Snapshot · fictional company and funds</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FOUNDERS STAT -->
-<section class="stat-section founder-only">
-  <div class="stat-inner">
-    <div class="stat-deco" aria-hidden="true">3:44</div>
-    <div class="reveal">
-      <span class="stat-eyebrow">The Reality</span>
-      <div class="stat-number">3:44</div>
-      <div class="stat-unit">Average time investors spend reviewing a pitch deck.</div>
-      <div class="stat-source">DocSend &amp; Harvard Business School, 2021</div>
-    </div>
-    <div class="stat-body reveal d1">
-      <h2>You have less than four minutes to make a case that took months to build.</h2>
-      <p>Most decks fail not because the company is weak — but because the signal doesn't land. Investors aren't wrong to pass. They're reading a document that wasn't designed for how they decide. Laelapx tells you exactly where your signal breaks down, before it costs you a meeting.</p>
-    </div>
-  </div>
-</section>
-
-<!-- FOUNDERS PROBLEM -->
-<section class="problem-section founder-only">
-  <div class="problem-inner">
-    <span class="section-eyebrow reveal">The Pattern</span>
-    <h2 class="section-h2 reveal d1">The silence after<br>the send.</h2>
-    <p class="section-sub reveal d2">Most founders receive no useful feedback after a pass. They optimize the wrong things, repeat the same mistakes, and lose runway they can't recover.</p>
-    <div class="pain-grid">
-      <div class="pain-card reveal d1">
-        <div class="pain-icon"><div class="pain-dot"></div></div>
-        <h3>No feedback loop</h3>
-        <p>Investors rarely explain why they passed. Without that signal, every next pitch is a guess dressed as strategy.</p>
-      </div>
-      <div class="pain-card reveal d2">
-        <div class="pain-icon"><div class="pain-dot"></div></div>
-        <h3>Thesis mismatch</h3>
-        <p>Outreach to investors who don't fund your stage, sector, or geography wastes months of relationship capital.</p>
-      </div>
-      <div class="pain-card reveal d3">
-        <div class="pain-icon"><div class="pain-dot"></div></div>
-        <h3>Deck blind spots</h3>
-        <p>Founders are too close to their story to see how it reads to someone spending three minutes and forty-four seconds on it.</p>
-      </div>
-      <div class="pain-card reveal d4">
-        <div class="pain-icon"><div class="pain-dot"></div></div>
-        <h3>Wrong timing</h3>
-        <p>Pitching before a company is fundable — even by a few months — can permanently close doors that shouldn't have been opened yet.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOUNDERS FEATURES -->
-<section class="features-section founder-only" id="features-founders">
-  <div class="features-inner">
-    <div class="features-header reveal">
-      <span class="section-eyebrow">Your Fundability Snapshot</span>
-      <h2 class="section-h2">Four things investors screen for.<br>Before they open your deck.</h2>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card reveal">
-        <div class="fi fi-score"></div>
-        <span class="feature-num">01 — Score</span>
-        <h3>Fundability Score</h3>
-        <p>A composite score across market, team, traction, and financial signals. Not an opinion — a structured read of where your company stands relative to what investors fund at your stage.</p>
-      </div>
-      <div class="feature-card reveal d1">
-        <div class="fi fi-bars">
-          <span style="height:55%"></span>
-          <span style="height:100%"></span>
-          <span style="height:38%;opacity:0.35"></span>
-        </div>
-        <span class="feature-num">02 — Analysis</span>
-        <h3>Gap Analysis</h3>
-        <p>Specific gaps that are likely to cause a pass, ranked by impact. Each gap includes what's missing, why it matters to investors, and what closing it actually looks like.</p>
-      </div>
-      <div class="feature-card reveal d2">
-        <div class="fi fi-lines">
-          <span style="width:100%;background:var(--blue)"></span>
-          <span style="width:78%;background:var(--blue);opacity:0.65"></span>
-          <span style="width:55%;background:var(--red);opacity:0.55"></span>
-          <span style="width:85%;background:var(--blue);opacity:0.55"></span>
-        </div>
-        <span class="feature-num">03 — Feedback</span>
-        <h3>Deck Review</h3>
-        <p>Slide-by-slide feedback on narrative, clarity, and signal density. We surface what an investor reads, what they skip, and where your story loses them.</p>
-      </div>
-      <div class="feature-card reveal d3">
-        <div class="fi fi-target"></div>
-        <span class="feature-num">04 — Match</span>
-        <h3>Investor Match List</h3>
-        <p>A curated list of investors whose thesis, stage focus, and portfolio align with your company right now — so outreach starts where fit already exists.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOUNDERS HOW IT WORKS -->
-<section class="hiw-section founder-only" id="how-founders">
-  <div class="hiw-inner">
-    <div class="hiw-header reveal">
-      <span class="section-eyebrow">How It Works</span>
-      <h2 class="section-h2">Three steps.</h2>
-      <p class="section-sub">No meetings. No calls. Upload your deck and get your Snapshot.</p>
+<!-- ═══ HOW IT WORKS ═══════════════════════════════════ -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">How it works</span><h2>Three steps. <em>No warm intro.</em></h2></div>
+      <p>No calls, no coaching sessions. Tell us about your company once, and get a read on it the way an investor would take it. Your score, your biggest gap, and investor matches are free. Every gap with its fix, and the full report, come with <a href="/pricing" style="color:var(--cobalt);border-bottom:1px solid currentColor">Founder+ and Laelapx+</a>.</p>
     </div>
     <div class="steps">
-      <div class="step reveal">
-        <div class="step-num">01</div>
-        <h3>Upload your deck</h3>
-        <p>Submit your current pitch deck — PDF or link. We don't ask for personal information or financials beyond what's already in the deck.</p>
-      </div>
-      <div class="step reveal d1">
-        <div class="step-num">02</div>
-        <h3>We analyze it</h3>
-        <p>Your deck is evaluated against the signals investors actually screen for — at your stage, in your sector, against current market conditions.</p>
-      </div>
-      <div class="step reveal d2">
-        <div class="step-num">03</div>
-        <h3>Get your Snapshot</h3>
-        <p>Receive your Fundability Score, gap analysis, deck feedback, and matched investor list — before your first outreach.</p>
-      </div>
-    </div>
-    <div class="reveal d3" style="text-align:center;margin-top:36px">
-      <a href="/snapshot" class="btn-ghost">See a sample Snapshot →</a>
+      <article class="step"><div class="step-art"><canvas data-art="doc"></canvas></div><span class="n">01</span><h3>Submit your startup</h3><p>The problem, the product, the market, the team, and the round — plus a link to your deck. Six short sections.</p></article>
+      <article class="step"><div class="step-art"><canvas data-art="dial"></canvas></div><span class="n">02</span><h3>Get your Snapshot</h3><p>Your score, section by section, with the gaps ranked and a concrete fix for each one. Edit and re-score as you improve.</p></article>
+      <article class="step"><div class="step-art"><canvas data-art="peak"></canvas></div><span class="n">03</span><h3>Pitch who fits</h3><p>Matched investors on Laelapx, plus outside funds worth applying to. Investors who fit can find you too.</p></article>
     </div>
   </div>
 </section>
 
-<!-- FOUNDERS BEFORE / AFTER -->
-<section class="ba-section founder-only">
-  <div class="ba-inner">
-    <span class="section-eyebrow reveal">The Difference</span>
-    <h2 class="section-h2 reveal d1">Before and after.</h2>
-    <div class="ba-grid">
-      <div class="ba-arrow" aria-hidden="true">→</div>
-      <div class="ba-col ba-before reveal">
-        <span class="ba-label">Without Laelapx</span>
-        <div class="ba-items">
-          <div class="ba-item"><div class="ba-bullet"></div><p>Cold outreach to investors with misaligned thesis</p></div>
-          <div class="ba-item"><div class="ba-bullet"></div><p>No feedback after a pass — just silence</p></div>
-          <div class="ba-item"><div class="ba-bullet"></div><p>Months spent fixing the wrong things</p></div>
-          <div class="ba-item"><div class="ba-bullet"></div><p>Pitching before you're ready — burning bridges</p></div>
-          <div class="ba-item"><div class="ba-bullet"></div><p>Deck optimized for what founders think investors want</p></div>
+<!-- ═══ INVESTORS ══════════════════════════════════════ -->
+<section class="inv" id="investors">
+  <div class="inv-panel">
+    <canvas class="inv-globe" id="invGlobe" aria-hidden="true"></canvas>
+    <div class="wrap inv-grid">
+      <div class="inv-copy">
+        <span class="eyebrow">For investors</span>
+        <h2>Deal flow that’s <em>already been read.</em></h2>
+        <p>Every founder you see on Laelapx has been scored, mapped to your thesis, and has agreed to be contacted. The first screen is done before you open the profile.</p>
+        <ul class="inv-list">
+          <li>Ranked by fit with your stages, sectors, and check size</li>
+          <li>Only complete profiles above the score threshold reach you</li>
+          <li>Gaps surfaced up front — no hunting through a deck</li>
+        </ul>
+        <a href="/handler/sign-up" class="btn btn-peach">Start a free 60-day pilot <span class="arr">→</span></a>
+      </div>
+      <div>
+        <div class="deals" id="deals">
+          <div class="deal"><span class="score">91</span><div class="meta"><b>Infrastructure AI</b><small>Series A · DevTools</small></div><span class="tag">97% fit</span></div>
+          <div class="deal"><span class="score">84</span><div class="meta"><b>B2B fintech platform</b><small>Seed · Fintech</small></div><span class="tag">88% fit</span></div>
+          <div class="deal"><span class="score">78</span><div class="meta"><b>Climate data</b><small>Pre-Seed · Climate</small></div><span class="tag">74% fit</span></div>
+          <div class="deal dim"><span class="score">—</span><div class="meta"><b>Off-thesis &amp; below threshold</b><small>Filtered before it reaches you</small></div></div>
         </div>
-      </div>
-      <div class="ba-col ba-after reveal d1">
-        <span class="ba-label">With Laelapx</span>
-        <div class="ba-items">
-          <div class="ba-item"><div class="ba-bullet"></div><p>Outreach to investors already aligned to your company</p></div>
-          <div class="ba-item"><div class="ba-bullet"></div><p>Know your gaps before they become a pass</p></div>
-          <div class="ba-item"><div class="ba-bullet"></div><p>Fix what matters — in the order it matters</p></div>
-          <div class="ba-item"><div class="ba-bullet"></div><p>Pitch when your Snapshot says you're ready</p></div>
-          <div class="ba-item"><div class="ba-bullet"></div><p>Deck built around how investors actually decide</p></div>
-        </div>
+        <p class="deals-foot">Illustrative example</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FOUNDERS CONTRAST -->
-<section class="contrast-section founder-only">
-  <div class="contrast-inner">
-    <span class="section-eyebrow reveal">What We Are</span>
-    <h2 class="section-h2 reveal d1">Not access. Intelligence.</h2>
-    <div class="contrast-grid">
-      <div class="contrast-card reveal d1">
-        <span class="contrast-not">Pitch coach</span>
-        <span class="contrast-is">Objective analysis</span>
-        <p>We don't tell you what to say. We tell you what's working and what isn't — based on how your deck reads, not how it sounds in a room.</p>
-      </div>
-      <div class="contrast-card reveal d2">
-        <span class="contrast-not">Investor database</span>
-        <span class="contrast-is">Thesis-matched outreach</span>
-        <p>We don't give you a list of emails. We surface investors whose documented thesis, stage focus, and portfolio fit your company right now.</p>
-      </div>
-      <div class="contrast-card reveal d3">
-        <span class="contrast-not">A guarantee</span>
-        <span class="contrast-is">Honest intelligence</span>
-        <p>We don't promise funding. We give you an honest read of where you stand — so you can decide whether to pitch, fix, or wait.</p>
-      </div>
+<!-- ═══ PRINCIPLES ═════════════════════════════════════ -->
+<section class="principles">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow" style="color:var(--cobalt)">What we are</span><h2>Not access. <em>Intelligence.</em></h2></div>
+    </div>
+    <div class="pr-grid">
+      <div class="pr"><span class="not">A pitch coach</span><h3>An objective read</h3><p>We don’t tell you what to say. We show you what’s landing and what isn’t, against what investors at your stage screen for.</p></div>
+      <div class="pr"><span class="not">An email list</span><h3>Thesis-matched fit</h3><p>Not a spreadsheet of inboxes. Investors whose stage, sectors, and check size fit your company right now.</p></div>
+      <div class="pr"><span class="not">A guarantee</span><h3>Honest intelligence</h3><p>We don’t promise funding. We tell you where you stand, so you can decide whether to pitch, fix, or wait.</p></div>
     </div>
   </div>
 </section>
 
-<!-- FOUNDERS CTA -->
-<section class="cta-section founder-only" id="access">
-  <div class="cta-inner reveal">
-    <div class="cta-rule"></div>
-    <h2>Stop guessing.<br>Start knowing.</h2>
-    <p>Submit your startup. Get your Fundability Snapshot — score, gap analysis, and matched investors — and walk into your next conversation with a clear picture of where you stand.</p>
-    <a href="#" class="btn-white" onclick="openModal('founders');return false;">Get started →</a>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════ -->
-<!-- INVESTORS VIEW                         -->
-<!-- ═══════════════════════════════════════ -->
-
-<!-- INVESTORS HERO -->
-<section class="hero investor-only">
-  <div class="hero-inner wide">
-    <div>
-      <span class="hero-label">For Investors</span>
-      <h1 class="hero-h1">Deal flow<br>that's already<br>been vetted.</h1>
-      <p class="hero-sub">Laelapx pre-analyzes inbound before it reaches you. Thesis-aligned. Scored. Gaps already surfaced — so the work of a first screen is done before you open the deck.</p>
-      <div class="hero-actions">
-        <a href="#" class="btn-primary" onclick="openModal('investors');return false;">Get started →</a>
-        <a href="#how-investors" class="btn-ghost">How it works ↓</a>
-      </div>
-    </div>
-    <div class="hero-card-col">
-      <div class="deal-panel">
-        <div class="deal-header">
-          <span class="deal-header-label">Incoming Deal Flow</span>
-          <span class="deal-header-count">3 thesis-matched</span>
-        </div>
-        <div class="deal-stack">
-          <div class="deal-card highlighted">
-            <div class="deal-score high">91</div>
-            <div class="deal-info">
-              <div class="deal-name">Infrastructure AI — Series A</div>
-              <div class="deal-meta">
-                <span class="deal-tag stage">Series A</span>
-                <span class="deal-tag sector">Enterprise SaaS</span>
-              </div>
-            </div>
-            <div class="deal-match">
-              <span class="deal-match-pct">97%</span>
-              <span class="deal-match-label">Thesis fit</span>
-            </div>
-          </div>
-          <div class="deal-card">
-            <div class="deal-score high">84</div>
-            <div class="deal-info">
-              <div class="deal-name">B2B Fintech Platform</div>
-              <div class="deal-meta">
-                <span class="deal-tag stage">Seed</span>
-                <span class="deal-tag sector">Fintech</span>
-              </div>
-            </div>
-            <div class="deal-match">
-              <span class="deal-match-pct">88%</span>
-              <span class="deal-match-label">Thesis fit</span>
-            </div>
-          </div>
-          <div class="deal-card">
-            <div class="deal-score mid">68</div>
-            <div class="deal-info">
-              <div class="deal-name">Climate Data — Pre-Seed</div>
-              <div class="deal-meta">
-                <span class="deal-tag stage">Pre-Seed</span>
-                <span class="deal-tag sector">Climate</span>
-              </div>
-            </div>
-            <div class="deal-match">
-              <span class="deal-match-pct">74%</span>
-              <span class="deal-match-label">Thesis fit</span>
-            </div>
-          </div>
-          <div class="deal-unmatched">
-            <p>14 decks filtered — off-thesis or below score threshold</p>
-            <span>Hidden</span>
-          </div>
+<!-- ═══ FINAL CTA ══════════════════════════════════════ -->
+<section class="final" id="final">
+  <div class="final-stage">
+    <div class="final-inner" id="finalStage">
+      <div class="final-copy" id="finalCopy">
+        <span class="eyebrow" style="opacity:.85;margin-bottom:22px">Your raise starts here</span>
+        <h2><span>Stop guessing.</span><span>Start knowing.</span></h2>
+        <p>Get your Fundability Snapshot and walk into your next conversation knowing exactly where you stand.</p>
+        <div class="hero-ctas" style="margin-top:0">
+          <a href="/handler/sign-up" class="btn btn-peach">Get your Snapshot <span class="arr">→</span></a>
+          <a href="/pricing" class="link-u">See pricing <span class="arr">→</span></a>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- INVESTORS PROBLEM -->
-<section class="problem-section investor-only">
-  <div class="problem-inner">
-    <span class="section-eyebrow reveal">The Problem</span>
-    <h2 class="section-h2 reveal d1">Most inbound<br>is noise.</h2>
-    <p class="section-sub reveal d2">The volume of cold deal flow has increased. The quality hasn't. Every hour spent on unqualified inbound is an hour not spent on the deals that matter.</p>
-    <div class="noise-grid">
-      <div class="noise-card reveal d1">
-        <div class="noise-icon"><div class="noise-dot"></div></div>
-        <h3>Off-thesis</h3>
-        <p>Founders who haven't researched your portfolio, stage focus, or sector reach you first. The right ones come later, if at all.</p>
-      </div>
-      <div class="noise-card reveal d2">
-        <div class="noise-icon"><div class="noise-dot"></div></div>
-        <h3>Wrong stage</h3>
-        <p>Stage mismatch generates more avoidable screening conversations than any other factor. Pre-revenue pitching Series A. Bootstrapped seeking institutional.</p>
-      </div>
-      <div class="noise-card reveal d3">
-        <div class="noise-icon"><div class="noise-dot"></div></div>
-        <h3>Unreadable decks</h3>
-        <p>No clear unit economics, no market sizing, no narrative structure. The information you need to decide isn't there — or isn't findable.</p>
-      </div>
-      <div class="noise-card reveal d4">
-        <div class="noise-icon"><div class="noise-dot"></div></div>
-        <h3>Repeated outreach</h3>
-        <p>The same founder, same deck, three different email addresses. No updates, no new signal — persistence confused for progress.</p>
-      </div>
-    </div>
-  </div>
+<!-- ═══ EMBLEM ═════════════════════════════════════════ -->
+<section class="emblem" aria-label="About the name">
+  <div class="emblem-art"><canvas id="emblem" aria-hidden="true"></canvas></div>
+  <span class="eyebrow">Why Laelapx</span>
+  <p>Named for Laelaps, the hound of Greek myth <em>that always caught what it chased.</em></p>
 </section>
+</main>
 
-<!-- INVESTORS FEATURES -->
-<section class="features-section investor-only" id="features-investors">
-  <div class="features-inner">
-    <div class="features-header reveal">
-      <span class="section-eyebrow">What Laelapx Delivers</span>
-      <h2 class="section-h2">Pre-analyzed deal flow.<br>On your criteria.</h2>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card reveal">
-        <div class="fi fi-score"></div>
-        <span class="feature-num">01 — Score</span>
-        <h3>Fundability Score</h3>
-        <p>Every deck is scored across market, team, traction, and financial signals before it's matched to any investor. You see a number, not a narrative.</p>
-      </div>
-      <div class="feature-card reveal d1">
-        <div class="fi fi-target"></div>
-        <span class="feature-num">02 — Match</span>
-        <h3>Thesis Alignment</h3>
-        <p>We map your documented thesis — stage, sector, geography, check size — and surface only the companies that fit it. You define the filter once. We apply it continuously.</p>
-      </div>
-      <div class="feature-card reveal d2">
-        <div class="fi fi-bars">
-          <span style="height:55%"></span>
-          <span style="height:100%"></span>
-          <span style="height:38%;opacity:0.35"></span>
-        </div>
-        <span class="feature-num">03 — Analysis</span>
-        <h3>Gap Summary</h3>
-        <p>Each deal arrives with a pre-written gap analysis: what's strong, what's missing, and what questions you'd want answered in a first meeting — already identified.</p>
-      </div>
-      <div class="feature-card reveal d3">
-        <div class="fi fi-lines">
-          <span style="width:100%;background:var(--blue)"></span>
-          <span style="width:78%;background:var(--blue);opacity:0.65"></span>
-          <span style="width:55%;background:var(--blue);opacity:0.35"></span>
-          <span style="width:85%;background:var(--blue);opacity:0.55"></span>
-        </div>
-        <span class="feature-num">04 — Signal</span>
-        <h3>Deck Quality Read</h3>
-        <p>We flag where the narrative is unclear, where financials are missing, and where founders actually understand their business versus where they've been coached.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- INVESTORS HOW IT WORKS -->
-<section class="hiw-section investor-only" id="how-investors">
-  <div class="hiw-inner">
-    <div class="hiw-header reveal">
-      <span class="section-eyebrow">How It Works</span>
-      <h2 class="section-h2">Define your thesis once.<br>Receive only what fits.</h2>
-      <p class="section-sub">Share your criteria. We handle the filtering, scoring, and matching — continuously, against every new deck submitted to the platform.</p>
-    </div>
-    <div class="steps">
-      <div class="step reveal">
-        <div class="step-num">01</div>
-        <h3>Share your thesis</h3>
-        <p>Tell us your stage, sector focus, geography, and check size. We use this to build your match profile — applied to every incoming deck.</p>
-      </div>
-      <div class="step reveal d1">
-        <div class="step-num">02</div>
-        <h3>Founders get matched</h3>
-        <p>Founders who submit decks are matched to investors based on thesis fit and fundability score. Off-thesis deals never reach your inbox.</p>
-      </div>
-      <div class="step reveal d2">
-        <div class="step-num">03</div>
-        <h3>You receive signal</h3>
-        <p>Matched deals arrive pre-scored and pre-analyzed. You see what we saw, decide in minutes, and request a meeting only if the signal is there.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- INVESTORS VALUE -->
-<section class="value-section investor-only">
-  <div class="value-inner">
-    <div class="value-header reveal">
-      <span class="section-eyebrow">The Outcome</span>
-      <h2 class="section-h2">Less time screening.<br>More time deciding.</h2>
-    </div>
-    <div class="value-grid">
-      <div class="value-card reveal d1">
-        <div class="value-num">0</div>
-        <div class="value-label">Off-thesis decks in your inbox</div>
-        <div class="value-sub">Every deal that reaches you has already been matched to your documented thesis — not filtered by a human, by your own criteria.</div>
-      </div>
-      <div class="value-card reveal d2">
-        <div class="value-num" style="font-size:clamp(26px,3vw,38px);padding-top:14px;letter-spacing:-1px;line-height:1.2">Already<br>done</div>
-        <div class="value-label">Analyzed before you read it</div>
-        <div class="value-sub">Score, gap summary, and deck quality read are waiting when you open the deal. The work of a first screen is already complete.</div>
-      </div>
-      <div class="value-card reveal d3">
-        <div class="value-num">1×</div>
-        <div class="value-label">Setup. Continuous filter.</div>
-        <div class="value-sub">Define your thesis once. Every new deck submitted to the platform is evaluated against it automatically — no recurring effort required.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- INVESTORS CONTRAST -->
-<section class="contrast-section investor-only">
-  <div class="contrast-inner">
-    <span class="section-eyebrow reveal">What We Are</span>
-    <h2 class="section-h2 reveal d1">A filter, not a funnel.</h2>
-    <div class="contrast-grid">
-      <div class="contrast-card reveal d1">
-        <span class="contrast-not">Deal sourcing tool</span>
-        <span class="contrast-is">Inbound filter</span>
-        <p>We don't go find deals for you. We make the deals that find you worth reviewing — by ensuring only thesis-matched, scored companies reach your inbox.</p>
-      </div>
-      <div class="contrast-card reveal d2">
-        <span class="contrast-not">Warm intro service</span>
-        <span class="contrast-is">Pre-analyzed inbound</span>
-        <p>We don't replace relationships. We fix cold inbound — the part of deal flow that costs the most time and produces the least signal.</p>
-      </div>
-      <div class="contrast-card reveal d3">
-        <span class="contrast-not">Another database</span>
-        <span class="contrast-is">Active matching</span>
-        <p>We don't show you a searchable list. We match founders to your specific thesis in real time, as decks are submitted — not when you go looking.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- INVESTORS CTA -->
-<section class="cta-section investor-only" id="partner">
-  <div class="cta-inner reveal">
-    <div class="cta-rule"></div>
-    <h2>Less noise.<br>Better signal.</h2>
-    <p>Define your thesis once. Off-thesis startups never reach your inbox. Pre-analyzed inbound — for the rest of your fund's life.</p>
-    <a href="#" class="btn-white" onclick="openModal('investors');return false;">Get started →</a>
-  </div>
-</section>
-
-<!-- (Modal markup deleted — every CTA on this page now navigates to the
-     app's Stack Auth sign-up via the redirect in the script block below.) -->
-
-<!-- ═══════════════════════════════════════ -->
-<!-- SHARED FOOTER                          -->
-<!-- ═══════════════════════════════════════ -->
 <footer>
-  <div class="footer-inner">
-    <div class="footer-logo">Laelapx<span>.</span></div>
-    <div class="footer-links founder-only">
-      <a href="#features-founders" class="footer-link">Features</a>
-      <a href="#how-founders" class="footer-link">How It Works</a>
-      <a href="/privacy" class="footer-link">Privacy</a>
-      <a href="/terms" class="footer-link">Terms</a>
-      <a href="mailto:hello@laelapx.com" class="footer-link">Contact</a>
+  <div class="wrap">
+    <div class="foot">
+      <div><a href="/" class="brand"><span class="mark" aria-hidden="true" style="width:44px;height:44px"></span><span>Laelapx<i>.</i></span></a><p class="foot-tag">Fundability intelligence for founders and investors.</p></div>
+      <div class="foot-links">
+        <a href="/founders">Founders</a><a href="/investors">Investors</a><a href="/pricing">Pricing</a><a href="/snapshot">Sample</a><a href="mailto:hello@laelapx.com">Contact</a>
+      </div>
     </div>
-    <div class="footer-links investor-only">
-      <a href="#features-investors" class="footer-link">Features</a>
-      <a href="#how-investors" class="footer-link">How It Works</a>
-      <a href="/privacy" class="footer-link">Privacy</a>
-      <a href="/terms" class="footer-link">Terms</a>
-      <a href="mailto:investors@laelapx.com" class="footer-link">Contact</a>
-    </div>
-    <div class="footer-copy">© 2026 Laelapx.</div>
+    <div class="foot-legal"><span>© 2026 Laelapx</span><span><a href="/privacy">Privacy</a> &nbsp;·&nbsp; <a href="/terms">Terms</a></span></div>
   </div>
 </footer>
 
+<script src="/vendor/lenis-1.3.23.min.js"></script>
 <script>
-/* ─── AUTH REDIRECT ───
-   Marketing + app are served from the same Next.js project, so every CTA
-   navigates relatively to the auth handler. Both founder and investor land
-   on /welcome which forwards them based on their saved role.
-*/
-function openModal(/* type */) {
-  window.location.href = '/handler/sign-up';
+(() => {
+"use strict";
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const CREAM = "#F4E6CC", COBALT = "#1C3DAA", INK = "#0E2266";
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = (t) => 1 - Math.pow(1 - clamp(t), 3);
+const range = (p, a, b) => clamp((p - a) / (b - a));
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+
+/* ─── Noise (value noise + fbm) ─────────────────────────────── */
+function hash(ix, iy, s) {
+  let h = Math.imul(ix, 374761393) ^ Math.imul(iy, 668265263) ^ Math.imul(s, 2246822519);
+  h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
 }
+function vnoise(x, y, s) {
+  const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
+  const u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+  const a = hash(ix, iy, s), b = hash(ix + 1, iy, s), c = hash(ix, iy + 1, s), d = hash(ix + 1, iy + 1, s);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+function fbm(x, y, s = 1, oct = 4) {
+  let sum = 0, amp = 0.5, f = 1, norm = 0;
+  for (let i = 0; i < oct; i++) { sum += amp * vnoise(x * f, y * f, s + i * 31); norm += amp; amp *= 0.5; f *= 2.03; }
+  return sum / norm;
+}
+function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const gauss = (x, c, w) => Math.exp(-((x - c) / w) * ((x - c) / w));
 
-/* ─── VIEW SWITCHING ─── */
-function setView(view) {
-  const body = document.body;
-  const prev = body.dataset.view;
-  if (prev === view) return;
-
-  body.dataset.view = view;
-
-  // Update URL hash silently
-  history.replaceState(null, '', '#' + view);
-
-  // Update all toggle buttons
-  document.querySelectorAll('[data-view]').forEach(btn => {
-    if (btn === body) return;
-    btn.classList.toggle('active', btn.dataset.view === view);
-    if (btn.getAttribute('role') === 'tab') {
-      btn.setAttribute('aria-selected', btn.dataset.view === view);
+/* ─── Halftone renderer ────────────────────────────────────── */
+// Samples a density function on a hex grid and draws cream dots whose area
+// tracks density. An optional backing silhouette (in the background colour)
+// makes a layer occlude the layers behind it.
+function halftone(canvas, w, h, spacing, density, opts = {}) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+  canvas.style.width = w + "px"; canvas.style.height = h + "px";
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  if (opts.backing) { ctx.fillStyle = opts.bg || COBALT; ctx.beginPath(); opts.backing(ctx); ctx.fill(); }
+  ctx.fillStyle = opts.color || CREAM;
+  ctx.beginPath();
+  const rowH = spacing * 0.866, rMax = spacing * (opts.dot || 0.6);
+  for (let j = 0, y = 0; y < h + spacing; j++, y += rowH) {
+    for (let x = (j & 1) ? spacing / 2 : 0; x < w + spacing; x += spacing) {
+      let d = density(x, y);
+      if (!(d > 0.035)) continue;
+      if (d > 1) d = 1;
+      const r = rMax * Math.sqrt(d);
+      ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.2832);
     }
-  });
-
-  // Scroll to top
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  // Re-run reveal for newly visible elements
-  setTimeout(() => {
-    document.querySelectorAll('.reveal:not(.in)').forEach(el => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight - 40) el.classList.add('in');
-    });
-    // Re-trigger bar animation if switching to founders
-    if (view === 'founders') triggerBars();
-    // Re-trigger deal stagger if switching to investors
-    if (view === 'investors') staggerDeals();
-  }, 100);
-}
-
-// Attach toggle buttons
-document.querySelectorAll('.nav-toggle-btn, .mobile-toggle-btn').forEach(btn => {
-  btn.addEventListener('click', () => setView(btn.dataset.view));
-});
-
-// Init from URL hash
-const hash = location.hash.replace('#', '');
-if (hash === 'investors' || hash === 'founders') setView(hash);
-
-// Auto-open modal from ?modal=founders|investors
-const modalParam = new URLSearchParams(location.search).get('modal');
-if (modalParam === 'founders' || modalParam === 'investors') {
-  setView(modalParam);
-  setTimeout(() => openModal(modalParam), 250);
-  history.replaceState(null, '', location.pathname + '#' + modalParam);
-}
-
-/* ─── SCROLL REVEAL ─── */
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
-}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-/* ─── BAR ANIMATION ─── */
-function triggerBars() {
-  const card = document.querySelector('.snapshot-card');
-  if (!card) return;
-  card.querySelectorAll('.sc-bar-fill[data-w]').forEach((bar, i) => {
-    bar.style.width = '0';
-    setTimeout(() => { bar.style.width = bar.dataset.w; }, 400 + i * 80);
-  });
-}
-
-// Fire on page load if founders card is visible
-window.addEventListener('load', () => {
-  const card = document.querySelector('.snapshot-card');
-  if (card) {
-    const rect = card.getBoundingClientRect();
-    if (rect.top < window.innerHeight) triggerBars();
   }
-});
+  ctx.fill();
+}
 
-// Also fire via IntersectionObserver
-const barIO = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) triggerBars(); });
-}, { threshold: 0.3 });
-const sc = document.querySelector('.snapshot-card');
-if (sc) barIO.observe(sc);
+/* ─── Clouds ───────────────────────────────────────────────── */
+function makeCloud(seed, cx, cy, w, h) {
+  const r = rng(seed), puffs = [];
+  const n = Math.max(5, Math.round(w / (h * 0.55)));
+  for (let i = 0; i < n; i++) {
+    const t = n === 1 ? 0.5 : i / (n - 1), bump = Math.sin(t * Math.PI);
+    const pr = h * (0.32 + 0.5 * bump) * (0.8 + r() * 0.4);
+    puffs.push({ x: cx - w / 2 + t * w + (r() - 0.5) * h * 0.2, y: cy - pr * 0.5, r: pr });
+  }
+  for (let i = 0; i < 3; i++) {
+    const pr = h * (0.45 + r() * 0.3);
+    puffs.push({ x: cx + (r() - 0.5) * w * 0.45, y: cy - h * 0.55 - r() * h * 0.15, r: pr });
+  }
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity;
+  for (const p of puffs) { x0 = Math.min(x0, p.x - p.r); x1 = Math.max(x1, p.x + p.r); y0 = Math.min(y0, p.y - p.r); }
+  return { puffs, base: cy + h * 0.12, x0, x1, y0, seed };
+}
+function cloudDensity(clouds) {
+  return (x, y) => {
+    let best = 0;
+    for (const c of clouds) {
+      if (x < c.x0 || x > c.x1 || y < c.y0 || y > c.base) continue;
+      for (const p of c.puffs) {
+        const dx = x - p.x, dy = y - p.y, d2 = dx * dx + dy * dy;
+        if (d2 > p.r * p.r) continue;
+        const top = clamp((y - (p.y - p.r)) / (2 * p.r));        // 0 at top of puff
+        const rim = Math.sqrt(d2) / p.r;
+        let s = 0.98 - 0.62 * top - 0.18 * Math.max(0, dx / p.r); // lit from the upper left
+        s *= 1 - 0.35 * Math.pow(rim, 7);
+        if (s > best) best = s;
+      }
+      const bottomFade = smooth(c.base, c.base - 14, y);
+      best *= bottomFade;
+    }
+    if (best <= 0) return 0;
+    return best * (0.82 + 0.34 * fbm(x * 0.035, y * 0.035, 9, 3));
+  };
+}
+function cloudBacking(clouds) {
+  return (ctx) => {
+    for (const c of clouds) {
+      ctx.save(); ctx.beginPath(); ctx.rect(c.x0 - 2, c.y0 - 2, c.x1 - c.x0 + 4, c.base - c.y0 - 4); ctx.clip();
+      ctx.beginPath();
+      for (const p of c.puffs) { ctx.moveTo(p.x + p.r * 0.97, p.y); ctx.arc(p.x, p.y, p.r * 0.97, 0, 6.2832); }
+      ctx.fill(); ctx.restore();
+    }
+    ctx.beginPath();
+  };
+}
 
-/* ─── DEAL CARDS STAGGER ─── */
-function staggerDeals() {
-  const cards = document.querySelectorAll('.deal-card, .deal-unmatched');
-  cards.forEach((c, i) => {
-    c.style.opacity = '0';
-    c.style.transform = 'translateY(14px)';
-    c.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
-    setTimeout(() => {
-      c.style.opacity = '1';
-      c.style.transform = 'none';
-    }, 300 + i * 110);
+/* ─── Ridges ───────────────────────────────────────────────── */
+function ridgeArray(w, fn) { const a = new Float32Array(Math.ceil(w) + 4); for (let i = 0; i < a.length; i++) a[i] = fn(i); return a; }
+function ridgeBacking(arr, w, h) {
+  return (ctx) => { ctx.moveTo(0, h + 2); for (let x = 0; x <= w; x += 2) ctx.lineTo(x, arr[x | 0]); ctx.lineTo(w, h + 2); ctx.closePath(); };
+}
+// Local summits of a ridge (minima in screen y), at least `gap` px apart.
+function findPeaks(arr, W) {
+  const w = Math.max(16, (W * 0.045) | 0), peaks = [];
+  for (let x = 2; x < arr.length - 2; x++) {
+    const v = arr[x]; let ok = true;
+    for (let k = Math.max(0, x - w); k <= Math.min(arr.length - 1, x + w); k += 2) if (arr[k] < v) { ok = false; break; }
+    if (ok && (!peaks.length || x - peaks[peaks.length - 1] > w)) peaks.push(x);
+  }
+  if (!peaks.length) { let m = 0; for (let x = 1; x < arr.length; x++) if (arr[x] < arr[m]) m = x; peaks.push(m); }
+  return peaks;
+}
+// Engraving-style rock: every summit throws a spur line down the face.
+// Left of a spur is the lit face (light from the upper left), right of it the
+// shadow face. Gullies streak down the fall line: dark creases on the lit
+// face, light-catching ribs on the shadow face. Snow caps the high ground.
+function rockDensity(arr, opts) {
+  const { base, peak, H, W, contrast = 1, floor = 0.1, snow = true, seed = 13 } = opts;
+  const peaks = findPeaks(arr, W);
+  return (x, y) => {
+    const xi = Math.min(arr.length - 1, Math.max(0, x | 0));
+    const ry = arr[xi];
+    if (y < ry) return 0;
+    const depth = y - ry;
+    let dist = 1e9;
+    for (const px of peaks) {
+      const spur = px + depth * 0.22 + (fbm(depth * 0.012, px * 0.013, seed, 2) - 0.5) * depth * 0.5;
+      const dd = x - spur;
+      if (Math.abs(dd) < Math.abs(dist)) dist = dd;
+    }
+    const shade = smooth(-4, 4, dist);                       // 0 = lit face, 1 = shadow face
+    const u = x + (dist < 0 ? 1 : -1) * depth * 0.85;         // run along the fall line
+    const n = fbm(u * 0.028, depth * 0.005, seed + 3, 3);
+    const rib = 1 - Math.abs(2 * n - 1), streak = rib * rib * rib;
+    const tex = fbm(x * 0.06, y * 0.06, seed + 7, 2) - 0.5;
+    const lit = 0.8 - 0.5 * streak + 0.14 * tex;
+    const dark = 0.13 + 0.42 * streak + 0.1 * tex;
+    let d = lit * (1 - shade) + dark * shade;
+    if (snow) {
+      const hf = clamp((base - ry) / (base - peak));
+      const sd = H * 0.075 * hf * hf * (0.45 + 0.9 * fbm(x * 0.02, 5.3, seed + 21, 3)) * (0.65 + streak);
+      if (depth < sd) d = Math.max(d, shade < 0.5 ? 0.97 : 0.6);
+    }
+    d *= floor + (1 - floor) * Math.exp(-depth / (H * 0.3));
+    if (depth < 1.4) d = Math.max(d, 0.72 - 0.3 * shade);
+    return d * contrast;
+  };
+}
+
+/* ─── Hero scene ───────────────────────────────────────────── */
+const heroStage = document.getElementById("heroStage");
+const heroCopy = document.getElementById("heroCopy");
+const heroWhisper = document.getElementById("heroWhisper");
+const scrollCue = document.getElementById("scrollCue");
+const LAYERS = ["sky", "far", "cloudsBack", "peak", "cloudsL", "cloudsR", "hills", "fore"];
+const hero = {};
+for (const name of LAYERS) {
+  const c = document.createElement("canvas");
+  c.className = "layer"; c.setAttribute("aria-hidden", "true");
+  heroStage.insertBefore(c, heroCopy);
+  hero[name] = c;
+}
+
+// Bottom edge (px from the top of `copy`) of the last element in it.
+function copyBottom(copy) {
+  const last = copy.lastElementChild;
+  return last.offsetTop + last.offsetHeight;
+}
+const dotSpacing = (W) => (W < 700 ? 3.6 : Math.max(4.2, Math.min(5.2, W / 320)));
+
+function buildHero() {
+  const W = heroStage.clientWidth, H = heroStage.clientHeight;
+  const narrow = W < 700;
+  const sp = dotSpacing(W);
+  // The summit always sits just below the buttons, never behind the copy.
+  const ctaBottom = copyBottom(heroCopy);
+  const cx = W * 0.5, peakY = clamp(ctaBottom + H * 0.07, H * 0.5, H * 0.72), base = Math.min(H * 0.93, peakY + H * 0.36);
+
+  // sky haze: faint dots thickening toward the horizon
+  halftone(hero.sky, W, H, sp * 0.9, (x, y) => {
+    const t = smooth(peakY - H * 0.04, base, y);              // haze only down among the peaks
+    return t * 0.11 * (0.6 + 0.8 * fbm(x * 0.006, y * 0.012, 3, 3));
+  }, { dot: 0.5 });
+
+  // far ranges either side of the main peak
+  const farBase = peakY + (base - peakY) * 0.55;
+  const far = ridgeArray(W, (x) => {
+    let y = farBase - H * 0.15 * gauss(x, W * 0.16, W * 0.13) - H * 0.12 * gauss(x, W * 0.84, W * 0.14) - H * 0.05 * gauss(x, W * 0.33, W * 0.07) - H * 0.04 * gauss(x, W * 0.68, W * 0.06);
+    return y + (fbm(x * 0.009, 1.7, 4, 5) - 0.5) * H * 0.08;
+  });
+  halftone(hero.far, W, H, sp * 0.9, rockDensity(far, { base: farBase, peak: farBase - H * 0.16, H, W, contrast: 0.55, floor: 0.18, seed: 5 }), { backing: ridgeBacking(far, W, H), dot: 0.56 });
+
+  // high clouds out at the edges, clear of the headline
+  // (on phones the copy fills the sky, so they drop to just above the peaks)
+  const back = narrow
+    ? [makeCloud(11, W * 0.1, peakY - H * 0.035, W * 0.26, H * 0.03), makeCloud(12, W * 0.92, peakY - H * 0.06, W * 0.22, H * 0.026)]
+    : [makeCloud(11, W * 0.1, H * 0.27, W * 0.16, H * 0.05), makeCloud(12, W * 0.91, H * 0.2, W * 0.14, H * 0.045)];
+  const backD = cloudDensity(back);
+  halftone(hero.cloudsBack, W, H, sp * 0.9, (x, y) => backD(x, y) * 0.7, { backing: cloudBacking(back), dot: 0.55 });
+
+  // the summit: a broad massif with a crowned top and two shoulders
+  const half = W * (narrow ? 0.5 : 0.31);
+  const peak = ridgeArray(W, (x) => {
+    const dx = (x - cx) / half;
+    const t = Math.pow(Math.max(0, 1 - Math.abs(dx)), 1.25);
+    const shoulders = 0.62 * gauss(x, cx + half * 0.42, half * 0.16) + 0.5 * gauss(x, cx - half * 0.5, half * 0.15);
+    const y = base - (base - peakY) * Math.max(t, shoulders * (1 - Math.abs(dx) * 0.4));
+    return y + (fbm(x * 0.011, 3.1, 7, 5) - 0.5) * H * 0.06 * (0.3 + t);
+  });
+  // find the summit for the flag
+  let sx = cx, sy = H;
+  for (let x = (W * 0.3) | 0; x < W * 0.7; x++) if (peak[x] < sy) { sy = peak[x]; sx = x; }
+  hero.peak.style.transformOrigin = `${sx}px ${sy}px`;
+  const rock = rockDensity(peak, { base, peak: sy, H, W, seed: 13 });
+  halftone(hero.peak, W, H, sp, (x, y) => {
+    // flag: pole + pennant planted on the summit
+    if (Math.abs(x - sx) < 1.6 && y > sy - H * 0.05 && y < sy + 2) return 1;
+    if (x > sx && x < sx + H * 0.03 && y > sy - H * 0.05 && y < sy - H * 0.05 + (H * 0.018) * (1 - (x - sx) / (H * 0.03))) return 1;
+    return rock(x, y);
+  }, { backing: ridgeBacking(peak, W, H) });
+
+  // flanking clouds that hug the mountain's waist and part on scroll
+  const waist = peakY + (base - peakY) * 0.5;
+  const L = [makeCloud(21, W * 0.05, waist + H * 0.07, W * (narrow ? 0.42 : 0.24), H * 0.085), makeCloud(22, W * 0.22, waist - H * 0.015, W * (narrow ? 0.16 : 0.085), H * 0.038)];
+  const R = [makeCloud(31, W * 0.95, waist + H * 0.06, W * (narrow ? 0.42 : 0.25), H * 0.09), makeCloud(32, W * 0.79, waist - H * 0.035, W * (narrow ? 0.15 : 0.08), H * 0.034)];
+  halftone(hero.cloudsL, W, H, sp, cloudDensity(L), { backing: cloudBacking(L) });
+  halftone(hero.cloudsR, W, H, sp, cloudDensity(R), { backing: cloudBacking(R) });
+
+  // rolling hills with ploughed fields, a trail and a cabin
+  const hillY = Math.min(H * 0.9, base - H * 0.02);
+  const hills = ridgeArray(W, (x) => hillY + Math.sin(x * 0.004 + 0.6) * H * 0.02 + Math.sin(x * 0.011 + 1.3) * H * 0.01 - H * 0.07 * gauss(x, W * 0.13, W * 0.16) - H * 0.045 * gauss(x, W * 0.87, W * 0.15));
+  const cabX = W * 0.15, cabY = hills[cabX | 0], cabW = Math.max(20, W * 0.018), cabH = cabW * 0.62;
+  const trailX = (y) => W * 0.53 + Math.sin((y - hillY) * 0.018) * W * 0.06 * ((y - hillY) / (H * 0.2));
+  halftone(hero.hills, W, H * 1.05, sp * 1.05, (x, y) => {
+    // cabin
+    if (x > cabX - cabW / 2 && x < cabX + cabW / 2) {
+      const roofTop = cabY - cabH - cabW * 0.35;
+      const roofY = roofTop + Math.abs(x - cabX) / (cabW / 2) * cabW * 0.35;
+      if (y > roofY && y < cabY - cabH + 2) return 0.95;
+      if (y >= cabY - cabH + 2 && y < cabY + 2) return Math.abs(x - cabX) < cabW * 0.12 && y > cabY - cabH * 0.55 ? 0.1 : 0.85;
+    }
+    const xi = Math.min(hills.length - 1, Math.max(0, x | 0)), ry = hills[xi];
+    if (y < ry) return 0;
+    const depth = y - ry;
+    const tx = trailX(y), tw = 1.5 + (y - hillY) * 0.05;
+    if (y > hillY && Math.abs(x - tx) < tw) return 0.85;
+    const rows = Math.sin(depth * 0.4 + fbm(x * 0.008, y * 0.01, 17, 3) * 9);
+    const glow = Math.exp(-depth / (H * 0.045));
+    const sun = 0.6 + 0.4 * smooth(W * 0.75, W * 0.1, x);              // fields catch light on the left
+    return clamp((0.1 + 0.13 * (rows * 0.5 + 0.5)) * sun + 0.6 * glow) * (0.8 + 0.35 * fbm(x * 0.02, y * 0.02, 19, 2));
+  }, { backing: ridgeBacking(hills, W, H * 1.05) });
+
+  // foreground brush: shadowed bushes with lit crowns and a few wildflowers
+  const fore = ridgeArray(W, (x) => H * 0.97 - H * 0.15 * gauss(x, 0, W * 0.12) - H * 0.12 * gauss(x, W, W * 0.13) + (fbm(x * 0.02, 9.1, 23, 3) - 0.5) * H * 0.05);
+  halftone(hero.fore, W, H * 1.1, sp * 1.25, (x, y) => {
+    const xi = Math.min(fore.length - 1, Math.max(0, x | 0)), ry = fore[xi];
+    if (y < ry) return 0;
+    const depth = y - ry, n = fbm(x * 0.02, y * 0.028, 29, 3);
+    let d = 0.08 + 0.55 * smooth(0.5, 0.7, n) * Math.exp(-depth / (H * 0.06));
+    if (n > 0.52 && hash((x / 11) | 0, (y / 11) | 0, 41) > 0.965) d = 1; // flowers
+    return d;
+  }, { backing: ridgeBacking(fore, W, H * 1.1), dot: 0.62 });
+
+  hero.W = W; hero.H = H;
+}
+
+/* ─── Final scene: sunrise over the ridge ──────────────────── */
+const finalStage = document.getElementById("finalStage");
+const finalCopy = document.getElementById("finalCopy");
+const fin = {};
+for (const name of ["sun", "range", "clouds", "fore"]) {
+  const c = document.createElement("canvas"); c.className = "layer"; c.setAttribute("aria-hidden", "true");
+  finalStage.insertBefore(c, finalCopy); fin[name] = c;
+}
+function buildFinal() {
+  const W = finalStage.clientWidth, H = finalStage.clientHeight, narrow = W < 700;
+  const sp = dotSpacing(W);
+  // The sun's top edge clears the buttons once it has fully risen.
+  const clear = copyBottom(finalCopy) + H * 0.05;
+  const scx = W * 0.5, scy = H * 0.9, R = clamp(scy - clear, H * 0.12, Math.min(W, H) * (narrow ? 0.36 : 0.34));
+  halftone(fin.sun, W, H, sp, (x, y) => {
+    const dx = x - scx, dy = y - scy, d = Math.sqrt(dx * dx + dy * dy);
+    if (d < R) {
+      const below = (y - (scy - R * 0.1)) / (R * 1.1);
+      if (below > 0 && Math.sin(below * 34) > 0.2 + below * 0.5) return 0;   // retro sun bands
+      return 0.92 - 0.25 * (d / R);
+    }
+    return 0.24 * Math.exp(-(d - R) / (R * 0.3));                           // glow
+  });
+  // two ranges framing a valley the sun rises out of
+  // (on tall phone screens the ranges are lower and broader so the sun stays round)
+  const rgBase = H * (narrow ? 0.95 : 0.93), hk = narrow ? 0.5 : 1, wk = narrow ? 1.7 : 1;
+  const rg = ridgeArray(W, (x) => rgBase - H * 0.22 * hk * gauss(x, W * 0.12, W * 0.16 * wk) - H * 0.17 * hk * gauss(x, W * 0.9, W * 0.15 * wk) - H * 0.07 * hk * gauss(x, W * 0.3, W * 0.08 * wk) + (fbm(x * 0.01, 2.2, 51, 5) - 0.5) * H * 0.07 * hk);
+  halftone(fin.range, W, H, sp, rockDensity(rg, { base: rgBase, peak: rgBase - H * 0.22 * hk, H, W, contrast: 0.9, floor: 0.12, seed: 51 }), { backing: ridgeBacking(rg, W, H) });
+  const cl = narrow
+    ? [makeCloud(61, W * 0.0, H * 0.8, W * 0.24, H * 0.032), makeCloud(62, W * 1.0, H * 0.76, W * 0.22, H * 0.03)]
+    : [makeCloud(61, W * 0.1, H * 0.62, W * 0.22, H * 0.07), makeCloud(62, W * 0.9, H * 0.55, W * 0.2, H * 0.065)];
+  halftone(fin.clouds, W, H, sp, cloudDensity(cl), { backing: cloudBacking(cl) });
+  const fr = ridgeArray(W, (x) => H * 0.975 + Math.sin(x * 0.006) * H * 0.012 - H * 0.03 * gauss(x, W * 0.5, W * 0.3));
+  halftone(fin.fore, W, H * 1.1, sp * 1.2, (x, y) => {
+    const ry = fr[Math.min(fr.length - 1, Math.max(0, x | 0))];
+    if (y < ry) return 0;
+    const n = fbm(x * 0.02, y * 0.03, 71, 3);
+    return 0.08 + 0.5 * smooth(0.5, 0.7, n) * Math.exp(-(y - ry) / (H * 0.05));
+  }, { backing: ridgeBacking(fr, W, H * 1.1) });
+}
+
+/* ─── Small halftone art ───────────────────────────────────── */
+function buildArt() {
+  document.querySelectorAll("canvas[data-art]").forEach((c) => {
+    const W = c.parentElement.clientWidth, H = c.parentElement.clientHeight, kind = c.dataset.art;
+    const cx = W / 2, cy = H / 2;
+    let fn;
+    if (kind === "doc") {
+      fn = (x, y) => {
+        let d = 0.05 * fbm(x * 0.02, y * 0.02, 81, 2);
+        for (let k = 2; k >= 0; k--) {
+          const ox = cx - 46 + k * 16, oy = cy - 52 - k * 10, w = 92, h = 112;
+          if (x > ox && x < ox + w && y > oy && y < oy + h) {
+            d = k === 0 ? 0.9 : 0.35 + k * 0.08;
+            if (k === 0 && x > ox + 12 && x < ox + w - 12) {
+              const ly = y - oy - 22;
+              if (ly > 0 && ly % 14 < 4 && (x < ox + w - 12 - ((ly / 14) | 0) % 3 * 16)) d = 0.18;
+            }
+          }
+        }
+        return d;
+      };
+    } else if (kind === "dial") {
+      fn = (x, y) => {
+        const dx = x - cx, dy = y - cy - 6, r = Math.sqrt(dx * dx + dy * dy), a = Math.atan2(dy, dx);
+        let d = 0.05 * fbm(x * 0.02, y * 0.02, 83, 2);
+        if (r > 46 && r < 60) d = (a > -Math.PI && a < Math.PI * 0.3) ? 0.95 : 0.25;
+        if (r < 8) d = 0.95;
+        const na = -Math.PI * 0.25, px = Math.cos(na), py = Math.sin(na), t = dx * px + dy * py, perp = Math.abs(dx * py - dy * px);
+        if (t > 0 && t < 42 && perp < 2.6) d = 0.95;
+        return d;
+      };
+    } else {
+      const arr = ridgeArray(W, (x) => H * 0.86 - H * 0.55 * Math.pow(Math.max(0, 1 - Math.abs(x - cx) / (W * 0.3)), 1.2) - H * 0.12 * gauss(x, cx + W * 0.16, W * 0.06) + (fbm(x * 0.03, 1, 85, 3) - 0.5) * 10);
+      let sx = cx, sy = H; for (let x = 0; x < W; x++) if (arr[x] < sy) { sy = arr[x]; sx = x; }
+      const rock = rockDensity(arr, { base: H * 0.86, peak: sy, H: H * 1.6, W: W * 2.2, seed: 85 });
+      fn = (x, y) => {
+        if (Math.abs(x - sx) < 1.4 && y > sy - 26 && y < sy) return 1;
+        if (x > sx && x < sx + 16 && y > sy - 26 && y < sy - 26 + 9 * (1 - (x - sx) / 16)) return 1;
+        return Math.max(rock(x, y), 0.05 * fbm(x * 0.02, y * 0.02, 87, 2));
+      };
+    }
+    halftone(c, W, H, 4, fn, { dot: 0.62 });
   });
 }
 
-// Fire on page load (investor view)
-if (document.body.dataset.view === 'investors') staggerDeals();
-// Also fire after a brief delay on first load
-setTimeout(() => {
-  if (document.body.dataset.view === 'founders') triggerBars();
-  if (document.body.dataset.view === 'investors') staggerDeals();
-}, 200);
+/* ─── Snapshot backdrop + investor globe ───────────────────── */
+// A low range along the bottom of the Snapshot panel: the summit, far below.
+function buildSnapBg() {
+  const c = document.getElementById("snapBg"), p = c.parentElement, W = p.clientWidth, H = p.clientHeight;
+  const base = H * 1.02;
+  const arr = ridgeArray(W, (x) => base - H * 0.2 * gauss(x, W * 0.14, W * 0.15) - H * 0.12 * gauss(x, W * 0.42, W * 0.1) - H * 0.08 * gauss(x, W * 0.9, W * 0.12) + (fbm(x * 0.008, 4.4, 91, 5) - 0.5) * H * 0.06);
+  halftone(c, W, H, dotSpacing(W), rockDensity(arr, { base, peak: base - H * 0.2, H, W, contrast: 0.38, floor: 0.2, seed: 91 }), { dot: 0.55 });
+}
+// A wireframe globe: shaded sphere crossed by meridians and parallels.
+function buildGlobe() {
+  const c = document.getElementById("invGlobe"), S = c.getBoundingClientRect().width || 600;
+  const R = S * 0.46, cx = S / 2, cy = S / 2, TILT = 0.38;
+  halftone(c, S, S, Math.max(4.4, S / 150), (x, y) => {
+    const dx = (x - cx) / R, dy = (y - cy) / R, r2 = dx * dx + dy * dy;
+    if (r2 > 1) return 0.1 * Math.exp(-(Math.sqrt(r2) - 1) * 10);
+    const z = Math.sqrt(1 - r2);
+    const lit = clamp(-0.5 * dx - 0.4 * dy + 0.75 * z);                    // light from upper left
+    const yy = dy * Math.cos(TILT) - z * Math.sin(TILT), zz = dy * Math.sin(TILT) + z * Math.cos(TILT);
+    const lat = Math.asin(clamp(yy, -1, 1)), lon = Math.atan2(dx, zz);
+    const near = (v, step, w) => { const k = v / step; return Math.abs(k - Math.round(k)) * step < w; };
+    const line = near(lat, Math.PI / 9, 0.012) || near(lon, Math.PI / 9, 0.012 / Math.max(0.2, Math.cos(lat)));
+    return line ? 0.15 + 0.5 * lit : 0.03 + 0.16 * lit * lit;
+  }, { dot: 0.56 });
+}
+
+/* ─── The Laelapx emblem, engraved in halftone ─────────────── */
+// The logo's two hounds become two dot densities: the upper (lighter blue)
+// hound reads solid, the lower (navy) hound a step lighter, with the eyes and
+// fangs left open where the artwork is transparent.
+const logoImg = new Image();
+const logoReady = new Promise((res) => { logoImg.onload = res; logoImg.onerror = res; });
+logoImg.src = "/laelapx-logo.png";
+function buildEmblem() {
+  const c = document.getElementById("emblem");
+  const S = Math.round(c.parentElement.clientWidth);
+  if (!S || !logoImg.naturalWidth) return;
+  const off = document.createElement("canvas");
+  off.width = off.height = S;
+  const octx = off.getContext("2d", { willReadFrequently: true });
+  // the mark sits in the middle ~49% of the 1080px artwork; crop to it
+  const k = logoImg.naturalWidth / 1080, crop = 528 * k, o = 278 * k;
+  octx.drawImage(logoImg, o, o, crop, crop, 0, 0, S, S);
+  const px = octx.getImageData(0, 0, S, S).data;
+  halftone(c, S, S, Math.max(3.6, S / 92), (x, y) => {
+    const xi = Math.min(S - 1, x | 0), yi = Math.min(S - 1, y | 0), i = (yi * S + xi) * 4;
+    const a = px[i + 3] / 255;
+    if (a < 0.1) return 0;
+    const lum = (px[i] * 0.3 + px[i + 1] * 0.59 + px[i + 2] * 0.11) / 255;
+    // light from the upper left, like the mountains
+    const shade = 0.88 + 0.12 * (1 - (x + y) / (2 * S));
+    return a * (lum > 0.3 ? 0.8 : 0.5) * shade;
+  }, { color: COBALT, dot: 0.64 });
+}
+logoReady.then(() => { if (lastW) buildEmblem(); });
+
+/* ─── Build everything (and rebuild on resize) ─────────────── */
+let lastW = 0, lastH = 0;
+function buildAll(force) {
+  const w = innerWidth, h = innerHeight;
+  // Mobile browsers fire resize when the URL bar slides; only rebuild on real changes.
+  if (!force && w === lastW && Math.abs(h - lastH) < 120) return;
+  lastW = w; lastH = h;
+  const t0 = performance.now();
+  buildHero(); buildFinal(); buildArt(); buildSnapBg(); buildGlobe(); buildEmblem();
+  window.__buildMs = Math.round(performance.now() - t0);
+}
+let rT;
+addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(() => buildAll(false), 180); });
+
+/* ─── Text helpers ─────────────────────────────────────────── */
+const ticker = document.getElementById("ticker");
+const WORDS = ["Problem", "Why now", "Solution", "Market", "Team", "Traction", "Go-to-market", "The ask"];
+ticker.innerHTML = [...WORDS, ...WORDS, ...WORDS].map((w) => `<span>${w}</span>`).join("");
+
+const revealText = document.getElementById("revealText");
+(function splitWords(el) {
+  const walk = (node) => {
+    for (const child of [...node.childNodes]) {
+      if (child.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        child.textContent.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) frag.appendChild(document.createTextNode(part));
+          else { const s = document.createElement("span"); s.className = "w"; s.textContent = part; frag.appendChild(s); }
+        });
+        node.replaceChild(frag, child);
+      } else if (child.nodeType === 1) walk(child);
+    }
+  };
+  walk(el);
+})(revealText);
+const words = [...revealText.querySelectorAll(".w")];
+
+/* ─── Reveal-on-enter for cards ────────────────────────────── */
+const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: 0.2 });
+document.querySelectorAll(".step,.pr").forEach((el) => io.observe(el));
+
+/* ─── Nav + menu ───────────────────────────────────────────── */
+const nav = document.getElementById("nav");
+const menuBtn = document.getElementById("menuBtn"), menu = document.getElementById("mobileMenu");
+menuBtn.addEventListener("click", () => {
+  const open = !menu.classList.contains("open");
+  menu.classList.toggle("open", open); menu.setAttribute("aria-hidden", String(!open)); menuBtn.setAttribute("aria-expanded", String(open));
+  nav.classList.toggle("solid", false);
+});
+menu.addEventListener("click", (e) => { if (e.target.closest("a")) { menu.classList.remove("open"); menu.setAttribute("aria-hidden", "true"); menuBtn.setAttribute("aria-expanded", "false"); } });
+
+/* ─── Smooth scroll ────────────────────────────────────────── */
+let lenis = null;
+if (!REDUCED && window.Lenis) {
+  lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.95 });
+}
+document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
+  const t = document.querySelector(a.getAttribute("href")); if (!t) return;
+  e.preventDefault();
+  if (lenis) lenis.scrollTo(t, { duration: 1.6 }); else t.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth" });
+}));
+
+/* ─── Scroll choreography ──────────────────────────────────── */
+const heroEl = document.getElementById("hero"), snapEl = document.getElementById("snapshot"), finalEl = document.getElementById("final");
+const steps = [...document.querySelectorAll(".snap-step")], dots = [...document.querySelectorAll(".snap-dots b")];
+const dialArc = document.getElementById("dialArc"), dialNum = document.getElementById("dialNum"), rating = document.getElementById("rating");
+const barFills = [...document.querySelectorAll(".bar i")], barNums = [...document.querySelectorAll(".bar-row b")];
+const paneGaps = document.getElementById("paneGaps"), paneFit = document.getElementById("paneFit");
+const gapRows = [...paneGaps.querySelectorAll(".row")], fitRows = [...paneFit.querySelectorAll(".row")];
+const snapCard = document.getElementById("snapCard");
+const deals = [...document.querySelectorAll(".deal")];
+const globe = document.getElementById("invGlobe");
+const statEl = document.getElementById("stat");
+const emblemEl = document.getElementById("emblem");
+const CIRC = 326.73;
+
+function sectionProgress(el) {
+  const r = el.getBoundingClientRect(), span = r.height - innerHeight;
+  return span > 0 ? clamp(-r.top / span) : (r.top < 0 ? 1 : 0);
+}
+const tf = (el, s) => { if (el._tf !== s) { el.style.transform = s; el._tf = s; } };
+const op = (el, v) => { const s = v.toFixed(3); if (el._op !== s) { el.style.opacity = s; el._op = s; } };
+
+let currentStep = -1;
+function frame(time) {
+  const t = REDUCED ? 0 : time / 1000;
+  const vh = innerHeight;
+
+  // HERO — the camera climbs: layers drift at different depths, clouds part
+  const p = sectionProgress(heroEl);
+  if (hero.W) {
+    const W = hero.W, H = hero.H;
+    const drift = Math.sin(t * 0.18) * 10;
+    tf(hero.sky, `translate3d(0,${p * 30}px,0)`);
+    tf(hero.far, `translate3d(0,${p * H * 0.06}px,0)`);
+    tf(hero.cloudsBack, `translate3d(${drift * 0.6 - p * W * 0.05}px,${p * H * 0.03}px,0)`);
+    tf(hero.peak, `translate3d(0,${p * H * 0.1}px,0) scale(${1 + p * 0.1})`);
+    tf(hero.cloudsL, `translate3d(${drift - ease(p * 1.1) * W * 0.5}px,${-p * H * 0.08}px,0)`);
+    tf(hero.cloudsR, `translate3d(${-drift + ease(p * 1.1) * W * 0.5}px,${-p * H * 0.06}px,0)`);
+    tf(hero.hills, `translate3d(0,${p * H * 0.3}px,0)`);
+    tf(hero.fore, `translate3d(0,${p * H * 0.55}px,0)`);
+    tf(heroCopy, `translate3d(0,${-p * H * 0.28}px,0)`);
+    op(heroCopy, 1 - range(p, 0.05, 0.38));
+    op(scrollCue, 1 - range(p, 0, 0.08));
+    const wp = range(p, 0.42, 0.66);
+    op(heroWhisper, wp * (1 - range(p, 0.9, 1)));
+    tf(heroWhisper, `translate3d(0,${(1 - ease(wp)) * 40}px,0)`);
+  }
+  nav.classList.toggle("solid", heroEl.getBoundingClientRect().bottom < vh * 0.15 && !menu.classList.contains("open"));
+
+  // TICKER — drifts with scroll
+  const tr = ticker.getBoundingClientRect();
+  if (tr.bottom > -50 && tr.top < vh + 50) tf(ticker, `translate3d(${-((scrollY * 0.35) % (ticker.scrollWidth / 3))}px,0,0)`);
+
+  // REALITY — words light up as they cross the viewport
+  const rr = revealText.getBoundingClientRect();
+  if (rr.bottom > 0 && rr.top < vh) {
+    const rp = clamp((vh * 0.85 - rr.top) / (rr.height + vh * 0.35));
+    const lit = Math.floor(rp * words.length * 1.05);
+    for (let i = 0; i < words.length; i++) { const on = i < lit; if (words[i]._on !== on) { words[i].classList.toggle("on", on); words[i]._on = on; } }
+    const sr = statEl.getBoundingClientRect();
+    tf(statEl, `translate3d(0,${(sr.top - vh * 0.3) * -0.08}px,0)`);
+  }
+
+  // SNAPSHOT — scrubbed like a video
+  const s = sectionProgress(snapEl);
+  const stepIdx = Math.min(3, Math.floor(s * 4 * 0.999));
+  if (stepIdx !== currentStep) { steps.forEach((el, i) => el.classList.toggle("on", i === stepIdx)); currentStep = stepIdx; }
+  dots.forEach((d, i) => tf(d, `scaleX(${range(s, i / 4, (i + 1) / 4).toFixed(3)})`));
+  const dp = ease(range(s, 0.02, 0.2));
+  dialArc.style.strokeDashoffset = (CIRC * (1 - 0.72 * dp)).toFixed(1);
+  const dn = String(Math.round(72 * dp)); if (dialNum._v !== dn) { dialNum.textContent = dn; dialNum._v = dn; }
+  const rOn = dp > 0.98; if (rating._v !== rOn) { rating.classList.toggle("on", rOn); rating._v = rOn; }
+  barFills.forEach((b, i) => {
+    const bp = ease(range(s, 0.25 + i * 0.04, 0.4 + i * 0.04)), v = +b.dataset.v;
+    tf(b, `scaleX(${(bp * v / 100).toFixed(3)})`);
+    const txt = String(Math.round(v * bp)); if (barNums[i]._v !== txt) { barNums[i].textContent = txt; barNums[i]._v = txt; }
+  });
+  const showFit = s >= 0.75;
+  paneGaps.classList.toggle("on", !showFit); paneFit.classList.toggle("on", showFit);
+  gapRows.forEach((r, i) => { const g = ease(range(s, 0.5 + i * 0.05, 0.6 + i * 0.05)); op(r, g); tf(r, `translate3d(${(1 - g) * 26}px,0,0)`); });
+  fitRows.forEach((r, i) => { const g = ease(range(s, 0.78 + i * 0.05, 0.88 + i * 0.05)); op(r, g); tf(r, `translate3d(${(1 - g) * 26}px,0,0)`); });
+  const cardIn = ease(range(s, 0, 0.06));
+  tf(snapCard, `translate3d(0,${(1 - cardIn) * 40 + Math.sin(t * 0.8) * 3}px,0) rotate(${(1 - cardIn) * 1.5}deg)`);
+
+  // INVESTORS — deal cards float, globe turns slowly with scroll
+  const ir = globe.parentElement.getBoundingClientRect();
+  if (ir.bottom > 0 && ir.top < vh) {
+    const ip = clamp((vh - ir.top) / (vh + ir.height));
+    tf(globe, `${innerWidth > 980 ? "translateY(-50%) " : ""}rotate(${(ip - 0.5) * 24}deg)`);
+    deals.forEach((d, i) => tf(d, `translate3d(${(1 - ease(range(ip, 0.1 + i * 0.05, 0.4 + i * 0.05))) * 60}px,${Math.sin(t * 0.9 + i * 1.3) * 3}px,0)`));
+  }
+
+  // FINAL — the sun rises
+  const fp = sectionProgress(finalEl);
+  if (fin.sun.width) {
+    const H = finalStage.clientHeight;
+    tf(fin.sun, `translate3d(0,${(1 - ease(fp * 1.3)) * H * 0.3}px,0)`);
+    tf(fin.clouds, `translate3d(${Math.sin(t * 0.15) * 12}px,${(1 - fp) * H * 0.04}px,0)`);
+    tf(fin.range, `translate3d(0,${(1 - fp) * H * 0.04}px,0)`);
+    tf(fin.fore, `translate3d(0,${(1 - fp) * H * 0.1}px,0)`);
+    tf(finalCopy, `translate3d(0,${(1 - ease(fp * 1.6)) * 60}px,0)`);
+    op(finalCopy, 0.25 + 0.75 * ease(fp * 1.8));
+  }
+
+  // EMBLEM — the hounds turn as they pass through the viewport
+  const er = emblemEl.getBoundingClientRect();
+  if (er.bottom > 0 && er.top < vh) {
+    const ep = clamp((vh - er.top) / (vh + er.height));
+    tf(emblemEl, `rotate(${((ep - 0.5) * -70).toFixed(2)}deg)`);
+  }
+
+  if (lenis) lenis.raf(time);
+  requestAnimationFrame(frame);
+}
+
+/* ─── Go ───────────────────────────────────────────────────── */
+const start = () => { buildAll(true); requestAnimationFrame(frame); };
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else addEventListener("load", start);
+})();
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
-<script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>

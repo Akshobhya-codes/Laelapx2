@@ -7,7 +7,8 @@ const APP_URL =
     : "http://localhost:3000");
 
 /* ─── BRANDED SHELL ───────────────────────────────────────────────────── */
-function shell(opts: {
+// Exported so billing-templates.ts shares the same chrome.
+export function shell(opts: {
   preheader: string;
   bodyHtml: string;
   ctaLabel?: string;
@@ -138,7 +139,7 @@ export function messageReceivedEmail(input: {
   };
 }
 
-function escapeHtml(s: string): string {
+export function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

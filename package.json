@@ -7,6 +7,8 @@
     "build": "npm --prefix web run build",
     "start": "npm --prefix web run start",
     "lint": "npm --prefix web run lint",
+    "stripe:setup": "npm --prefix web run stripe:setup",
+    "stripe:listen": "npm --prefix web run stripe:listen",
     "postinstall": "npm --prefix web install"
   }
 }

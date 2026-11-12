@@ -1,0 +1,8 @@
+# Never upload local secrets or build output with `vercel deploy`.
+# Production env vars come from the Vercel project settings.
+.env*
+**/.env*
+node_modules
+**/node_modules
+**/.next
+.vercel

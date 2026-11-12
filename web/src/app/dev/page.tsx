@@ -201,6 +201,62 @@ export default async function Home() {
             body="Search across startups, funds, and people. Live dropdown in nav, full results page here."
             cta="Open →"
           />
+          <RouteCard
+            href="/pricing"
+            number="16"
+            title="Pricing"
+            body="Public. Founder tiers (Free / Founder+ / Laelapx+) and the 7 investor tiers, monthly/annual toggle, disclaimers. Checkout via Stripe."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/billing"
+            number="17"
+            title="Billing"
+            body="Current plan per side, Stripe portal, weekly profile quota, team seats (Micro Fund+), Founder Review orders and delivered memos."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/admin"
+            number="18"
+            title="Admin"
+            body="ADMIN_EMAILS only. Founder Review queue, support inbox, event publishing, subscribers with MRR, pilot feedback."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/funder/pipeline"
+            number="19"
+            title="Pipeline"
+            body="Micro Fund+. Kanban of every founder the team opened; stages, meetings, owner + partner decision on Institutional."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/funder/criteria"
+            number="20"
+            title="Custom criteria"
+            body="Emerging Fund+. Hard filters (MRR, customers, score, countries, stage, keywords) with a live preview count."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/funder/analytics"
+            number="21"
+            title="Analytics"
+            body="Institutional+. Weekly deal flow, funnel, pipeline by stage, partner activity, quarterly market insights."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/events"
+            number="22"
+            title="Events"
+            body="Founder+ for sessions and workshops, Laelapx+ for in-person. RSVP with capacity; join link only after RSVP."
+            cta="Open →"
+          />
+          <RouteCard
+            href="/support"
+            number="23"
+            title="Support"
+            body="Laelapx+. Async thread with the team; replies come from /admin and arrive by email."
+            cta="Open →"
+          />
         </div>
 
         <section className="mt-24 rounded-2xl border border-ink/10 bg-white p-8">
@@ -237,8 +293,19 @@ export default async function Home() {
             <Status status="done">User profiles (/u/[slug]) — LinkedIn-style with bio, startups, fund</Status>
             <Status status="done">Privacy controls — searchable / show startups / show fund / show email / hidden mode</Status>
             <Status status="done">Global search — live dropdown in nav + /search page across startups, funds, people</Status>
-            <Status status="next">Stripe — founder + investor subscription tiers</Status>
-            <Status status="next">Production deploy to app.laelapx.com</Status>
+            <Status status="done">Plans defined once in lib/billing/plans.ts — prices, features, quotas, seats; Stripe prices matched by lookup_key</Status>
+            <Status status="done">Paywall: entitlements resolved server-side (lib/billing/entitlements.ts); founder dashboard sections + investor contact details gated per plan</Status>
+            <Status status="done">Investor weekly profile quota + 60-day pilot (15 profiles) with feedback loop; team seats share one quota</Status>
+            <Status status="done">Founder visibility to investors requires consent + 70% completeness + score ≥ 45 (lib/billing/visibility.ts)</Status>
+            <Status status="done">Stripe Checkout + customer portal + signed webhook (/api/stripe/webhook) → subscriptions table</Status>
+            <Status status="done">$499 Founder Review: one-time checkout → /admin queue → memo delivered to /billing + email</Status>
+            <Status status="done">AI narrative + gap analysis cached per submission revision (was 3 OpenAI calls per refresh)</Status>
+            <Status status="done">Contact unlocks require founder consent (open to investor contact) — no plan overrides it, no quota spent</Status>
+            <Status status="done">Investor: stage/sector filters (Syndicate+), pipeline board (Micro Fund+), meetings + custom criteria + priority review (Emerging+), partner workflow + analytics + quarterly insights (Institutional+)</Status>
+            <Status status="done">Founder: events + RSVP (Founder+; in-person Laelapx+), async support thread, deep deck review (reads the PDF) + score history across revisions (Laelapx+)</Status>
+            <Status status="done">Admin: support inbox + event publishing alongside the review queue</Status>
+            <Status status="next">Add STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET + ADMIN_EMAILS, run scripts/stripe-setup.mjs, test with 4242 card</Status>
+            <Status status="next">Connect Vercel to GitHub, then production deploy</Status>
           </ul>
         </section>
       </main>

@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import type { Submission } from "@/lib/submission/schema";
 import type { Gap, Snapshot } from "./rubric";
 import { completeJson, completeText } from "@/lib/ai/openai";
@@ -180,4 +181,31 @@ export async function enrichSnapshot(
     }),
   ]);
   return { narrative, gaps };
+}
+
+/**
+ * Cached enrichment, keyed by submission revision. The narrative and gap
+ * passes are three OpenAI calls, and the result only changes when the
+ * submission or its score does — so a founder refreshing the dashboard
+ * (or an investor-side render) shouldn't pay for them again. Same TTL as
+ * the market-signals cache. `enrichSnapshot` stays exported for callers
+ * that want a forced recompute.
+ */
+const enrichCached = unstable_cache(
+  async (
+    _submissionId: string,
+    _updatedAt: string,
+    _composite: number,
+    s: Submission,
+    snap: Snapshot
+  ) => enrichSnapshot(s, snap),
+  ["enrich-snapshot-v1"],
+  { revalidate: 60 * 60 * 24 * 7 }
+);
+
+export function enrichSnapshotCached(
+  stored: { id: string; updatedAt: string; data: Submission },
+  snap: Snapshot
+): Promise<Enrichment> {
+  return enrichCached(stored.id, stored.updatedAt, snap.composite, stored.data, snap);
 }

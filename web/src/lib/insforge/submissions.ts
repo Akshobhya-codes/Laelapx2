@@ -52,6 +52,8 @@ type SubmissionRow = {
   // Added by migration 0007 — nullable until the migration is applied.
   scored_snapshot: Snapshot | null;
   scored_for_updated_at: string | null;
+  // Added by migration 0010 — set when first seen investor-visible.
+  first_visible_at?: string | null;
 };
 
 export type StoredSubmission = {
@@ -66,6 +68,8 @@ export type StoredSubmission = {
   scoredSnapshot: Snapshot | null;
   /** The submission's updated_at at the time the cached score was computed. */
   scoredForUpdatedAt: string | null;
+  /** First time the submission was observed investor-visible (priority review). */
+  firstVisibleAt: string | null;
 };
 
 /* ─── MAPPERS ─────────────────────────────────────────────────────────── */
@@ -118,7 +122,25 @@ function rowToStored(r: SubmissionRow): StoredSubmission {
     updatedAt: r.updated_at,
     scoredSnapshot: r.scored_snapshot ?? null,
     scoredForUpdatedAt: r.scored_for_updated_at ?? null,
+    firstVisibleAt: r.first_visible_at ?? null,
   };
+}
+
+/**
+ * Stamp `first_visible_at` on submissions seen investor-visible for the
+ * first time. Drives priority review: Emerging+ accounts see a newly
+ * visible founder immediately, other plans after a fixed window.
+ */
+export async function markFirstVisible(submissionIds: string[]): Promise<string> {
+  const now = new Date().toISOString();
+  if (submissionIds.length === 0) return now;
+  const client = getInsforge();
+  await client.database
+    .from("submissions")
+    .update({ first_visible_at: now })
+    .in("id", submissionIds)
+    .is("first_visible_at", null);
+  return now;
 }
 
 /**
@@ -294,6 +316,19 @@ export async function getSubmissionBySlug(
   if (error) throw new Error(`getSubmissionBySlug failed: ${error.message}`);
   if (!data) return null;
   return rowToStored(data as SubmissionRow);
+}
+
+export async function getSubmissionsByIds(
+  ids: string[]
+): Promise<StoredSubmission[]> {
+  if (ids.length === 0) return [];
+  const client = getInsforge();
+  const { data, error } = await client.database
+    .from("submissions")
+    .select("*")
+    .in("id", ids);
+  if (error) throw new Error(`getSubmissionsByIds failed: ${error.message}`);
+  return (data as SubmissionRow[]).map(rowToStored);
 }
 
 export async function listAllSubmissions(opts?: {
