@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "stripe:setup": "node scripts/stripe-setup.mjs",
-    "stripe:listen": "node scripts/stripe-listen.mjs"
+    "stripe:listen": "node scripts/stripe-listen.mjs",
+    "sync:users": "node scripts/sync-app-users.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

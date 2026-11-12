@@ -45,6 +45,18 @@ type Props = {
     seats: number;
     updatedAt: string;
   }[];
+  signups: {
+    id: string;
+    name: string;
+    email: string | null;
+    emailVerified: boolean;
+    role: "founder" | "investor" | null;
+    authMethods: string[];
+    plans: string[];
+    signedUpAt: string | null;
+    lastActiveAt: string | null;
+    deleted: boolean;
+  }[];
   feedback: {
     id: string;
     investor: Person;
@@ -59,16 +71,20 @@ type Props = {
   initialThread: string | null;
 };
 
-export type Tab = "reviews" | "support" | "events" | "subscribers" | "pilot";
+export type Tab = "reviews" | "support" | "events" | "subscribers" | "signups" | "pilot";
 
 const fmt = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
+
+const fmtYear = (iso: string | null) =>
+  iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
 
 export function AdminPage({
   adminName,
   stats,
   orders,
   subscribers,
+  signups,
   feedback,
   support,
   events,
@@ -112,6 +128,7 @@ export function AdminPage({
               ["support", `Support${unreadSupport ? ` (${unreadSupport} new)` : ` (${support.length})`}`],
               ["events", `Events (${upcoming} upcoming)`],
               ["subscribers", `Subscribers (${subscribers.length})`],
+              ["signups", `Sign-ups (${signups.filter((u) => !u.deleted).length})`],
               ["pilot", `Pilot feedback (${feedback.length})`],
             ] as [Tab, string][]
           ).map(([t, label]) => (
@@ -178,6 +195,48 @@ export function AdminPage({
                         </td>
                         <td className="px-4 py-3">{fmt(s.renewsAt)}</td>
                         <td className="px-4 py-3">{s.seats}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          )}
+
+          {tab === "signups" && (
+            signups.length === 0 ? (
+              <Empty>No sign-ups recorded yet. Run <code>npm run sync:users</code> to backfill from Stack Auth.</Empty>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-ink/10 bg-white">
+                <table className="w-full text-[13px]">
+                  <thead className="bg-paper-2 text-left text-[10px] font-bold uppercase tracking-[0.15em] text-ink-faint">
+                    <tr>
+                      <th className="px-4 py-3">Who</th>
+                      <th className="px-4 py-3">Role</th>
+                      <th className="px-4 py-3">Paid plan</th>
+                      <th className="px-4 py-3">Signed in with</th>
+                      <th className="px-4 py-3">Signed up</th>
+                      <th className="px-4 py-3">Last active</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-ink/8">
+                    {signups.map((u) => (
+                      <tr key={u.id} className={clsx(u.deleted && "opacity-50")}>
+                        <td className="px-4 py-3">
+                          <div className="font-semibold text-ink">
+                            {u.name}
+                            {u.deleted && <span className="ml-2 text-[10px] font-bold uppercase tracking-[0.12em] text-ink-faint">deleted</span>}
+                          </div>
+                          <div className="text-[11px] text-ink-faint">
+                            {u.email ?? "—"}
+                            {u.email && !u.emailVerified && " · unverified"}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 capitalize">{u.role ?? <span className="text-ink-faint">Not picked</span>}</td>
+                        <td className="px-4 py-3 font-semibold">{u.plans.length ? u.plans.join(", ") : <span className="font-normal text-ink-faint">Free</span>}</td>
+                        <td className="px-4 py-3 capitalize">{u.authMethods.join(", ") || "—"}</td>
+                        <td className="px-4 py-3">{fmtYear(u.signedUpAt)}</td>
+                        <td className="px-4 py-3">{fmtYear(u.lastActiveAt)}</td>
                       </tr>
                     ))}
                   </tbody>

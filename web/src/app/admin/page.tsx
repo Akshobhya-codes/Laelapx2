@@ -11,12 +11,13 @@ import { listProfilesByUserIds } from "@/lib/insforge/profiles";
 import { listAllSubmissions } from "@/lib/insforge/submissions";
 import { getPlan } from "@/lib/billing/plans";
 import { isSubscriptionActive } from "@/lib/billing/entitlements";
+import { listAppUsers } from "@/lib/insforge/app-users";
 import { AdminPage, type Tab } from "./admin-client";
 
 export const metadata = { title: "Admin · Laelapx" };
 export const dynamic = "force-dynamic";
 
-const TABS: Tab[] = ["reviews", "support", "events", "subscribers", "pilot"];
+const TABS: Tab[] = ["reviews", "support", "events", "subscribers", "signups", "pilot"];
 
 /** Request-time clock read, kept out of the component body. */
 const isPast = (iso: string) => new Date(iso).getTime() < Date.now();
@@ -31,13 +32,15 @@ export default async function Admin({
   if (!isAdminEmail(user.primaryEmail)) notFound();
   const sp = await searchParams;
 
-  const [orders, subs, feedback, submissions, inbox, events] = await Promise.all([
+  const [orders, subs, feedback, submissions, inbox, events, appUsers] = await Promise.all([
     listAllReviewOrders(),
     listAllSubscriptions(),
     listAllPilotFeedback(),
     listAllSubmissions({ limit: 500 }),
     listSupportInbox(),
     listAllEvents(),
+    // Soft-fail so a missing 0011 migration can't take down the whole admin page.
+    listAppUsers().catch(() => []),
   ]);
   const rsvps = await listRsvps(events.map((e) => e.id));
 
@@ -115,6 +118,23 @@ export default async function Admin({
         seats: s.seats,
         updatedAt: s.updatedAt,
       }))}
+      signups={appUsers.map((u) => {
+        const paid = subs
+          .filter((s) => s.userId === u.userId && isSubscriptionActive(s))
+          .map((s) => getPlan(s.side, s.plan)?.name ?? s.plan);
+        return {
+          id: u.userId,
+          name: u.displayName ?? "Unnamed",
+          email: u.email,
+          emailVerified: u.emailVerified,
+          role: u.role,
+          authMethods: u.authMethods,
+          plans: paid,
+          signedUpAt: u.signedUpAt,
+          lastActiveAt: u.lastActiveAt,
+          deleted: !!u.deletedAt,
+        };
+      })}
       feedback={feedback.map((f) => ({
         id: f.id,
         investor: who(f.investorUserId),

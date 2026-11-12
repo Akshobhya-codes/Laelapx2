@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { stackServerApp } from "@/stack";
+import { recordAppUser } from "@/lib/insforge/app-users";
 
 export type Role = "founder" | "investor";
 
@@ -13,5 +14,7 @@ export async function chooseRoleAction(role: Role): Promise<void> {
       role,
     },
   });
+  // Keep the app_users mirror's role current. Soft-fails.
+  await recordAppUser(user, { role });
   redirect(role === "founder" ? "/founder" : "/funder");
 }
