@@ -150,13 +150,15 @@ export async function respondConnectAction(
     message: string | null;
   };
 
-  await respondToConnect(connectId, accept);
-
   // Look up the submission to get founder id + slug + name.
   const sub = await getSubmissionBySlug(ownerSlug);
   if (!sub) throw new Error("Submission not found");
-  // Defense-in-depth: only the owner can respond.
+  // Authorize BEFORE mutating: only the owner of the startup this request
+  // was sent to may accept or decline it.
   if (sub.ownerUserId !== user.id) throw new Error("Not authorized");
+  if (connect.submission_id !== sub.id) throw new Error("Not authorized");
+
+  await respondToConnect(connectId, accept);
 
   if (accept) {
     // Create / fetch the conversation.
