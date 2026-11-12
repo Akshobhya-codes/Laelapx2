@@ -193,3 +193,64 @@ export function reviewDeliveredEmail(input: {
     }),
   };
 }
+
+/* ─── CONCIERGE APPLICATIONS ─────────────────────────────────────────── */
+
+export function conciergeAdminEmail(input: {
+  founderName: string;
+  founderEmail: string | null;
+  companyName: string;
+  fundName: string;
+  fundUrl: string;
+  includesKickoff: boolean;
+  notes: string | null;
+}) {
+  const rows = [
+    ["Founder", escapeHtml(input.founderName)],
+    ["Email", input.founderEmail ? escapeHtml(input.founderEmail) : "—"],
+    ["Company", escapeHtml(input.companyName)],
+    ["Apply to", `<a href="${escapeHtml(input.fundUrl)}" style="color:#2c5ba8;">${escapeHtml(input.fundName)}</a>`],
+    ["Kickoff call", input.includesKickoff ? "Paid — schedule it before applying" : "Already done"],
+    ["Notes", input.notes ? escapeHtml(input.notes) : "—"],
+  ]
+    .map(
+      ([k, v]) =>
+        `<tr><td style="padding:6px 10px 6px 0;font-size:12px;font-weight:700;color:#9a968e;text-transform:uppercase;letter-spacing:0.1em;vertical-align:top;">${k}</td><td style="padding:6px 0;font-size:14px;color:#191714;">${v}</td></tr>`
+    )
+    .join("");
+  return {
+    subject: `Apply for ${input.companyName} → ${input.fundName}`,
+    html: shell({
+      preheader: `A founder paid for us to apply to ${input.fundName}.`,
+      bodyHtml:
+        h("New application to submit") +
+        p("A Laelapx+ founder paid for the team to apply on their behalf:") +
+        `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 4px;">${rows}</table>`,
+      ctaLabel: "Open applications",
+      ctaHref: `${APP_URL}/admin?tab=applications`,
+    }),
+  };
+}
+
+export function conciergeReceiptEmail(input: {
+  founderFirstName: string;
+  fundName: string;
+  includesKickoff: boolean;
+}) {
+  return {
+    subject: `We're applying to ${input.fundName} for you`,
+    html: shell({
+      preheader: `Payment received. Here's what happens next.`,
+      bodyHtml:
+        h(`We've got it, ${escapeHtml(input.founderFirstName)}.`) +
+        p(
+          input.includesKickoff
+            ? `Before we apply to ${escapeHtml(input.fundName)}, we'll reach out to book your kickoff call, where we go through your company in depth so the application reads the way your best pitch does.`
+            : `We'll prepare your application to ${escapeHtml(input.fundName)} using what we learned in your kickoff call, then submit it and let you know.`
+        ) +
+        muted("You'll see the status on your dashboard as it moves from paid to in progress to submitted."),
+      ctaLabel: "Open your dashboard",
+      ctaHref: `${APP_URL}/founder`,
+    }),
+  };
+}

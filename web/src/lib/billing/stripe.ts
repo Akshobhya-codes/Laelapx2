@@ -62,6 +62,66 @@ export async function findPriceByLookupKey(
   return res.data[0] ?? null;
 }
 
+/**
+ * Concierge application checkout: $X per application, plus the one-time
+ * kickoff call on a founder's first request. Inline prices (price_data), so
+ * no Stripe products need creating in either sandbox or live.
+ */
+export async function createConciergeCheckout(input: {
+  customerId: string;
+  userId: string;
+  applicationId: string;
+  fundName: string;
+  applicationCents: number;
+  kickoffCents: number | null;
+  returnPath: string;
+}): Promise<{ url: string; sessionId: string }> {
+  const metadata = {
+    userId: input.userId,
+    kind: "concierge_application",
+    applicationId: input.applicationId,
+    includesKickoff: input.kickoffCents ? "1" : "0",
+  };
+  const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+  if (input.kickoffCents) {
+    line_items.push({
+      quantity: 1,
+      price_data: {
+        currency: "usd",
+        unit_amount: input.kickoffCents,
+        product_data: {
+          name: "Laelapx kickoff call",
+          description: "One-time call where our team learns your company before we apply on your behalf.",
+        },
+      },
+    });
+  }
+  line_items.push({
+    quantity: 1,
+    price_data: {
+      currency: "usd",
+      unit_amount: input.applicationCents,
+      product_data: {
+        name: `Application to ${input.fundName}`,
+        description: "Prepared and submitted by the Laelapx team on your behalf.",
+      },
+    },
+  });
+  const sep = input.returnPath.includes("?") ? "&" : "?";
+  const session = await getStripe().checkout.sessions.create({
+    mode: "payment",
+    customer: input.customerId,
+    client_reference_id: input.userId,
+    line_items,
+    payment_intent_data: { metadata },
+    metadata,
+    success_url: `${APP_URL}${input.returnPath}${sep}apply=paid`,
+    cancel_url: `${APP_URL}${input.returnPath}${sep}apply=cancelled`,
+  });
+  if (!session.url) throw new Error("Stripe did not return a checkout URL");
+  return { url: session.url, sessionId: session.id };
+}
+
 /* ─── CHECKOUT ───────────────────────────────────────────────────────── */
 
 export async function createSubscriptionCheckout(input: {

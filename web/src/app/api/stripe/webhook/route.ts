@@ -26,7 +26,15 @@ import {
   reviewOrderAdminEmail,
   reviewOrderReceiptEmail,
   subscriptionStartedEmail,
+  conciergeAdminEmail,
+  conciergeReceiptEmail,
 } from "@/lib/email/billing-templates";
+import {
+  getApplication,
+  getExternalFund,
+  updateApplication,
+  upsertKickoff,
+} from "@/lib/insforge/fund-network";
 import { adminEmails } from "@/lib/billing/admin";
 import { FOUNDER_REVIEW } from "@/lib/billing/plans";
 
@@ -100,6 +108,76 @@ async function onCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   if (session.mode === "payment" && session.metadata?.kind === "founder_review") {
     await onReviewPaid(session);
+  }
+
+  if (session.mode === "payment" && session.metadata?.kind === "concierge_application") {
+    await onConciergePaid(session);
+  }
+}
+
+/* ─── CONCIERGE APPLICATIONS ─────────────────────────────────────────── */
+
+async function onConciergePaid(session: Stripe.Checkout.Session) {
+  const applicationId = session.metadata?.applicationId;
+  if (!applicationId) return;
+  const app = await getApplication(applicationId);
+  if (!app || app.status !== "awaiting_payment") return; // already handled
+
+  await updateApplication(applicationId, { status: "paid", stripeCheckoutSessionId: session.id });
+  const includesKickoff = session.metadata?.includesKickoff === "1";
+  if (includesKickoff) {
+    await upsertKickoff(app.founderUserId, { status: "paid", stripeCheckoutSessionId: session.id });
+  }
+
+  after(() =>
+    notifyConciergePaid(app.id, includesKickoff, session).catch((e) =>
+      console.error("[stripe] concierge notify failed:", e)
+    )
+  );
+}
+
+async function notifyConciergePaid(applicationId: string, includesKickoff: boolean, session: Stripe.Checkout.Session) {
+  const app = await getApplication(applicationId);
+  if (!app) return;
+  const fund = await getExternalFund(app.fundDomain);
+  const founder = await stackServerApp.getUser(app.founderUserId);
+  const founderName = founder?.displayName ?? "A founder";
+  const founderEmail = founder?.primaryEmail ?? session.customer_details?.email ?? null;
+  const { data } = await getInsforge()
+    .database.from("submissions")
+    .select("company_name, slug")
+    .eq("id", app.submissionId)
+    .maybeSingle();
+  const sub = data as { company_name: string; slug: string } | null;
+  const fundName = fund?.fundName ?? app.fundDomain;
+
+  const admins = adminEmails();
+  if (admins.length) {
+    const tpl = conciergeAdminEmail({
+      founderName,
+      founderEmail,
+      companyName: sub?.company_name ?? "their company",
+      fundName,
+      fundUrl: fund?.applyUrl || fund?.websiteUrl || `https://${app.fundDomain}`,
+      includesKickoff,
+      notes: app.founderNotes,
+    });
+    await sendEmail({ to: admins.join(", "), subject: tpl.subject, html: tpl.html });
+  }
+
+  await createNotification({
+    userId: app.founderUserId,
+    kind: "application_requested",
+    payload: { fundName, message: `We're applying to ${fundName} for you.` },
+    href: sub ? `/founder/${sub.slug}` : "/founder",
+  });
+  if (founderEmail) {
+    const tpl = conciergeReceiptEmail({
+      founderFirstName: founderName.split(" ")[0],
+      fundName,
+      includesKickoff,
+    });
+    await sendEmail({ to: founderEmail, subject: tpl.subject, html: tpl.html });
   }
 }
 

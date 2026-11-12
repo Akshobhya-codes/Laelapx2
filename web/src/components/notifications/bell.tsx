@@ -28,6 +28,7 @@ const KIND_META: Record<NotificationKind, { icon: string; color: string }> = {
   review_delivered: { icon: "✓", color: "bg-flag-green/15 text-flag-green" },
   support_reply: { icon: "💬", color: "bg-blue/15 text-blue" },
   deal_assigned: { icon: "→", color: "bg-blue/15 text-blue" },
+  application_requested: { icon: "↗", color: "bg-flag-green/15 text-flag-green" },
 };
 
 export function NotificationsBell() {
@@ -276,6 +277,8 @@ function titleFor(n: StoredNotification): string {
       return "The Laelapx team replied";
     case "deal_assigned":
       return `${from} assigned you ${startup ?? "a deal"}`;
+    case "application_requested":
+      return `We're applying to ${n.payload.fundName ?? "a fund"} for you`;
   }
 }
 

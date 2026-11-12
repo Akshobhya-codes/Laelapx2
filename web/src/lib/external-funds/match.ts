@@ -2,9 +2,8 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import type { StoredSubmission } from "@/lib/insforge/submissions";
 import { thesisFitScore } from "@/lib/insforge/investors";
-import { buildVcQuery, serpSearch } from "./serp";
-import { fetchAndCleanPage } from "./scrape";
-import { extractFund } from "./extract";
+import { upsertExternalFunds } from "@/lib/insforge/fund-network";
+import { discoverFunds } from "./discover";
 import type { ExternalFund, ExternalFundMatch } from "./types";
 
 const CACHE_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
@@ -17,45 +16,14 @@ function bucketKey(stage: string, sectors: string[]): string {
 /**
  * Build a fund corpus for a given (stage, sectors) bucket. Cached for 7 days
  * across all founders in the bucket. First founder pays the latency; everyone
- * else hits cache.
+ * else hits cache. Every fund found is also recorded in `external_funds`
+ * (the fund network behind the homepage marquee and fund applications).
  */
 const buildBucket = unstable_cache(
   async (stage: string, sectors: string[]): Promise<ExternalFund[]> => {
-    const query = buildVcQuery({ stage, sectors });
-    const results = await serpSearch(query, { num: 10 });
-    if (results.length === 0) return [];
-
-    // Drop obvious non-fund domains we can't filter via SERP exclusions alone.
-    const filtered = results.filter((r) => isLikelyFundUrl(r.url));
-
-    const pages = await Promise.all(
-      filtered.slice(0, 8).map((r) => fetchAndCleanPage(r.url))
-    );
-
-    const extractions = await Promise.all(
-      pages.map((p) =>
-        p
-          ? extractFund({
-              pageText: p.text,
-              sourceUrl: p.finalUrl,
-              candidateApplyUrls: p.candidateApplyUrls,
-            })
-          : Promise.resolve(null)
-      )
-    );
-
-    // De-duplicate by fund name (case-insensitive) — sometimes a fund has
-    // multiple pages in SERP results (homepage + thesis page).
-    const seen = new Set<string>();
-    const out: ExternalFund[] = [];
-    for (const f of extractions) {
-      if (!f) continue;
-      const k = f.fundName.toLowerCase();
-      if (seen.has(k)) continue;
-      seen.add(k);
-      out.push(f);
-    }
-    return out;
+    const funds = await discoverFunds(stage, sectors);
+    await upsertExternalFunds(funds);
+    return funds;
   },
   ["external-funds-v1"],
   { revalidate: CACHE_TTL_SECONDS }
@@ -94,35 +62,6 @@ export async function matchExternalFunds(
     .filter((m) => m.fitScore >= minScore)
     .sort((a, b) => b.fitScore - a.fitScore)
     .slice(0, top);
-}
-
-const FUND_HOST_BLOCKLIST = [
-  "linkedin.com",
-  "crunchbase.com",
-  "pitchbook.com",
-  "ycombinator.com",
-  "wikipedia.org",
-  "reddit.com",
-  "medium.com",
-  "forbes.com",
-  "techcrunch.com",
-  "bloomberg.com",
-  "axios.com",
-  "twitter.com",
-  "x.com",
-  "youtube.com",
-  "facebook.com",
-];
-
-function isLikelyFundUrl(url: string): boolean {
-  try {
-    const host = new URL(url).hostname.toLowerCase();
-    return !FUND_HOST_BLOCKLIST.some(
-      (b) => host === b || host.endsWith(`.${b}`)
-    );
-  } catch {
-    return false;
-  }
 }
 
 export { bucketKey };

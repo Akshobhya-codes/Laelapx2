@@ -14,7 +14,9 @@ export type NotificationKind =
   | "review_delivered"
   // Plan features (migration 0010)
   | "support_reply"
-  | "deal_assigned";
+  | "deal_assigned"
+  // Fund network (migration 0012)
+  | "application_requested";
 
 export type NotificationPayload = {
   startupSlug?: string;

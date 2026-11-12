@@ -13,6 +13,12 @@ import {
   type SupportThreadView,
   type AdminEventView,
 } from "./admin-tools";
+import {
+  ApplicationsAdmin,
+  type AdminApplicationView,
+  type AdminKickoffView,
+  type AdminFundView,
+} from "./admin-applications";
 
 type Person = { name: string; email: string | null };
 
@@ -67,11 +73,14 @@ type Props = {
   }[];
   support: SupportThreadView[];
   events: AdminEventView[];
+  applications: AdminApplicationView[];
+  kickoffs: AdminKickoffView[];
+  funds: AdminFundView[];
   initialTab: Tab;
   initialThread: string | null;
 };
 
-export type Tab = "reviews" | "support" | "events" | "subscribers" | "signups" | "pilot";
+export type Tab = "reviews" | "applications" | "support" | "events" | "subscribers" | "signups" | "pilot";
 
 const fmt = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—";
@@ -88,6 +97,9 @@ export function AdminPage({
   feedback,
   support,
   events,
+  applications,
+  kickoffs,
+  funds,
   initialTab,
   initialThread,
 }: Props) {
@@ -125,6 +137,7 @@ export function AdminPage({
           {(
             [
               ["reviews", `Review queue (${orders.filter((o) => o.status !== "delivered" && o.status !== "refunded").length})`],
+              ["applications", `Applications (${applications.filter((a) => a.mode === "concierge" && (a.status === "paid" || a.status === "in_progress")).length} to do)`],
               ["support", `Support${unreadSupport ? ` (${unreadSupport} new)` : ` (${support.length})`}`],
               ["events", `Events (${upcoming} upcoming)`],
               ["subscribers", `Subscribers (${subscribers.length})`],
@@ -148,6 +161,7 @@ export function AdminPage({
         </div>
 
         <div className="mt-8">
+          {tab === "applications" && <ApplicationsAdmin applications={applications} kickoffs={kickoffs} funds={funds} />}
           {tab === "support" && <SupportInbox threads={support} initialThread={initialThread} />}
           {tab === "events" && <EventsManager events={events} />}
           {tab === "reviews" && (
