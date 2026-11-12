@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import clsx from "clsx";
 import {
-  adminSetFundInMarqueeAction,
   adminUpdateApplicationAction,
   adminUpdateKickoffAction,
 } from "@/app/actions/fund-applications";
@@ -115,12 +114,12 @@ export function ApplicationsAdmin({
       <section>
         <h3 className="text-[18px] font-extrabold tracking-tight text-navy">Fund network ({funds.length})</h3>
         <p className="mt-1 text-[13px] text-ink-soft">
-          Every outside fund our research has matched to a founder. Turn one off to drop it from the homepage marquee.
+          Every outside fund our research has matched to a Laelapx+ founder.
         </p>
         {funds.length === 0 ? (
           <Empty>No funds recorded yet. They appear as Laelapx+ founders open their dashboards.</Empty>
         ) : (
-          <Table head={["Fund", "Last matched", "Homepage marquee"]}>
+          <Table head={["Fund", "Last matched"]}>
             {funds.map((f) => (
               <FundRow key={f.domain} fund={f} />
             ))}
@@ -206,25 +205,13 @@ function KickoffRow({ kickoff }: { kickoff: AdminKickoffView }) {
 }
 
 function FundRow({ fund }: { fund: AdminFundView }) {
-  const [on, setOn] = useState(fund.showInMarquee);
-  const [pending, start] = useTransition();
   return (
-    <tr className={clsx(!on && "opacity-50")}>
+    <tr>
       <td className="px-4 py-3">
         <a href={fund.websiteUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink hover:text-blue">{fund.fundName}</a>
         <div className="text-[11px] text-ink-faint">{fund.domain}</div>
       </td>
       <td className="px-4 py-3">{fmt(fund.lastSeenAt)}</td>
-      <td className="px-4 py-3">
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => start(async () => { const next = !on; await adminSetFundInMarqueeAction(fund.domain, next); setOn(next); })}
-          className={clsx("rounded-full px-3 py-1 text-[11px] font-bold", on ? "bg-flag-green/15 text-flag-green" : "bg-ink/8 text-ink-faint")}
-        >
-          {on ? "Shown" : "Hidden"}
-        </button>
-      </td>
     </tr>
   );
 }

@@ -18,7 +18,7 @@ import {
   upsertKickoff,
 } from "@/lib/insforge/fund-network";
 import { requireAdmin } from "@/lib/billing/admin";
-import { setFundInMarquee, type ApplicationStatus, type KickoffStatus } from "@/lib/insforge/fund-network";
+import type { ApplicationStatus, KickoffStatus } from "@/lib/insforge/fund-network";
 
 /**
  * Applying to out-of-network funds (Laelapx+). Two ways:
@@ -136,11 +136,5 @@ export async function adminUpdateKickoffAction(input: {
     scheduledFor: input.scheduledFor,
     adminNotes: input.adminNotes,
   });
-  revalidatePath("/admin");
-}
-
-export async function adminSetFundInMarqueeAction(domain: string, show: boolean): Promise<void> {
-  await requireAdmin();
-  await setFundInMarquee(domain, show);
   revalidatePath("/admin");
 }

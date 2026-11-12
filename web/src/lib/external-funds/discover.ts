@@ -7,7 +7,7 @@ import type { ExternalFund } from "./types";
  * The uncached fund-discovery pipeline: search the web for funds matching a
  * (stage, sectors) bucket, read each fund's page, and extract structured
  * data with the LLM. `match.ts` wraps this in a 7-day cache for the founder
- * dashboard; `scripts/backfill-fund-network.ts` calls it directly.
+ * dashboard; `/api/dev/backfill-fund-network` (local dev only) calls it directly.
  *
  * Deliberately free of `next/cache` so it runs outside Next.js too.
  */

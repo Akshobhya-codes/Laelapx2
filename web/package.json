@@ -9,8 +9,7 @@
     "lint": "eslint",
     "stripe:setup": "node scripts/stripe-setup.mjs",
     "stripe:listen": "node scripts/stripe-listen.mjs",
-    "sync:users": "node scripts/sync-app-users.mjs",
-    "fund-network:backfill": "tsx --conditions=react-server --env-file=.env.local scripts/backfill-fund-network.ts"
+    "sync:users": "node scripts/sync-app-users.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
